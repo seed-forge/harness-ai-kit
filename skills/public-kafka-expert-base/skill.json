@@ -1,0 +1,55 @@
+{
+  "namespace": "team",
+  "id": "public-kafka-expert-base",
+  "name": "public-kafka-expert-base",
+  "owner": "team",
+  "version": "0.1.0",
+  "status": "draft",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "summary": "Kafka 知识基座：Topics/Partitions、Consumer Groups、Producer Config、Serialization、Exactly-Once、Rebalancing。供 devlab-middleware-expert 通过 extends 继承。借鉴自 confluentinc/agent-skills。",
+  "tags": [
+    "kafka",
+    "queue",
+    "knowledge-base",
+    "extends-base",
+    "streaming"
+  ],
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "kiro"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "team-skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "This is a knowledge base skill, designed to be extended by other skills via the extends mechanism.",
+    "Design topics around domain events, not database tables.",
+    "Choose partition count based on throughput needs and consumer parallelism.",
+    "Always handle consumer rebalancing gracefully."
+  ],
+  "post_install_hints": [],
+  "updated_at": "2026-07-09"
+}

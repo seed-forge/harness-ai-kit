@@ -1,0 +1,54 @@
+{
+  "namespace": "team",
+  "id": "public-rabbitmq-expert-base",
+  "name": "public-rabbitmq-expert-base",
+  "owner": "team",
+  "version": "0.1.0",
+  "status": "draft",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "summary": "RabbitMQ 知识基座：Exchange Types、Queue & Routing、Durability、Dead Letter、Confirmations。供 devlab-middleware-expert 通过 extends 继承。借鉴自 mindrally/skills。",
+  "tags": [
+    "rabbitmq",
+    "queue",
+    "knowledge-base",
+    "extends-base",
+    "amqp"
+  ],
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "kiro"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "team-skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "This is a knowledge base skill, designed to be extended by other skills via the extends mechanism.",
+    "Always declare queues and exchanges explicitly — don't rely on defaults.",
+    "Use publisher confirms and consumer acknowledgments for reliability."
+  ],
+  "post_install_hints": [],
+  "updated_at": "2026-07-09"
+}

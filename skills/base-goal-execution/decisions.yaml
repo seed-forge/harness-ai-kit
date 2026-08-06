@@ -1,0 +1,13 @@
+decisions:
+  - id: HD-1
+    point: 交付确认（Phase 4）
+    trigger: 所有任务执行完毕、进入交付阶段输出交付报告后
+    options: [用户确认验收 / 退回修复未达标项]
+    default: 必问
+    rationale: 交付需用户逐条核对验收标准达成，不由 AI 单方判定完成
+  - id: HD-2
+    point: 超出原计划范围的变更
+    trigger: 执行中遇到需要超出原 Goal 范围的变更时
+    options: [停止并与用户确认扩展范围 / 维持原范围]
+    default: 必问
+    rationale: 范围蔓延需人工确认，避免擅自扩大改动面

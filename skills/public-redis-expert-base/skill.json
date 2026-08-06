@@ -1,0 +1,55 @@
+{
+  "namespace": "team",
+  "id": "public-redis-expert-base",
+  "name": "public-redis-expert-base",
+  "owner": "team",
+  "version": "0.1.1",
+  "status": "draft",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "summary": "Redis 知识基座：数据结构选型、Key 命名、连接池/Pipeline、集群/副本读取、TTL 与淘汰。供 devlab-middleware-expert 通过 extends 继承。借鉴自 redis/agent-skills。",
+  "tags": [
+    "redis",
+    "database",
+    "knowledge-base",
+    "extends-base",
+    "cache"
+  ],
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "kiro"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "team-skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "This is a knowledge base skill, designed to be extended by other skills via the extends mechanism.",
+    "Pick the data structure that matches the access pattern, not just the shape of the data.",
+    "Use colon-separated key names with a stable hierarchy.",
+    "Always use connection pooling or multiplexing; never one connection per request."
+  ],
+  "post_install_hints": [],
+  "updated_at": "2026-07-09"
+}

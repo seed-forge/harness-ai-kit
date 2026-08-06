@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip install -e ".[dev]" || pip install -e . && pip install ruff pytest
+      - name: Lint
+        run: ruff check ai_kit/ --select=E9,F63,F7,F82 --ignore=F401,F811
+      - name: Import check
+        run: python -c "import ai_kit; print('import OK')"
+      - name: CLI smoke test
+        run: |
+          ai-kit --version
+          ai-kit --help
+          ai-kit doctor
+      - name: Validate skills
+        run: |
+          if [ -d skills ]; then
+            python -c "
+            from pathlib import Path
+            import json, sys
+            errors = []
+            for skill_dir in sorted(Path('skills').iterdir()):
+                manifest = skill_dir / 'skill.json'
+                if manifest.exists():
+                    try:
+                        json.loads(manifest.read_text())
+                    except Exception as e:
+                        errors.append(f'{skill_dir.name}: {e}')
+            if errors:
+                print('Validation errors:', file=sys.stderr)
+                for e in errors: print(f'  {e}', file=sys.stderr)
+                sys.exit(1)
+            print(f'Validated {len(list(Path(\"skills\").iterdir()))} skills')
+            "
+          fi
+
+  sensitive-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for internal references
+        run: |
+          set -e
+          PATTERNS="askying|giteaee|nexus\.base|10\.147\.17|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\."
+          FOUND=$(grep -rnE "$PATTERNS" ai_kit/ skills/ 2>/dev/null || true)
+          if [ -n "$FOUND" ]; then
+            echo "ERROR: Internal references detected:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "No internal references found."
+      - name: Scan for secrets
+        run: |
+          set -e
+          SECRET_PATTERNS="sk-[A-Za-z0-9]{20,}|password\s*[:=]\s*['\"][^'\"]{6,}|api[_-]?key\s*[:=]\s*['\"][^'\"]{8,}"
+          FOUND=$(grep -rnEi "$SECRET_PATTERNS" ai_kit/ skills/ 2>/dev/null || true)
+          if [ -n "$FOUND" ]; then
+            echo "WARNING: Potential secrets detected (review manually):"
+            echo "$FOUND"
+          fi
+          echo "Secret scan complete."

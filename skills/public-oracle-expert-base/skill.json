@@ -1,0 +1,54 @@
+{
+  "namespace": "team",
+  "id": "public-oracle-expert-base",
+  "name": "public-oracle-expert-base",
+  "owner": "team",
+  "version": "0.1.0",
+  "status": "draft",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "summary": "Oracle 知识基座：Connection Types（SID/ServiceName/TNS）、JDBC Driver、Connection Pool、LOB Handling、Character Set。供 devlab-middleware-expert 通过 extends 继承。",
+  "tags": [
+    "oracle",
+    "database",
+    "knowledge-base",
+    "extends-base",
+    "rdbms"
+  ],
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "kiro"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "team-skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "This is a knowledge base skill, designed to be extended by other skills via the extends mechanism.",
+    "Use Service Name connection format, not legacy SID.",
+    "Use thin JDBC driver for most cases; thick/OCI only for advanced features."
+  ],
+  "post_install_hints": [],
+  "updated_at": "2026-07-09"
+}

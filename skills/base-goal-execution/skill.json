@@ -1,0 +1,43 @@
+{
+  "namespace": "team",
+  "id": "base-goal-execution",
+  "name": "base-goal-execution",
+  "owner": "team",
+  "version": "0.1.1",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "goal",
+    "plan",
+    "execution",
+    "workflow",
+    "base"
+  ],
+  "summary": "Goal 驱动执行：将计划转化为可追踪、可恢复、有验收标准的闭环执行流程。适用于 Qoder Plan 文件及任何多步工程任务。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "kiro",
+    "cursor",
+    "qoder"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "team-skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [],
+  "post_install_hints": [
+    "安装后请确认 AGENTS.md 中已自动注入「Goal 驱动执行」章节（由 agents_md_inject 驱动）。",
+    "如未自动注入，可手动将 SKILL.md 路径添加到项目的 AGENTS.md 中。"
+  ],
+  "agents_md_inject": "## Goal 驱动执行\n\n本工作空间采用 **Goal 驱动执行** 模式（详见 `.agents/skills/base-goal-execution/SKILL.md`）。\n\n### 核心规则\n\n1. **制定计划时**：必须包含 Goal（一句话目标）、Acceptance Criteria（可验证的验收标准）、Tasks（按依赖拓扑排序的任务列表）。\n2. **执行计划时**：逐任务执行、即时验证、进度可观测、失败有恢复策略。\n3. **交付时**：逐条核对验收标准，输出交付报告，列出剩余风险。\n\n### 适用范围\n\n- AI 通过 Qoder `CreatePlan` 工具生成的计划文件（包括 `SharedClientCache/cache/plans/*.md`）\n- 手写的任务清单或方案文档\n- 任何涉及 3 个以上步骤的工程任务",
+  "updated_at": "2026-07-12"
+}

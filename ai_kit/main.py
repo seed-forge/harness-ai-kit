@@ -193,7 +193,7 @@ def activate_entry_product(product_key: str | None = None) -> ProductProfile:
 def _get_cli_version() -> str:
     """Return the installed package version, falling back to pyproject.toml."""
     try:
-        return importlib.metadata.version("ai-kit")
+        return importlib.metadata.version("harness-ai-kit")
     except importlib.metadata.PackageNotFoundError:
         pass
     pyproject = Path(__file__).resolve().parent.parent.parent / "pyproject.toml"

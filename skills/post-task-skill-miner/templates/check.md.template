@@ -1,0 +1,53 @@
+# Checker — {{loop_name}}
+
+独立验证 Maker 产出的质量。不依赖 Maker 的内部推理过程，仅基于输入和输出做客观判定。
+
+## Verification Target
+
+验证 Maker 对 `{{maker_input_summary}}` 的处理结果是否符合预期。
+
+## Rubric Dimensions
+
+{{rubric_dimensions}}
+
+### 评分规则
+
+- 每个维度独立评分（0.0 ~ 1.0）
+- 加权总分 = Σ(dimension_weight × dimension_score)
+- 通过阈值：`{{pass_threshold}}`
+- `must_pass` 维度的分数低于 0.5 时，无论总分如何，判定为失败
+
+## Failure Conditions
+
+- {{failure_condition_1}}
+- {{failure_condition_2}}
+- 累计失败次数 ≥ 3 → 终止循环并升级
+- Checker 评分连续 3 轮无提升（stagnation）→ 终止循环并升级
+
+## Report Format
+
+按以下格式输出验证报告：
+
+```markdown
+## Checker Report
+
+### Dimension Scores
+| Dimension | Weight | Score | Verdict |
+|-----------|--------|-------|---------|
+| {{rubric_dim_1}} | {{weight_1}} | {{score_1}} | {{verdict_1}} |
+| {{rubric_dim_2}} | {{weight_2}} | {{score_2}} | {{verdict_2}} |
+
+### Weighted Total: {{total_score}} / {{pass_threshold}}
+### Verdict: PASS / FAIL
+### Issues Found:
+- {{issue_1}}
+- {{issue_2}}
+### Recommendation:
+- {{recommendation}}
+```
+
+## Constraints
+
+- 只做验证，不做修复。修复由 Maker 在下一轮迭代中处理。
+- 验证必须可重复。同一输入在同一条件下应产出相同判定结果。
+- 不要接受"看起来差不多"的主观判定。所有维度必须基于可量化或可二元判定的标准。

@@ -1,0 +1,58 @@
+{
+  "namespace": "team",
+  "id": "public-mysql-expert-base",
+  "name": "public-mysql-expert-base",
+  "owner": "team",
+  "version": "0.1.1",
+  "status": "draft",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "summary": "MySQL/InnoDB 知识基座：schema 设计、索引策略、查询调优、事务与锁、运维操作。供 devlab-middleware-expert 技能通过 extends 继承。借鉴自 planetscale/database-skills，去除 PlanetScale 特有内容。",
+  "tags": [
+    "mysql",
+    "database",
+    "knowledge-base",
+    "extends-base",
+    "innodb"
+  ],
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "kiro"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "team-skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "This is a knowledge base skill, designed to be extended by other skills via the extends mechanism.",
+    "Prefer measured evidence (EXPLAIN, metrics) over blanket rules of thumb.",
+    "Note MySQL-version-specific behavior when giving advice.",
+    "Ask for explicit human approval before destructive data operations (drops/deletes/truncates)."
+  ],
+  "post_install_hints": [
+    "This skill is typically hidden from IDE listings and merged into extending skills.",
+    "If used directly, load the reference files as needed for each topic area."
+  ],
+  "updated_at": "2026-07-09"
+}

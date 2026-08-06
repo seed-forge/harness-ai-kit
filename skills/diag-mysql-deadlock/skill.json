@@ -1,0 +1,60 @@
+{
+  "namespace": "diag",
+  "id": "diag-mysql-deadlock",
+  "name": "diag-mysql-deadlock",
+  "owner": "team",
+  "version": "0.1.0",
+  "status": "draft",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "diag",
+    "mysql",
+    "deadlock",
+    "innodb",
+    "diagnostic"
+  ],
+  "summary": "MySQL 死锁全链诊断：捕获 InnoDB 状态、解析锁链、分类模式（AB-BA/Gap Lock/FK/Auto-Inc）、查找长事务，输出结构化报告与三级修复建议。",
+  "compatible_clients": [
+    "codex",
+    "claude-code"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "team-skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "MySQL PROCESS privilege required for SHOW ENGINE INNODB STATUS.",
+    "Do not guess passwords; prompt user for connection info when missing."
+  ],
+  "post_install_hints": [
+    "Pair with infra-datasource-ops for MySQL connection string management."
+  ],
+  "recommended_tools": [
+    "db_query",
+    "db_get_status",
+    "db_get_processlist"
+  ],
+  "contributors": [],
+  "skill_type": "diagnostic",
+  "updated_at": "2026-07-08"
+}

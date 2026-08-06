@@ -1,0 +1,42 @@
+{
+  "namespace": "team",
+  "id": "markitdown",
+  "name": "markitdown",
+  "owner": "team",
+  "version": "0.1.0",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "document",
+    "markdown",
+    "conversion",
+    "docx",
+    "pdf"
+  ],
+  "summary": "调用已安装的 MarkItDown，把 docx、pdf、pptx、xlsx、图片、html、csv 等资料稳定转换为 markdown。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "kiro",
+    "cursor"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "team-skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [
+    "Requires Python runtime with the markitdown package and the verified extra parser dependencies installed."
+  ],
+  "post_install_hints": [
+    "If markitdown is not on PATH, use `python -m markitdown` or a local wrapper script."
+  ],
+  "updated_at": "2026-05-09"
+}

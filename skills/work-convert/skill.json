@@ -1,0 +1,103 @@
+{
+  "namespace": "work",
+  "id": "work-convert",
+  "name": "work-convert",
+  "owner": "team",
+  "version": "0.2.5",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "work",
+    "office",
+    "document",
+    "convert",
+    "format"
+  ],
+  "summary": "办公文档格式互转编排：文件 → 文件格式转换（docx→pdf, pptx→pdf 等），依赖 soffice 和社区上游技能。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "qoder"
+  ],
+  "installation": {
+    "default_scope": "global"
+  },
+  "dependencies": [
+    {
+      "type": "skill",
+      "namespace": "work",
+      "id": "work-markitdown",
+      "version": ">=0.2.0",
+      "scope": "required"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "docx",
+      "source_url": "https://github.com/anthropics/skills/tree/main/skills/docx",
+      "version": "latest",
+      "scope": "required"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "pdf",
+      "source_url": "https://github.com/anthropics/skills/tree/main/skills/pdf",
+      "version": "latest",
+      "scope": "required"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "xlsx",
+      "source_url": "https://github.com/anthropics/skills/tree/main/skills/xlsx",
+      "version": "latest",
+      "scope": "required"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "pptx",
+      "source_url": "https://github.com/anthropics/skills/tree/main/skills/pptx",
+      "version": "latest",
+      "scope": "required"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "team-skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [
+      {
+        "name": "soffice",
+        "command": "soffice --version"
+      }
+    ],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": [
+      "soffice --version"
+    ]
+  },
+  "runtime_requirements": [
+    "LibreOffice soffice is the primary conversion engine.",
+    "On Windows, soffice path: C:\\Program Files\\LibreOffice\\program\\soffice.exe",
+    "Always verify output file is non-empty and renders correctly."
+  ],
+  "post_install_hints": [
+    "Install LibreOffice if soffice is not available."
+  ],
+  "updated_at": "2026-07-16"
+}

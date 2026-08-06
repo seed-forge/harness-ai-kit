@@ -1,0 +1,47 @@
+# {{loop_name}}
+
+{{loop_description}}
+
+## Context
+
+- Session source: `{{source_session_id}}`
+- Generated from: `{{source_summaries}}`
+- Tags: {{loop_tags}}
+
+## Input
+
+- {{maker_input_1}}
+- {{maker_input_2}}
+
+## Workflow
+
+### Step 1: {{step_1_title}}
+
+{{step_1_description}}
+
+### Step 2: {{step_2_title}}
+
+{{step_2_description}}
+
+### Step 3: {{step_3_title}}
+
+{{step_3_description}}
+
+{{maker_steps}}
+
+## Constraints
+
+- {{constraint_1}}
+- {{constraint_2}}
+- Do not modify files outside the target scope.
+- Follow existing code conventions in the target repository.
+
+## Success Criteria
+
+- {{success_criterion_1}}
+- {{success_criterion_2}}
+
+## Dependencies
+
+- {{dependency_1}}
+- {{dependency_2}}

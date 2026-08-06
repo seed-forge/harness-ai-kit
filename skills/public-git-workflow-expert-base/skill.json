@@ -1,0 +1,69 @@
+{
+  "namespace": "team",
+  "id": "public-git-workflow-expert-base",
+  "name": "public-git-workflow-expert-base",
+  "owner": "team",
+  "version": "0.1.2",
+  "status": "draft",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "summary": "Git 工作流知识基座：extends netresearch/git-workflow-skill 上游通用 Git 知识，叠加团队 commit 规范、分支策略、Gitea 工作流、CI/CD 集成、镜像同步经验。供下游技能通过 extends 继承。",
+  "tags": [
+    "git",
+    "workflow",
+    "knowledge-base",
+    "extends-base",
+    "conventional-commits",
+    "gitea"
+  ],
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "kiro"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "team-skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [
+      {
+        "name": "git",
+        "command": "git",
+        "install_commands": [
+          "apt-get install -y git",
+          "brew install git"
+        ]
+      }
+    ],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": [
+      "git --version"
+    ]
+  },
+  "runtime_requirements": [
+    "This is a knowledge base skill, designed to be extended by other skills via the extends mechanism.",
+    "Always follow Conventional Commits format for commit messages.",
+    "No direct push to main — always open a PR.",
+    "No squash unless explicitly asked.",
+    "Force-push only with --force-with-lease.",
+    "Use giteactl/tea for Gitea operations; gh for GitHub."
+  ],
+  "post_install_hints": [],
+  "updated_at": "2026-07-23"
+}

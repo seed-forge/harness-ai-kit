@@ -1,0 +1,60 @@
+{
+  "namespace": "team",
+  "id": "public-nl2sql-expert-base",
+  "name": "public-nl2sql-expert-base",
+  "owner": "team",
+  "version": "0.1.1",
+  "status": "draft",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "summary": "NL2SQL/Text2SQL 知识基座：两阶段架构(NL2DSL2SQL)、查询类型分类、字段/术语映射、条件与 metric 抽取、多表 JOIN 推理、SQL 正确性与评测。供 devlab-nl2sql-engineering 通过 extends 继承。",
+  "tags": [
+    "nl2sql",
+    "text2sql",
+    "dsl",
+    "knowledge-base",
+    "extends-base",
+    "rag"
+  ],
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "kiro",
+    "qoder"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "team-skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "This is a knowledge base skill, designed to be extended via the extends mechanism.",
+    "Prefer measured evidence (评测集正确率/EXPLAIN) over blanket rules.",
+    "Distinguish 表象修复 vs 根因修复; avoid symptom-only patches.",
+    "Ask for explicit human approval before destructive schema/data operations."
+  ],
+  "post_install_hints": [
+    "Typically hidden from IDE listings and merged into extending skills.",
+    "Load reference files per topic area as needed."
+  ],
+  "updated_at": "2026-07-24"
+}

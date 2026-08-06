@@ -1,0 +1,42 @@
+{
+  "namespace": "team",
+  "id": "infra-system-env-ops",
+  "name": "infra-system-env-ops",
+  "owner": "team",
+  "version": "0.2.1",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "infra",
+    "homelab",
+    "linux",
+    "port-forward",
+    "iptables",
+    "network",
+    "windows",
+    "ssh-tunnel",
+    "monit",
+    "watchdog",
+    "service-reliability"
+  ],
+  "summary": "基础设施系统环境运维 Skill。v1 覆盖端口转发/iptables/portproxy/SSH tunnel，v2 扩展 Monit 统一看门狗、服务崩溃自愈、系统资源监控和 Mattermost 告警集成。",
+  "compatible_clients": [
+    "codex",
+    "claude-code"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "team-skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [],
+  "post_install_hints": [],
+  "updated_at": "2026-05-14"
+}

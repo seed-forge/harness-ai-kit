@@ -1,0 +1,46 @@
+{
+  "namespace": "team",
+  "id": "base-cn-registry-mirror-strategy",
+  "name": "base-cn-registry-mirror-strategy",
+  "owner": "team",
+  "version": "0.1.5",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "docker",
+    "ci",
+    "mirror",
+    "debian",
+    "alpine",
+    "npm",
+    "pip",
+    "maven",
+    "gradle",
+    "golang"
+  ],
+  "summary": "国内镜像源与代理分层策略：覆盖 Docker 拉取、Debian/Alpine 包管理、Node/npm、Python/pip、Maven/Gradle 与 Go 模块，便于 Dockerfile 与 CI 统一维护。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "kiro",
+    "cursor"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "team-skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [],
+  "post_install_hints": [
+    "镜像站可用性会随时间变化；正文以「变量 + 默认候选」为主，团队应在内网文档或私有 registry 中维护最终落点。",
+    "涉及公司合规时，优先使用组织提供的制品库与代理，而不是公共镜像。"
+  ],
+  "updated_at": "2026-05-22"
+}
