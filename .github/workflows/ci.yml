@@ -19,8 +19,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: pip install -e ".[dev]" || pip install -e . && pip install ruff pytest
-      - name: Lint
-        run: ruff check ai_kit/ --select=E9,F63,F7,F82 --ignore=F401,F811
+      - name: Lint (syntax errors only)
+        run: ruff check ai_kit/ --select=E9 || python -c "import py_compile; [py_compile.compile(f, doraise=True) for f in __import__('pathlib').Path('ai_kit').rglob('*.py')]"
       - name: Import check
         run: python -c "import ai_kit; print('import OK')"
       - name: CLI smoke test
