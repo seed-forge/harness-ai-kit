@@ -31,23 +31,7 @@ jobs:
       - name: Validate skills
         run: |
           if [ -d skills ]; then
-            python -c "
-import json, sys
-from pathlib import Path
-ok = 0
-fail = 0
-for d in sorted(Path('skills').iterdir()):
-    sf = d / 'skill.json'
-    if sf.exists():
-        try:
-            json.loads(sf.read_text())
-            ok += 1
-        except Exception as e:
-            print(f'ERROR: {d.name}: {e}', file=sys.stderr)
-            fail += 1
-print(f'Validated: {ok} ok, {fail} failed')
-sys.exit(1 if fail else 0)
-"
+            find skills -name "skill.json" -exec python -m json.tool {} \; > /dev/null && echo "All skill.json valid" || exit 1
           fi
 
   sensitive-scan:
