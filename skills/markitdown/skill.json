@@ -28,7 +28,7 @@
   "sources": {
     "preferred": [
       "repo-checkout",
-      "team-skill-registry"
+      "skill-registry"
     ],
     "allow_fallback": true
   },

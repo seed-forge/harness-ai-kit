@@ -5,7 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 SOURCE_REPO = "repo-checkout"
-SOURCE_REGISTRY = "team-skill-registry"
+SOURCE_REGISTRY = "skill-registry"
 SOURCE_WORKSPACE_REPO = SOURCE_REPO
 SOURCE_INTERNAL_REGISTRY = SOURCE_REGISTRY
 SOURCE_PUBLIC_REGISTRY = "public-registry"
@@ -91,7 +91,7 @@ class SourcePolicy(BaseModel):
     preferred: list[
         Literal[
             "repo-checkout",
-            "team-skill-registry",
+            "skill-registry",
             "public-registry",
             "git-repo",
             "local-cache",

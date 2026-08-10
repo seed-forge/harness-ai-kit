@@ -131,7 +131,7 @@ def add_inspect_resolution_parsers(subparsers: Any, *, runtime_choices: Sequence
     list_parser.add_argument("--repo-root", help="Explicit ai-kit repository root.")
     list_parser.add_argument("--sync-repo", action="store_true", help="Sync the repo before listing skills.")
 
-    resolve_parser = subparsers.add_parser("resolve", help="Resolve a team skill dependency graph without installing it.")
+    resolve_parser = subparsers.add_parser("resolve", help="Resolve a skill dependency graph without installing it.")
     resolve_parser.add_argument("asset_kind", choices=["skill", "loop"], help="Asset kind to resolve.")
     resolve_parser.add_argument("asset_id", help="Root asset id to resolve.")
     resolve_parser.add_argument("--feature", action="append", default=[], help="Enable optional dependency features.")
@@ -140,7 +140,7 @@ def add_inspect_resolution_parsers(subparsers: Any, *, runtime_choices: Sequence
     resolve_parser.add_argument("--offline", action="store_true", help="Resolve using local cache only.")
     resolve_parser.add_argument("--from", dest="source_selector", choices=["auto", "workspace-repo", "internal-registry", "public-registry", "git-repo", "repo", "registry"], default="auto", help="Prefer one source family when resolving.")
 
-    lock_parser = subparsers.add_parser("lock", help="Resolve a team skill graph and write ai-kit.lock.")
+    lock_parser = subparsers.add_parser("lock", help="Resolve a skill graph and write ai-kit.lock.")
     lock_parser.add_argument("asset_kind", nargs="?", choices=["skill", "loop"], help="Asset kind to lock.")
     lock_parser.add_argument("asset_id", nargs="?", help="Root asset id to lock.")
     lock_parser.add_argument("--feature", action="append", default=[], help="Enable optional dependency features.")
@@ -150,7 +150,7 @@ def add_inspect_resolution_parsers(subparsers: Any, *, runtime_choices: Sequence
     lock_parser.add_argument("--offline", action="store_true", help="Resolve using local cache only.")
     lock_parser.add_argument("--from", dest="source_selector", choices=["auto", "workspace-repo", "internal-registry", "public-registry", "git-repo", "repo", "registry"], default="auto", help="Prefer one source family when resolving.")
 
-    graph_parser = subparsers.add_parser("graph", help="Render the resolved dependency tree for one team skill.")
+    graph_parser = subparsers.add_parser("graph", help="Render the resolved dependency tree for one skill.")
     graph_parser.add_argument("asset_kind", choices=["skill", "loop"], help="Asset kind to graph.")
     graph_parser.add_argument("asset_id", help="Root asset id to graph.")
     graph_parser.add_argument("--feature", action="append", default=[], help="Enable optional dependency features.")
@@ -344,7 +344,7 @@ def add_loop_extract_parsers(subparsers: Any) -> None:
 
 
 def add_authoring_publish_release_parsers(subparsers: Any, *, runtime_choices: Sequence[str]) -> None:
-    create_parser = subparsers.add_parser("create", help="Scaffold a new team skill or team CLI inside the repository.")
+    create_parser = subparsers.add_parser("create", help="Scaffold a new skill or CLI inside the repository.")
     create_subparsers = create_parser.add_subparsers(dest="create_subject", required=True)
     create_skill_parser = create_subparsers.add_parser("skill", help="Create a new skill scaffold.")
     create_skill_parser.add_argument("asset_id", help="New skill ID.")

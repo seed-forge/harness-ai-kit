@@ -32,7 +32,7 @@
   "dependencies": [],
   "sources": {
     "preferred": [
-      "team-skill-registry",
+      "skill-registry",
       "repo-checkout"
     ],
     "allow_fallback": true

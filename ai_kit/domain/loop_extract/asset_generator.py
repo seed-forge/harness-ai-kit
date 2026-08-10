@@ -148,7 +148,7 @@ class LoopAssetGenerator:
             "entry": "LOOP.md",
             "dependencies": mapped.get("dependencies", []),
             "sources": {
-                "preferred": ["repo-checkout", "team-skill-registry"],
+                "preferred": ["repo-checkout", "skill-registry"],
                 "allow_fallback": True,
             },
             "companion_docs": {

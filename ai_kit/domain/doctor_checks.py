@@ -418,9 +418,9 @@ def source_selection_reason(
             return "selected repo-checkout because registry was unavailable or did not satisfy the request"
     if selected_source == pm.SOURCE_REGISTRY:
         if preferred == pm.SOURCE_REGISTRY and registry_version:
-            return "selected team-skill-registry because it is the preferred available source"
+            return "selected skill-registry because it is the preferred available source"
         if registry_version:
-            return "selected team-skill-registry because repo-checkout was unavailable or not selected"
+            return "selected skill-registry because repo-checkout was unavailable or not selected"
     if selected_source == pm.SOURCE_PUBLIC_REGISTRY:
         if preferred == pm.SOURCE_PUBLIC_REGISTRY and registry_version:
             return "selected public-registry because it is the preferred available source"

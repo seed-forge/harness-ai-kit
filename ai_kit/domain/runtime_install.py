@@ -31,7 +31,7 @@ RUNTIME_PROFILES: dict[str, RuntimeProfile] = {
         project_target=".agents/skills",
         global_target="~/.codex/skills",
         install_mode="skill_dir",
-        notes="Project scope installs raw team skills into the nearest .agents/skills directory.",
+        notes="Project scope installs raw skills into the nearest .agents/skills directory."
     ),
     "claude-code": RuntimeProfile(
         runtime_id="claude-code",
