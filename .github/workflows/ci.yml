@@ -32,22 +32,22 @@ jobs:
         run: |
           if [ -d skills ]; then
             python -c "
-            from pathlib import Path
-            import json, sys
-            errors = []
-            for skill_dir in sorted(Path('skills').iterdir()):
-                manifest = skill_dir / 'skill.json'
-                if manifest.exists():
-                    try:
-                        json.loads(manifest.read_text())
-                    except Exception as e:
-                        errors.append(f'{skill_dir.name}: {e}')
-            if errors:
-                print('Validation errors:', file=sys.stderr)
-                for e in errors: print(f'  {e}', file=sys.stderr)
-                sys.exit(1)
-            print(f'Validated {len(list(Path(\"skills\").iterdir()))} skills')
-            "
+import json, sys
+from pathlib import Path
+ok = 0
+fail = 0
+for d in sorted(Path('skills').iterdir()):
+    sf = d / 'skill.json'
+    if sf.exists():
+        try:
+            json.loads(sf.read_text())
+            ok += 1
+        except Exception as e:
+            print(f'ERROR: {d.name}: {e}', file=sys.stderr)
+            fail += 1
+print(f'Validated: {ok} ok, {fail} failed')
+sys.exit(1 if fail else 0)
+"
           fi
 
   sensitive-scan:
