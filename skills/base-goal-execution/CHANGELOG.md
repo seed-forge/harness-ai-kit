@@ -2,7 +2,7 @@
 
 ## 0.1.1 - 2026-07-24
 
-- 补全 Human Decision 结构（Skill 组织规范 §5）：新增 `decisions.yaml`（HD-1 交付确认（Phase 4） / HD-2 超出原计划范围的变更）+ SKILL.md `## Human Decisions` 汇总表。（team-ai-kit-audit-ops HD 治理 P2 批）
+- 补全 Human Decision 结构（Skill 组织规范 §5）：新增 `decisions.yaml`（HD-1 交付确认（Phase 4） / HD-2 超出原计划范围的变更）+ SKILL.md `## Human Decisions` 汇总表。（ai-kit-audit-ops HD 治理 P2 批）
 
 ## 0.1.0 - 2026-07-12
 

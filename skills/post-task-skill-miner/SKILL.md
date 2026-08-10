@@ -15,7 +15,7 @@ argument-hint: "<conversation summary / task transcript / final artifact set>"
 - Codex、Claude Code 完成了一次多轮长对话任务，想判断是否值得提炼成复用能力
 - 团队发现某类任务经常重复出现，但还不确定应不应该正式做成 Skill
 - 需要区分“只值得做知识卡片”与“值得进入执行层 Skill”之间的边界
-- 需要输出一个后续可交给 `skill-creator`、`team-ai-kit` 或项目级 Skill 目录继续落地的候选规范
+- 需要输出一个后续可交给 `skill-creator`、`ai-kit` 或项目级 Skill 目录继续落地的候选规范
 
 ## 输入
 
@@ -103,7 +103,7 @@ argument-hint: "<conversation summary / task transcript / final artifact set>"
    - `建议先做知识卡片`
    - `建议做项目级 Skill`
    - `建议做团队共享 Skill`
-8. 若建议沉淀为 Skill，再给出最小实现草案，供后续直接进入 `skill-creator` 或 `team-ai-kit` 的创建流程。
+8. 若建议沉淀为 Skill，再给出最小实现草案，供后续直接进入 `skill-creator` 或 `ai-kit` 的创建流程。
 9. 若候选满足 Loop 提炼条件（见下方「Loop 提炼能力」章节），同时输出 Loop 草案到 `loops/{loop_id}/draft/` 目录。
 
 ## Loop 提炼能力

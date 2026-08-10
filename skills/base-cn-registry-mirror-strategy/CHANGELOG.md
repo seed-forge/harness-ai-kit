@@ -20,5 +20,5 @@
 
 ## 0.1.1 - 2026-05-15
 
-- rename `references/mirror-recipes.md` to `references/REFERENCE-MIRROR-RECIPES.md` to satisfy team-ai-kit reference naming rules
+- rename `references/mirror-recipes.md` to `references/REFERENCE-MIRROR-RECIPES.md` to satisfy ai-kit reference naming rules
 - add this changelog so `skill.json` and `CHANGELOG.md` top versions stay aligned

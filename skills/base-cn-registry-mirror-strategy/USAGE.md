@@ -20,7 +20,7 @@
 ## 可直接复制的中文 Prompt
 
 ```text
-请按 team-ai-kit 技能 `base-cn-registry-mirror-strategy` 处理：
+请按 ai-kit 技能 `base-cn-registry-mirror-strategy` 处理：
 基镜像：<debian:bookworm-slim | alpine:3.xx | 其他>
 语言栈：<node | python | maven | gradle | go | 组合>
 构建环境：<本地 docker | GitHub Actions | Woodpecker/Kaniko | 其他>

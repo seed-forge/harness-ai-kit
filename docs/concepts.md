@@ -8,10 +8,10 @@ ai-kit manages six asset types, all sharing a unified dependency model:
 |------|-------------|----------------|
 | `skill` | AI agent skill (SKILL.md + metadata) | `.agents/skills/` (codex) / `.claude/skills/` (claude-code) |
 | `cli` | Python CLI package (pip-installable) | system or venv |
-| `mcp` | MCP server/tool | `team-ai-kit-assets/mcps/` |
-| `plugin` | Runtime plugin | `team-ai-kit-assets/plugins/` |
-| `hook` | Git or runtime hook | `team-ai-kit-assets/hooks/` |
-| `subagent` | Subagent definition | `team-ai-kit-assets/subagents/` |
+| `mcp` | MCP server/tool | `ai-kit-assets/mcps/` |
+| `plugin` | Runtime plugin | `ai-kit-assets/plugins/` |
+| `hook` | Git or runtime hook | `ai-kit-assets/hooks/` |
+| `subagent` | Subagent definition | `ai-kit-assets/subagents/` |
 
 ## Dependency Model
 
@@ -35,7 +35,7 @@ ai-kit manages six asset types, all sharing a unified dependency model:
 |---------|--------------|--------------|
 | Codex | `.agents/skills/` | `~/.codex/skills/` |
 | Claude Code | `.claude/skills/` | `~/.claude/skills/` |
-| Kiro | `.kiro/steering/` + `team-ai-kit-skills/` | `~/.kiro/steering/` |
+| Kiro | `.kiro/steering/` + `ai-kit-skills/` | `~/.kiro/steering/` |
 | Cursor | `.cursor/rules/` | (not supported) |
 
 ## Project Manifest

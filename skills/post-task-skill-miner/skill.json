@@ -37,7 +37,7 @@
     "Use this skill after the task is materially complete so the retrospective is based on real outcomes instead of unfinished exploration."
   ],
   "post_install_hints": [
-    "When this skill recommends creating or updating a reusable skill, continue with `skill-creator` or the local team-ai-kit create/submit workflow."
+    "When this skill recommends creating or updating a reusable skill, continue with `skill-creator` or the local ai-kit create/submit workflow."
   ],
   "updated_at": "2026-07-12"
 }

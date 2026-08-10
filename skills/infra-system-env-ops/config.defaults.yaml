@@ -1,4 +1,4 @@
-$schema: team-ai-kit-config/v1
+$schema: ai-kit-config/v1
 
 config: []
 # No runtime configuration required for this skill.

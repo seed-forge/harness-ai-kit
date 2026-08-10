@@ -66,7 +66,7 @@ Breaking change: Add `!` after type or `BREAKING CHANGE:` in footer.
 
 在通用 Conventional Commits 基础上，团队额外约定：
 
-1. **scope 使用组件/模块 ID**：如 `feat(cli):`, `fix(homelab-compose-app-deploy):`, `docs(team-ai-kit-forge):`
+1. **scope 使用组件/模块 ID**：如 `feat(cli):`, `fix(homelab-compose-app-deploy):`, `docs(ai-kit-forge):`
 2. **description 使用中文或英文均可**，但同一 PR 内保持一致
 3. **多变更拆原子 commit**：一个 commit 做一件事，便于 bisect 和 revert
 4. **commit body 说明 why**：type+scope 说明 what，body 说明 why（非显而易见时）
@@ -98,7 +98,7 @@ refactor/simplify-auth-flow
 
 - **02-工程工作空间**：大部分子项目使用 Trunk-based 或 GitHub Flow
 - **fleet-platform / 控制仓**：必须 PR + review，禁止直推 main
-- **team-ai-kit skills 仓库**：PR + CI gate，merge 后自动 publish
+- **ai-kit skills 仓库**：PR + CI gate，merge 后自动 publish
 
 References:
 - [team-branch-strategy](references/REFERENCE-TEAM-BRANCH-STRATEGY.md)

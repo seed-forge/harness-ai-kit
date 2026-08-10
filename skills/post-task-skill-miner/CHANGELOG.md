@@ -6,7 +6,7 @@
 
 ## 0.2.1 - 2026-07-24
 
-- 补全 Human Decision 结构（Skill 组织规范 §5）：新增 `decisions.yaml`（HD-1 提炼资产是否推进创建）+ SKILL.md `## Human Decisions` 汇总表。（team-ai-kit-audit-ops HD 治理 P2 批）
+- 补全 Human Decision 结构（Skill 组织规范 §5）：新增 `decisions.yaml`（HD-1 提炼资产是否推进创建）+ SKILL.md `## Human Decisions` 汇总表。（ai-kit-audit-ops HD 治理 P2 批）
 
 ## 0.2.0 - 2026-07-12
 
@@ -21,4 +21,4 @@
 
 - added `post-task-skill-miner` as a shared retrospective skill for Codex and Claude Code style AI IDE workflows
 - defined a reusable rubric for deciding between knowledge-card only, project-level skill, and team-shared skill outcomes
-- aligned the deliverable shape with `team-ai-kit` skill packaging and governance expectations
+- aligned the deliverable shape with `ai-kit` skill packaging and governance expectations
