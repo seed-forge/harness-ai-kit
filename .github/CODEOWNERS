@@ -1,0 +1,10 @@
+# Default owner for everything in the repo
+# Requires review from a SeedForge maintainer on all PRs
+* @seed-forge/maintainers
+
+# Core CLI — tighter review
+/ai_kit/ @seed-forge/maintainers
+
+# CI / release config — tighter review
+/.github/ @seed-forge/maintainers
+/pyproject.toml @seed-forge/maintainers

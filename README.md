@@ -7,6 +7,8 @@
 
 **Package manager for AI agent assets** — install, lock and govern skills / CLIs / MCPs / loops across Codex, Claude Code, Cursor and Kiro. Includes an enterprise-grade AI-ops skill library.
 
+[Quickstart](docs/quickstart.md) · [Docs](docs/) · [Roadmap](ROADMAP.md) · [Changelog](CHANGELOG.md) · [中文文档](README.zh-CN.md)
+
 ## Why
 
 As AI agents proliferate, teams accumulate reusable prompts, skills, CLIs and MCP servers — but there's no `npm` for these assets. `ai-kit` fills that gap: one CLI to install, resolve, lock, validate and govern AI agent assets across multiple runtimes.
@@ -66,6 +68,8 @@ Requires Python >= 3.10 and `git`.
 
 ## Roadmap
 
+See [ROADMAP.md](ROADMAP.md) for the full plan with milestone criteria.
+
 | Phase | Content | Status |
 |-------|---------|--------|
 | **v0.1** (current) | CLI + schema + validate + GitHub direct install + curated skill library | ✅ Released |
@@ -88,6 +92,13 @@ harness-ai-kit/
 ├── pyproject.toml       # Package metadata
 └── LICENSE              # Apache-2.0
 ```
+
+## Community & Support
+
+- **Questions**: [GitHub Discussions](https://github.com/seed-forge/harness-ai-kit/discussions) or [SUPPORT.md](SUPPORT.md)
+- **Bugs & features**: [Issue tracker](https://github.com/seed-forge/harness-ai-kit/issues)
+- **Security**: See [SECURITY.md](SECURITY.md)
+- **Changes**: See [CHANGELOG.md](CHANGELOG.md)
 
 ## Contributing
 
