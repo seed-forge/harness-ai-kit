@@ -1,57 +1,109 @@
 # Quick Start
 
-## 1. Install
+Get from zero to a working AI skill in under 2 minutes.
+
+## Prerequisites
+
+- Python >= 3.10 (`python --version` to check)
+- Git (`git --version` to check)
+- One of: Codex, Claude Code, Cursor, or Kiro
+
+## Step 1: Install
 
 ```bash
 pip install harness-ai-kit
 ```
 
-## 2. Initialize
+Verify:
+
+```bash
+ai-kit --version
+# Expected: ai-kit 0.1.0
+```
+
+## Step 2: Initialize
 
 ```bash
 ai-kit init
 ```
 
-This creates `~/.ai-kit/config.yaml` with default settings (PyPI index, GitHub source support).
+This creates `~/.ai-kit/config.yaml` and clones the skill repository.
 
-## 3. Add a Skill from GitHub
+Verify:
 
 ```bash
-cd my-project
+ai-kit doctor
+# Expected: all checks pass (git, config, checkout, runtime)
+```
+
+## Step 3: Add a Skill
+
+```bash
+cd your-project
 ai-kit add skill https://github.com/anthropics/skills/tree/main/skills/skill-creator
+```
+
+This downloads the skill and records it in `ai-kit.yml`.
+
+## Step 4: Sync
+
+```bash
 ai-kit sync
 ```
 
-The skill is now installed at `.agents/skills/skill-creator/` (Codex project scope by default).
+This installs the skill into your AI runtime's skill directory.
 
-## 4. Use Other Runtimes
-
-```bash
-# Claude Code (project scope)
-ai-kit add skill anthropics/skills --subpath skills/skill-creator --runtime claude-code --scope project
-
-# Cursor
-ai-kit add skill anthropics/skills --subpath skills/skill-creator --runtime cursor --scope project
-
-# Kiro
-ai-kit add skill anthropics/skills --subpath skills/skill-creator --runtime kiro --scope project
-```
-
-## 5. Explore Built-in Skills
-
-The repository includes a curated enterprise skill library:
+Verify:
 
 ```bash
-ai-kit list          # list all available skills
-ai-kit show diag-mysql-deadlock  # show a specific skill's metadata
-ai-kit cat diag-mysql-deadlock   # print the skill's SKILL.md
+ls .agents/skills/skill-creator/    # Codex
+# or
+ls .claude/skills/skill-creator/    # Claude Code
 ```
 
-## 6. Lock and Reproduce
+## Step 5: Use It
+
+Open your AI coding tool and ask it to use the skill. For example:
+
+> "Help me create a new skill using the skill-creator skill"
+
+The AI agent reads the SKILL.md from the installed directory and follows its instructions.
+
+---
+
+## What's Next?
+
+- **Browse curated skills**: `ai-kit list` — 23 production-tested skills included
+- **See all commands**: [CLI Reference](cli-reference.md)
+- **Real-world examples**: [examples/](../examples/README.md) — team sync, multi-runtime, offline mode
+- **Trouble?**: [Troubleshooting guide](troubleshooting.md)
+- **Write your own skill**: [Skill Authoring Guide](skill-authoring.md)
+
+## Multi-Runtime Quick Reference
 
 ```bash
-ai-kit lock          # resolve all dependencies and write ai-kit.lock
-ai-kit sync          # install from lockfile (reproducible)
+# Codex (default) — installs to .agents/skills/
+ai-kit add skill <id> --runtime codex
+
+# Claude Code — installs to .claude/skills/
+ai-kit add skill <id> --runtime claude-code
+
+# Cursor — installs to .cursor/rules/
+ai-kit add skill <id> --runtime cursor
+
+# Kiro — installs to .kiro/steering/ + ai-kit-skills/
+ai-kit add skill <id> --runtime kiro
 ```
 
-Share `ai-kit.yml` and `ai-kit.lock` with your team — anyone running `ai-kit sync` gets the exact same versions.
+## Team Workflow
+
+```bash
+# Team lead: pin skills for the project
+ai-kit init-project
+ai-kit add skill diag-mysql-deadlock
+ai-kit lock
+git add ai-kit.yml ai-kit.lock && git commit -m "pin team skills"
+
+# Team members: get identical state
+ai-kit sync
+```

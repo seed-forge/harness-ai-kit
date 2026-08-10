@@ -13,16 +13,52 @@
 
 As AI agents proliferate, teams accumulate reusable prompts, skills, CLIs and MCP servers — but there's no `npm` for these assets. `ai-kit` fills that gap: one CLI to install, resolve, lock, validate and govern AI agent assets across multiple runtimes.
 
+### Why not just copy SKILL.md files?
+
+| | Copy-paste | ai-kit |
+|---|-----------|--------|
+| Install a skill | `git clone` → find the right dir → copy files | `ai-kit add skill <url>` |
+| Pin versions | Manual tracking | `ai-kit.lock` with SHA-256 |
+| Team consistency | "Works on my machine" | `ai-kit.yml` + `ai-kit sync` = identical state |
+| Multiple AI runtimes | Repeat for each tool | `--runtime codex/claude-code/cursor/kiro` |
+| Dependency conflicts | Silent breakage | SAT solver detects conflicts upfront |
+| Offline / air-gapped | Re-download everything | `ai-kit sync --offline` from cache |
+
 ## Quick Start
 
 ```bash
 pip install harness-ai-kit
 ai-kit init
+cd your-project
 ai-kit add skill https://github.com/anthropics/skills/tree/main/skills/skill-creator
 ai-kit sync
 ```
 
-That's it — the skill is now installed into your project's `.agents/skills/` directory, ready for your AI agent to use.
+Verify it worked:
+
+```bash
+ai-kit doctor              # health check — should be all green
+ls .agents/skills/          # skill-creator should be here
+```
+
+The skill is now available to your AI agent. See [examples/](examples/README.md) for real-world usage patterns (team sync, multi-runtime, offline mode).
+
+## Command Cheatsheet
+
+| Command | What it does |
+|---------|-------------|
+| `ai-kit init` | First-time machine setup |
+| `ai-kit add skill <id-or-url>` | Add a skill to your project |
+| `ai-kit sync` | Install declared assets to runtime |
+| `ai-kit list` | Browse available skills |
+| `ai-kit show <id>` | Show skill metadata |
+| `ai-kit lock` | Pin exact versions to ai-kit.lock |
+| `ai-kit doctor` | Health check your environment |
+| `ai-kit remove skill <id>` | Remove a skill |
+| `ai-kit outdated` | Check for updates |
+| `ai-kit cache clean` | Clear local cache |
+
+Full reference: [docs/cli-reference.md](docs/cli-reference.md)
 
 ## Features
 
@@ -41,6 +77,58 @@ pip install harness-ai-kit
 ```
 
 Requires Python >= 3.10 and `git`.
+
+## Built-in Skill Library
+
+23 production-tested skills included. Install any with `ai-kit add skill <id>`.
+
+<details>
+<summary><strong>Database Expert Bases</strong> (9 skills — schema design, indexing, query tuning, replication)</summary>
+
+| Skill | Domain |
+|-------|--------|
+| `public-mysql-expert-base` | MySQL/InnoDB — schema, indexes, locks, tuning |
+| `public-postgres-expert-base` | PostgreSQL — B-Tree/GIN/GiST, JSONB, partitioning |
+| `public-redis-expert-base` | Redis — data structures, connection pool, TTL |
+| `public-mongodb-expert-base` | MongoDB — aggregation, indexes, replica sets |
+| `public-kafka-expert-base` | Kafka — topics, consumer groups, exactly-once |
+| `public-rabbitmq-expert-base` | RabbitMQ — exchanges, durability, dead letter |
+| `public-oracle-expert-base` | Oracle — JDBC, LOB, character set |
+| `public-nl2sql-expert-base` | NL2SQL — natural language to SQL |
+| `public-git-workflow-expert-base` | Git — commit, branch, PR conventions |
+
+</details>
+
+<details>
+<summary><strong>Diagnostic Playbooks</strong> (7 skills — enterprise troubleshooting chains)</summary>
+
+| Skill | Scenario |
+|-------|----------|
+| `diag-mysql-deadlock` | InnoDB deadlock capture + lock chain analysis |
+| `diag-mysql-slow-query` | Slow query log + EXPLAIN + index analysis |
+| `diag-mysql-replication` | Master-slave delay root cause |
+| `diag-container-oom` | dmesg OOM killer → cgroup → Docker memory |
+| `diag-k8s-pod-crashloop` | CrashLoopBackOff full-chain diagnosis |
+| `diag-k8s-node-pressure` | CPU/Memory/Disk/PID pressure |
+| `diag-network-port-unreach` | DNS → TCP → iptables → service → route |
+
+</details>
+
+<details>
+<summary><strong>General & Infra</strong> (7 skills)</summary>
+
+| Skill | Purpose |
+|-------|---------|
+| `base-cn-registry-mirror-strategy` | China mirror acceleration (Docker/Debian/Python/Maven) |
+| `base-goal-execution` | Goal-driven execution with checkpoints |
+| `markitdown` | Document-to-Markdown conversion |
+| `work-convert` / `work-export` | Document conversion/export |
+| `post-task-skill-miner` | Post-task retrospective → skill extraction |
+| `infra-system-env-ops` | Monit watchdog / service self-healing |
+
+</details>
+
+Full catalog with install commands: [docs/asset-map.md](docs/asset-map.md)
 
 ## Architecture
 
@@ -87,7 +175,14 @@ harness-ai-kit/
 │   ├── infrastructure/   # Infrastructure (git ops, registry client, ...)
 │   └── data/             # Default config seed
 ├── skills/              # Curated enterprise skill library
+├── examples/            # Real-world usage examples
 ├── docs/                # Documentation
+│   ├── quickstart.md    # Step-by-step getting started
+│   ├── cli-reference.md # Complete CLI command reference
+│   ├── concepts.md      # Core concepts explained
+│   ├── skill-authoring.md # Write your own skills
+│   ├── asset-map.md     # Skill library catalog
+│   └── troubleshooting.md # Common issues and fixes
 ├── .github/             # CI, issue templates, community files
 ├── pyproject.toml       # Package metadata
 └── LICENSE              # Apache-2.0
