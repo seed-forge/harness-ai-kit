@@ -1,0 +1,75 @@
+{
+  "namespace": "community",
+  "id": "devlab-ai-kit-miner",
+  "name": "devlab-ai-kit-miner",
+  "owner": "seedforge",
+  "version": "0.4.3",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "devlab",
+    "miner",
+    "retrospective",
+    "distillation",
+    "post-task",
+    "multi-asset"
+  ],
+  "summary": "研发会话后复盘提炼：分析已完成的研发会话，判断哪些经验值得沉淀为 Skill/CLI/MCP/Loop/Subagent/知识卡片，输出最小规格草案。基于 post-task-skill-miner 二次定制，覆盖全资产类型决策和 devlab-* 命名规范。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "kiro"
+  ],
+  "installation": {
+    "default_scope": "project",
+    "install_mode": "skill_dir"
+  },
+  "dependencies": [
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "post-task-skill-miner",
+      "version": ">=0.2.0",
+      "scope": "required"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example": "",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "Use this skill after the task is materially complete so the retrospective is based on real outcomes instead of unfinished exploration."
+  ],
+  "post_install_hints": [
+    "建议同时安装 post-task-skill-miner 作为基础复盘能力",
+    "复盘输出草案后，可用 ai-kit-forge 接手创建资产"
+  ],
+  "skill_type": "operational",
+  "updated_at": "2026-07-13",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

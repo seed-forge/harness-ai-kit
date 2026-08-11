@@ -1,0 +1,7 @@
+decisions:
+  - id: HD-1
+    point: 提炼资产是否推进创建/发布
+    trigger: 复盘识别出可沉淀的 devlab-* 资产草案后
+    options: [用户确认后推进创建/发布 / 仅记录不落地]
+    default: 必问
+    rationale: 是否新建或发布资产由用户决定，miner 只做识别与建议

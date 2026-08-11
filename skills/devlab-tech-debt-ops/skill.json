@@ -1,0 +1,25 @@
+{
+  "namespace": "community",
+  "id": "devlab-tech-debt-ops",
+  "name": "devlab-tech-debt-ops",
+  "owner": "seedforge",
+  "version": "0.1.1",
+  "status": "trial",
+  "tags": [
+    "refactor",
+    "tech-debt",
+    "architecture",
+    "god-class",
+    "design-patterns",
+    "methodology"
+  ],
+  "summary": "技术债清理/重构编排方法论（非业务债，侧重技术债）：现状梳理→拆分设计→引用清零安全移除→回归验证；附设计模式清单与典型模式示意性伪代码（点到即止，实操由 AI 给选项）。",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

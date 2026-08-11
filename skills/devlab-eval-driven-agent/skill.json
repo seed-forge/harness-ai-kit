@@ -1,0 +1,26 @@
+{
+  "namespace": "community",
+  "id": "devlab-eval-driven-agent",
+  "name": "devlab-eval-driven-agent",
+  "owner": "seedforge",
+  "version": "0.1.1",
+  "status": "trial",
+  "tags": [
+    "eval",
+    "testing",
+    "ai-agent",
+    "regression",
+    "dataset",
+    "methodology",
+    "production"
+  ],
+  "summary": "eval 自评测体系驱动的 AI Agent 生产体系：评测集组织、Mock 隔离、标准化比对、自动评测脚本与回归；预留与产品运营系统打通（真实数据反馈），并规划配套 evalctl CLI 做真实数据采集与反馈回流。",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}
