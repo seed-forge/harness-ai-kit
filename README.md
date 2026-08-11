@@ -7,7 +7,7 @@
 
 **Package manager for AI agent assets** — install, lock and govern skills / CLIs / MCPs / loops across Codex, Claude Code, Cursor and Kiro. Includes an enterprise-grade AI-ops skill library.
 
-[Quickstart](docs/quickstart.md) · [Docs](docs/) · [Roadmap](ROADMAP.md) · [Changelog](CHANGELOG.md) · [中文文档](README.zh-CN.md)
+[Quickstart](docs/quickstart.md) · [Skill Catalog](CATALOG.md) · [Usage Scenarios](docs/usage-scenarios.md) · [Docs](docs/) · [Roadmap](ROADMAP.md) · [Changelog](CHANGELOG.md) · [中文文档](README.zh-CN.md)
 
 ## Why
 
@@ -80,7 +80,9 @@ Requires Python >= 3.10 and `git`.
 
 ## Built-in Skill Library
 
-23 production-tested skills included. Install any with `ai-kit add skill <id>`.
+34 production-tested skills included. Install any with `ai-kit add skill <id>`. Full categorized index: **[CATALOG.md](CATALOG.md)**.
+
+> New here? Read [Usage Scenarios](docs/usage-scenarios.md) first — it explains how skills get pulled into real work via an SDD framework (e.g. Trellis), and how loops bind to a runtime.
 
 <details>
 <summary><strong>Database Expert Bases</strong> (9 skills — schema design, indexing, query tuning, replication)</summary>
@@ -115,6 +117,33 @@ Requires Python >= 3.10 and `git`.
 </details>
 
 <details>
+<summary><strong>AI Engineering Methodology</strong> (5 skills — spec-driven dev, agent architecture, eval, tech debt)</summary>
+
+| Skill | Purpose |
+|-------|---------|
+| `devlab-spec-driven-dev` | Spec-driven AI collaboration (requirements → design → tasks) |
+| `devlab-ai-agent-engineering` | AI agent app architecture methodology |
+| `devlab-eval-driven-agent` | Eval-driven agent quality system |
+| `devlab-ai-kit-miner` | Post-session retrospective → asset extraction |
+| `devlab-tech-debt-ops` | Tech debt lifecycle (audit → refactor → verify) |
+
+</details>
+
+<details>
+<summary><strong>Patent & Document Authoring</strong> (6 skills)</summary>
+
+| Skill | Purpose |
+|-------|---------|
+| `patent-specification-writer` | Patent specification drafting |
+| `patent-review` | Patent quality review with dimensions checklist |
+| `patent-disclosure-workflow` | Patent disclosure end-to-end workflow |
+| `work-sc-patent-specification-writer` | Patent spec (work-sc namespace) |
+| `work-sc-software-copyright-writer` | Software copyright application materials |
+| `document-reference-sop-builder` | Turn an exemplar document into a reusable SOP |
+
+</details>
+
+<details>
 <summary><strong>General & Infra</strong> (7 skills)</summary>
 
 | Skill | Purpose |
@@ -128,7 +157,7 @@ Requires Python >= 3.10 and `git`.
 
 </details>
 
-Full catalog with install commands: [docs/asset-map.md](docs/asset-map.md)
+Full catalog with install commands: **[CATALOG.md](CATALOG.md)** · usage patterns: [docs/usage-scenarios.md](docs/usage-scenarios.md)
 
 ## Architecture
 
