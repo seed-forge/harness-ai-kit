@@ -1,0 +1,69 @@
+{
+  "namespace": "work-sc",
+  "id": "work-sc-software-copyright-writer",
+  "name": "work-sc-software-copyright-writer",
+  "owner": "seedforge",
+  "version": "0.1.1",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "work",
+    "office",
+    "software-copyright",
+    "specification",
+    "writing",
+    "scenario"
+  ],
+  "summary": "软件著作权申请材料撰写：软件说明书（≥5000字）+ 源程序示例（≥2000行），含软著审查专家自查。与 work-sc-patent-specification-writer 同簇。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "qoder"
+  ],
+  "installation": {
+    "default_scope": "global"
+  },
+  "dependencies": [
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "docx",
+      "source_url": "https://github.com/anthropics/skills/tree/main/skills/docx",
+      "version": "latest",
+      "scope": "optional",
+      "feature": "docx-export"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md"
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "不负责软著登记流程办理，仅产出申请材料"
+  ],
+  "post_install_hints": [],
+  "updated_at": "2026-07-24",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
+}

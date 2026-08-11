@@ -1,0 +1,7 @@
+decisions:
+  - id: HD-1
+    point: 导出 Word 文档
+    trigger: 交底材料撰写完成、需要导出 Word 之前
+    options: [用户确认内容后导出 / 退回修改]
+    default: 必问
+    rationale: 导出为正式交付物，需用户确认内容无误后再生成

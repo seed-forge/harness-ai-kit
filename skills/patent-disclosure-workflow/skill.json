@@ -1,0 +1,75 @@
+{
+  "namespace": "community",
+  "id": "patent-disclosure-workflow",
+  "name": "patent-disclosure-workflow",
+  "owner": "seedforge",
+  "version": "0.1.2",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "patent",
+    "workflow",
+    "disclosure",
+    "docx",
+    "review"
+  ],
+  "summary": "面向中文专利技术交底编写、补强、预审和按需导出的团队共享工作流 Skill。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "kiro",
+    "cursor"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "patent-specification-writer",
+      "version": ">=0.1.0",
+      "scope": "required"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "patent-docx-exporter",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "word-export"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "markitdown",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "docx-input"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [
+    "Enable `docx-input` when the upstream disclosure or reference template arrives as docx.",
+    "Enable `word-export` only when the user explicitly wants a Word deliverable."
+  ],
+  "post_install_hints": [
+    "Treat this skill as the orchestration layer; keep drafting in markdown and call the exporter only after content review is complete."
+  ],
+  "updated_at": "2026-05-14",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
+}

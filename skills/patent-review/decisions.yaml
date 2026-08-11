@@ -1,0 +1,7 @@
+decisions:
+  - id: HD-1
+    point: --fix 模式的自动修改确认
+    trigger: 使用 --fix 模式、对中高危问题执行自动修复之前（经 AskUserQuestion）
+    options: [用户确认后执行修复 / 仅报告不修改]
+    default: 必问
+    rationale: 自动修改专利评审内容影响交付质量，中高危修改必须经用户确认

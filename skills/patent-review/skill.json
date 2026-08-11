@@ -1,0 +1,71 @@
+{
+  "namespace": "community",
+  "id": "patent-review",
+  "name": "patent-review",
+  "owner": "seedforge",
+  "version": "0.1.3",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "patent",
+    "review",
+    "quality-assurance",
+    "multi-round",
+    "disclosure",
+    "drawio"
+  ],
+  "summary": "专利技术交底书多轮循环严格审查。支持多维审查（数据流闭合、术语一致、状态迁移、公式完整、错误代码分流、图文一致性（集成drawio-skill））、逐轮收敛、可选自动修复（默认关闭需人工确认）。",
+  "compatible_clients": [
+    "claude-code"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "patent-disclosure-workflow",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "workflow-integration"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "drawio-skill",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "diagram-consistency"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [
+    "Run this skill after patent disclosure drafts (.md) are complete and before Word export.",
+    "For multi-document review, pass all related disclosures as input.",
+    "Default mode is review-only (dry-run); auto-fix requires explicit --fix flag and per-issue confirmation for severe issues.",
+    "Enable `diagram-consistency` feature when .drawio or .xml diagram files are available alongside the disclosure."
+  ],
+  "post_install_hints": [
+    "Invoke with /patent-review or via Skill tool. Pass patent disclosure markdown file paths as input.",
+    "Use --fix to enable auto-repair mode, but severe issues will still require human confirmation.",
+    "For cross-document interface checks, pass all related disclosures together.",
+    "For text-diagram consistency (D7), pass .drawio files alongside the patent .md files. The drawio-skill will auto-parse them."
+  ],
+  "updated_at": "2026-06-07",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
+}

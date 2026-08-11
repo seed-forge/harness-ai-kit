@@ -1,0 +1,58 @@
+{
+  "namespace": "community",
+  "id": "patent-specification-writer",
+  "name": "patent-specification-writer",
+  "owner": "seedforge",
+  "version": "0.1.0",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "patent",
+    "writing",
+    "disclosure",
+    "technical-solution"
+  ],
+  "summary": "面向中文专利说明书与技术交底主体内容编写的团队共享基础写作 Skill。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "kiro",
+    "cursor"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "markitdown",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "docx-input"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [
+    "When the upstream disclosure arrives as docx, enable the `docx-input` feature or convert it to markdown before drafting."
+  ],
+  "post_install_hints": [
+    "Use this skill as the drafting layer; pair it with `patent-disclosure-workflow` for intake, polishing, and export orchestration."
+  ],
+  "updated_at": "2026-05-14",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
+}
