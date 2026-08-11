@@ -24,6 +24,38 @@ As AI agents proliferate, teams accumulate reusable prompts, skills, CLIs and MC
 | Dependency conflicts | Silent breakage | SAT solver detects conflicts upfront |
 | Offline / air-gapped | Re-download everything | `ai-kit sync --offline` from cache |
 
+### No lock-in — you don't have to use ai-kit
+
+Every skill in the [catalog](CATALOG.md) is a plain folder of Markdown + JSON. If you don't want another CLI, you don't need one:
+
+- **Let your agent fetch it** — paste the skill's GitHub URL to Codex / Claude Code / Cursor and ask it to install the skill into your runtime's skills directory.
+- **`npx` / one-off scripts** — pull a single `SKILL.md` straight from the repo, no install step.
+- **Copy the folder yourself** — drop it into `.agents/skills/` (Codex) or `.claude/skills/` (Claude Code) by hand.
+
+ai-kit is **not** a gatekeeper for the content. What it adds on top is the **asset manifest**: a curated, versioned, checksummed inventory (`ai-kit.yml` + `ai-kit.lock`) of *what* your project uses. If that inventory is useful to you, the CLI is the fastest way to manage it. If not, the skills work fine without it.
+
+### Team collaboration — commit the manifest, not the assets
+
+The manifest is where ai-kit pays off most. The intended team flow:
+
+```
+Member A (sets up)
+  ai-kit add skill devlab-spec-driven-dev
+  ai-kit add skill diag-mysql-deadlock
+  git add ai-kit.yml ai-kit.lock        # commit ONLY the manifest
+  git commit -m "chore: pin team AI skills"
+
+Member B (joins / updates)
+  ai-kit sync                            # done — exact same assets, SHA-256 verified
+```
+
+Two concrete benefits:
+
+1. **Nothing sensitive leaves the repo.** Member A commits only two small YAML/JSON files. The raw skill folders — which may carry local paths, personal runtime config, or credentials from a member's own machine — are never committed. Member B re-materializes them locally from the manifest.
+2. **Updates are cheap and non-destructive.** When the team bumps a skill version, members just `ai-kit sync` (or `ai-kit update`) to pull the latest. Because the lockfile records exactly what's managed by ai-kit, a member's own hand-added / custom skills are left untouched — sync reconciles the manifest, it doesn't wipe your local additions.
+
+In short: the manifest is the team's shared source of truth for "which AI assets we run", and `sync` is how everyone stays identical without sharing anything sensitive.
+
 ## Quick Start
 
 ```bash

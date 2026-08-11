@@ -5,6 +5,8 @@ real work, how do these skills get pulled into the loop?** This page answers tha
 
 There are two distinct usage models, one for **skills** and one for **loops**.
 
+> **No lock-in:** every skill is a plain Markdown+JSON folder. You can have your agent fetch it, `npx`-style pull it, or copy it by hand — ai-kit is not required to *use* a skill. What ai-kit adds is the **asset manifest** (`ai-kit.yml` + `ai-kit.lock`) plus reproducible `sync`, which is what makes the team flow in the [README](../README.md#team-collaboration--commit-the-manifest-not-the-assets) work.
+
 ---
 
 ## Model A: Skills + an SDD framework (recommended)
