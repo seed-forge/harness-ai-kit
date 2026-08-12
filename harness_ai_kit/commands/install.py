@@ -132,7 +132,7 @@ def command_prune(args: argparse.Namespace, config_path: Path, context: InstallC
     config = context.effective_config(context.load_config(config_path))
     manifest_path, manifest = context.load_project_manifest_if_present()
     if manifest_path is None:
-        raise FileNotFoundError("No ai-kit.yml found in the current project.")
+        raise FileNotFoundError("No harness-ai-kit.yml found in the current project.")
     runtime_id = getattr(args, "runtime", None) or (manifest.runtime if manifest is not None else "codex")
     install_scope = getattr(args, "scope", None) or (manifest.scope if manifest is not None else "project")
     if install_scope != "project":
@@ -253,8 +253,8 @@ def _resolve_manifest_for_scope(
     """
     if scope == "global":
         global_state = state_dir()
-        global_yml = global_state / "ai-kit.yml"
-        global_lock = global_state / "ai-kit.lock"
+        global_yml = global_state / "harness-ai-kit.yml"
+        global_lock = global_state / "harness-ai-kit.lock"
         return (
             global_yml if global_yml.exists() else None,
             global_lock if global_lock.exists() else None,
@@ -644,8 +644,8 @@ def command_sync(args: argparse.Namespace, config_path: Path, context: InstallCo
     # For global scope, always prefer the global state directory over project yml
     if scope == "global":
         global_state = state_dir()
-        global_yml = global_state / "ai-kit.yml"
-        global_lock = global_state / "ai-kit.lock"
+        global_yml = global_state / "harness-ai-kit.yml"
+        global_lock = global_state / "harness-ai-kit.lock"
         if global_yml.exists():
             manifest_path = global_yml
             manifest = load_project_manifest(global_yml)
@@ -673,7 +673,7 @@ def command_sync(args: argparse.Namespace, config_path: Path, context: InstallCo
                 print(f"Initialized global manifest -> {global_yml}")
             else:
                 raise FileNotFoundError(
-                    f"No global ai-kit.yml or lockfile found. "
+                    f"No global harness-ai-kit.yml or lockfile found. "
                     f"Run `harness-ai-kit add skill <id> --scope global` first, "
                     f"or create {global_yml} manually."
                 )
@@ -683,7 +683,7 @@ def command_sync(args: argparse.Namespace, config_path: Path, context: InstallCo
     explicit_tokens = list(getattr(args, "skill_ids", []))
     if args.command == "sync":
         if manifest_path is None or manifest is None:
-            raise FileNotFoundError("No ai-kit.yml found in the current project.")
+            raise FileNotFoundError("No harness-ai-kit.yml found in the current project.")
         # --all-runtimes flag overrides manifest sync_targets
         if getattr(args, "all_runtimes", False) and not manifest.sync_targets:
             manifest = manifest.model_copy(update={"sync_targets": ["all"]})
@@ -799,7 +799,7 @@ def command_sync(args: argparse.Namespace, config_path: Path, context: InstallCo
         if target_dir_override:
             target_dir = Path(target_dir_override).expanduser().resolve()
         else:
-            # Loop 物化落点是执行工作空间的项目根（ai-kit.yml 所在目录）
+            # Loop 物化落点是执行工作空间的项目根（harness-ai-kit.yml 所在目录）
             # 的 .agents/loops；无 manifest 时退化为 cwd。资产解析来源的源仓
             # （repo_root）只用于 resolve_skill_plan，不作为落点——避免 lock 与
             # loop 副本被写进源仓库（factory-audit 2026-08-04 L2#4）。
@@ -807,7 +807,7 @@ def command_sync(args: argparse.Namespace, config_path: Path, context: InstallCo
             target_dir = project_root / ".agents" / "loops"
         target_dir.mkdir(parents=True, exist_ok=True)
         root_ids = asset_ids
-        lock_path = target_dir / "ai-kit.lock"
+        lock_path = target_dir / "harness-ai-kit.lock"
         plan_kwargs: dict[str, object] = {}
         if manifest is not None:
             plan_kwargs["preferred_sources"] = context.manifest_skill_source_policy(manifest)
@@ -895,7 +895,7 @@ def command_sync(args: argparse.Namespace, config_path: Path, context: InstallCo
     if getattr(args, "all", False) and repo_root is None and not explicit_git_root_sources:
         raise ValueError("`harness-ai-kit install skill --all` requires a bootstrapped local repository or explicit --repo-root.")
     if not getattr(args, "all", False) and not asset_ids and manifest is None:
-        raise ValueError("No skill roots selected. Pass a skill id or create ai-kit.yml.")
+        raise ValueError("No skill roots selected. Pass a skill id or create harness-ai-kit.yml.")
     repo_root_for_target = repo_root or Path.cwd()
     runtime_id = context.manifest_aware_runtime(args, manifest)
     install_scope = context.manifest_aware_scope(args, manifest)

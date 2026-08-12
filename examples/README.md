@@ -23,7 +23,7 @@ Now ask your AI agent: *"My MySQL is throwing deadlock errors, help me diagnose"
 
 ---
 
-## 2. Team — Shared Skills via ai-kit.yml + ai-kit.lock
+## 2. Team — Shared Skills via harness-ai-kit.yml + harness-ai-kit.lock
 
 Your team uses Claude Code. Everyone needs the same skills, pinned to exact versions.
 
@@ -35,7 +35,7 @@ harness-ai-kit add skill public-mysql-expert-base --runtime claude-code
 harness-ai-kit add skill diag-mysql-slow-query --runtime claude-code
 harness-ai-kit add skill diag-k8s-pod-crashloop --runtime claude-code
 harness-ai-kit lock
-git add ai-kit.yml ai-kit.lock
+git add harness-ai-kit.yml harness-ai-kit.lock
 git commit -m "chore: pin team AI skills"
 ```
 
@@ -104,12 +104,12 @@ Kiro uses steering files, not skill directories. harness-ai-kit handles the mapp
 harness-ai-kit add skill diag-k8s-node-pressure --runtime kiro
 harness-ai-kit sync
 
-# Skill is now at .kiro/steering/ + harness-ai-kit-skills/
+# Skill is now at .kiro/steering/ + harness-harness-ai-kit-skills/
 ```
 
 ---
 
-## Sample ai-kit.yml
+## Sample harness-ai-kit.yml
 
 ```yaml
 schema_version: "2"

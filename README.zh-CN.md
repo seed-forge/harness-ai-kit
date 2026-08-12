@@ -1,4 +1,4 @@
-# ai-kit
+# harness-ai-kit
 
 [![PyPI](https://img.shields.io/pypi/v/harness-ai-kit.svg?color=blue)](https://pypi.org/project/harness-ai-kit/)
 [![Python](https://img.shields.io/pypi/pyversions/harness-ai-kit.svg)](https://pypi.org/project/harness-ai-kit/)
@@ -11,9 +11,9 @@
 
 ```bash
 pip install harness-ai-kit
-ai-kit init
-ai-kit add skill https://github.com/anthropics/skills/tree/main/skills/skill-creator
-ai-kit sync
+harness-ai-kit init
+harness-ai-kit add skill https://github.com/anthropics/skills/tree/main/skills/skill-creator
+harness-ai-kit sync
 ```
 
 技能会安装到项目的 `.agents/skills/` 目录，AI 助手立即可用。
@@ -21,7 +21,7 @@ ai-kit sync
 ## 核心特性
 
 - **统一资产模型**：六类资产（skill / cli / mcp / plugin / hook / subagent）共享一套类型化依赖模型
-- **依赖求解**：基于 resolvelib 的 SAT 求解器，锁文件（ai-kit.lock）+ SHA-256 校验
+- **依赖求解**：基于 resolvelib 的 SAT 求解器，锁文件（harness-ai-kit.lock）+ SHA-256 校验
 - **多运行时适配**：Codex / Claude Code / Cursor / Kiro，项目级或全局级安装
 - **GitHub 直装**：从任意 GitHub 仓库安装技能，无需私有 registry
 - **原子安装回滚**：staging 安装 + 失败自动回滚

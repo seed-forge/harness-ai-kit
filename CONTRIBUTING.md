@@ -1,4 +1,4 @@
-# Contributing to ai-kit
+# Contributing to harness-ai-kit
 
 Thank you for your interest in contributing! This document covers the basics.
 
@@ -8,7 +8,7 @@ Thank you for your interest in contributing! This document covers the basics.
 git clone https://github.com/seed-forge/harness-ai-kit.git
 cd harness-ai-kit
 pip install -e .
-ai-kit --version  # verify it works
+harness-ai-kit --version  # verify it works
 ```
 
 ## Developer Certificate of Origin (DCO)
@@ -19,7 +19,7 @@ All commits must be signed off (`git commit -s`). By signing off, you certify th
 
 1. Fork the repo and create a feature branch from `main`
 2. Make your changes — keep commits atomic and focused
-3. Ensure `python -c "import ai_kit"` works and `ai-kit --help` runs cleanly
+3. Ensure `python -c "import ai_kit"` works and `harness-ai-kit --help` runs cleanly
 4. If you add or modify skills, run the validation: `python -c "import json; [json.loads(open(f'skills/{d}/skill.json').read()) for d in __import__('os').listdir('skills') if __import__('os').path.isfile(f'skills/{d}/skill.json')]"`
 5. Submit a PR — CI will run lint, import check, CLI smoke test, and a sensitive-reference scan
 
@@ -38,7 +38,7 @@ All commits must be signed off (`git commit -s`). By signing off, you certify th
 
 ## Reporting Issues
 
-Use the issue templates. For bugs, include the `ai-kit doctor` output. For feature requests, describe the use case.
+Use the issue templates. For bugs, include the `harness-ai-kit doctor` output. For feature requests, describe the use case.
 
 ## License
 

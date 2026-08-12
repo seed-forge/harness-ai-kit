@@ -63,7 +63,7 @@ def collect_registry_lock_guardrails(
     if lockfile is not None and manifest_skill_ids:
         if len(lockfile.roots) > max(len(manifest_skill_ids), 1) + 2:
             warnings.append(
-                f"ai-kit.lock lists {len(lockfile.roots)} roots but manifest declares {len(manifest_skill_ids)} skill(s); "
+                f"harness-ai-kit.lock lists {len(lockfile.roots)} roots but manifest declares {len(manifest_skill_ids)} skill(s); "
                 f"avoid `install --all --refresh-lock`. See {MAINTAINER_DOC}."
             )
 

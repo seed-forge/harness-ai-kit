@@ -5,7 +5,7 @@ import os
 from dataclasses import dataclass
 
 
-PRODUCT_ENV_VAR = "AI_KIT_PRODUCT"
+PRODUCT_ENV_VAR = "HARNESS_AI_KIT_PRODUCT"
 
 
 @dataclass(frozen=True)
@@ -26,20 +26,20 @@ class ProductProfile:
 
 
 PRODUCT_PROFILES: dict[str, ProductProfile] = {
-    "ai-kit": ProductProfile(
-        key="ai-kit",
+    "harness-ai-kit": ProductProfile(
+        key="harness-ai-kit",
         display_name="harness-ai-kit",
         command_name="harness-ai-kit",
         config_dirname=".harness-ai-kit",
-        default_checkout_dirname="ai-kit",
+        default_checkout_dirname="harness-ai-kit",
         default_repo_url="https://github.com/seed-forge/harness-ai-kit.git",
         self_cli_package_name="harness-ai-kit",
         cli_description="Package manager for AI agent assets (skills / CLIs / MCPs / loops).",
-        project_manifest_filename="ai-kit.yml",
-        lockfile_name="ai-kit.lock",
+        project_manifest_filename="harness-ai-kit.yml",
+        lockfile_name="harness-ai-kit.lock",
         managed_asset_bundle_root="",
-        runtime_skill_bundle_root="ai-kit-skills",
-        runtime_wrapper_prefix="ai-kit",
+        runtime_skill_bundle_root="harness-ai-kit-skills",
+        runtime_wrapper_prefix="harness-ai-kit",
     ),
 }
 
@@ -53,5 +53,5 @@ def activate_product(product_key: str) -> ProductProfile:
 
 
 def active_product_profile() -> ProductProfile:
-    requested = os.environ.get(PRODUCT_ENV_VAR, "ai-kit").strip() or "ai-kit"
-    return PRODUCT_PROFILES.get(requested, PRODUCT_PROFILES["ai-kit"])
+    requested = os.environ.get(PRODUCT_ENV_VAR, "harness-ai-kit").strip() or "harness-ai-kit"
+    return PRODUCT_PROFILES.get(requested, PRODUCT_PROFILES["harness-ai-kit"])

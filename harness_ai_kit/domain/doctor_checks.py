@@ -468,7 +468,7 @@ def doctor_sources_payload(
         runtime_id = lockfile.runtime
         install_scope = lockfile.install_scope
         features = list(lockfile.features)
-        warnings.append("Project has ai-kit.lock but no ai-kit.yml; current state is snapshot-driven only.")
+        warnings.append("Project has harness-ai-kit.lock but no harness-ai-kit.yml; current state is snapshot-driven only.")
 
     plan = None
     if root_ids and repo_root is not None:
@@ -527,7 +527,7 @@ def doctor_sources_payload(
         )
 
     if manifest is None:
-        warnings.append("No ai-kit.yml found in the current project.")
+        warnings.append("No harness-ai-kit.yml found in the current project.")
     if repo_root is None:
         warnings.append("harness-ai-kit repository root is not available on this machine.")
 

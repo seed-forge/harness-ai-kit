@@ -11,7 +11,7 @@ from harness_ai_kit.domain.manifest_io import find_lock_node
 from harness_ai_kit.domain.resolution import ResolutionPlan
 
 
-LOCKFILE_NAME = "ai-kit.lock"
+LOCKFILE_NAME = "harness-ai-kit.lock"
 
 
 def active_lockfile_name() -> str:

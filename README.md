@@ -18,8 +18,8 @@ As AI agents proliferate, teams accumulate reusable prompts, skills, CLIs and MC
 | | Copy-paste | harness-ai-kit |
 |---|-----------|--------|
 | Install a skill | `git clone` → find the right dir → copy files | `harness-ai-kit add skill <url>` |
-| Pin versions | Manual tracking | `ai-kit.lock` with SHA-256 |
-| Team consistency | "Works on my machine" | `ai-kit.yml` + `harness-ai-kit sync` = identical state |
+| Pin versions | Manual tracking | `harness-ai-kit.lock` with SHA-256 |
+| Team consistency | "Works on my machine" | `harness-ai-kit.yml` + `harness-ai-kit sync` = identical state |
 | Multiple AI runtimes | Repeat for each tool | `--runtime codex/claude-code/cursor/kiro` |
 | Dependency conflicts | Silent breakage | SAT solver detects conflicts upfront |
 | Offline / air-gapped | Re-download everything | `harness-ai-kit sync --offline` from cache |
@@ -32,7 +32,7 @@ Every skill in the [catalog](CATALOG.md) is a plain folder of Markdown + JSON. I
 - **`npx` / one-off scripts** — pull a single `SKILL.md` straight from the repo, no install step.
 - **Copy the folder yourself** — drop it into `.agents/skills/` (Codex) or `.claude/skills/` (Claude Code) by hand.
 
-harness-ai-kit is **not** a gatekeeper for the content. What it adds on top is the **asset manifest**: a curated, versioned, checksummed inventory (`ai-kit.yml` + `ai-kit.lock`) of *what* your project uses. If that inventory is useful to you, the CLI is the fastest way to manage it. If not, the skills work fine without it.
+harness-ai-kit is **not** a gatekeeper for the content. What it adds on top is the **asset manifest**: a curated, versioned, checksummed inventory (`harness-ai-kit.yml` + `harness-ai-kit.lock`) of *what* your project uses. If that inventory is useful to you, the CLI is the fastest way to manage it. If not, the skills work fine without it.
 
 ### Team collaboration — commit the manifest, not the assets
 
@@ -42,7 +42,7 @@ The manifest is where harness-ai-kit pays off most. The intended team flow:
 Member A (sets up)
   harness-ai-kit add skill devlab-spec-driven-dev
   harness-ai-kit add skill diag-mysql-deadlock
-  git add ai-kit.yml ai-kit.lock        # commit ONLY the manifest
+  git add harness-ai-kit.yml harness-ai-kit.lock        # commit ONLY the manifest
   git commit -m "chore: pin team AI skills"
 
 Member B (joins / updates)
@@ -86,7 +86,7 @@ The skill is now available to your AI agent. See [examples/](examples/README.md)
 | `harness-ai-kit sync` | Install declared assets to runtime |
 | `harness-ai-kit list` | Browse available skills |
 | `harness-ai-kit show <id>` | Show skill metadata |
-| `harness-ai-kit lock` | Pin exact versions to ai-kit.lock |
+| `harness-ai-kit lock` | Pin exact versions to harness-ai-kit.lock |
 | `harness-ai-kit doctor` | Health check your environment |
 | `harness-ai-kit remove skill <id>` | Remove a skill |
 | `harness-ai-kit outdated` | Check for updates |
@@ -97,7 +97,7 @@ Full reference: [docs/cli-reference.md](docs/cli-reference.md)
 ## Features
 
 - **Unified asset schema** — skills, CLIs, MCPs, plugins, hooks, subagents and loops share one typed dependency model with pinned versions
-- **Dependency resolution** — `resolvelib`-based solver with lockfile (`ai-kit.lock`) and checksum verification
+- **Dependency resolution** — `resolvelib`-based solver with lockfile (`harness-ai-kit.lock`) and checksum verification
 - **Multi-runtime support** — install to Codex, Claude Code, Cursor, Kiro (project or global scope)
 - **GitHub direct install** — install skills from any GitHub repo, no private registry required
 - **Staging + rollback** — atomic installs with automatic rollback on failure

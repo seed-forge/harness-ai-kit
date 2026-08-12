@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **BREAKING — the canonical name is now `harness-ai-kit` throughout.** The Python package (`harness_ai_kit`), primary command (`harness-ai-kit`), project manifest (`harness-ai-kit.yml`), lockfile (`harness-ai-kit.lock`), config directory (`~/.harness-ai-kit/`), runtime skill bundle root (`harness-ai-kit-skills`), and product env var (`HARNESS_AI_KIT_PRODUCT`) were all unified from the earlier `ai-kit` naming.
+  - The short command **`ai-kit` is retained as an alias** and keeps working (`ai-kit sync` == `harness-ai-kit sync`).
+  - **Migration for early adopters:** rename `ai-kit.yml` → `harness-ai-kit.yml` and `ai-kit.lock` → `harness-ai-kit.lock` in your project; move `~/.ai-kit/` → `~/.harness-ai-kit/`; then re-run `harness-ai-kit sync`. Skill inject markers (`<!-- ai-kit:inject ... -->`) become `<!-- harness-ai-kit:inject ... -->` and are refreshed automatically on the next sync.
+
+### Added
+
+- **11 additional curated skills** (34 total): AI engineering methodology (spec-driven dev, agent engineering, eval-driven agent, ai-kit miner, tech-debt ops), patent & document authoring (6), and testing/quality (web deep acceptance, web E2E, tech-fit eval)
+- **Skill catalog** (`CATALOG.md`) and **usage scenarios** (`docs/usage-scenarios.md`) covering the skill+SDD and loop+runtime models
+
 ## [0.1.0] - 2026-08-10
 
 Initial public release of harness-ai-kit — the package manager for AI agent assets.
@@ -14,7 +27,7 @@ Initial public release of harness-ai-kit — the package manager for AI agent as
 - **CLI core**: `harness-ai-kit` command with init, add, sync, lock, resolve, graph, list, doctor, verify, remove, search subcommands
 - **Unified asset model**: six asset kinds (skill / cli / mcp / plugin / hook / subagent) sharing a single typed dependency graph
 - **Dependency solver**: SAT-based resolution via resolvelib with feature flags and scope overrides
-- **Lockfile**: `ai-kit.lock` with SHA-256 content integrity verification
+- **Lockfile**: `harness-ai-kit.lock` with SHA-256 content integrity verification
 - **Multi-runtime sync**: Codex, Claude Code, Cursor, Kiro — project-level or global install
 - **GitHub direct install**: install skills from any GitHub repo without a private registry
 - **Atomic install**: staging-based install with automatic rollback on failure

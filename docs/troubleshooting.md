@@ -112,7 +112,7 @@ Common mistake: installed with `--scope global` but the AI tool reads project sc
 Two assets require incompatible versions of the same dependency.
 
 Fix: Check the conflict message, then either:
-- Pin a compatible version explicitly in `ai-kit.yml`
+- Pin a compatible version explicitly in `harness-ai-kit.yml`
 - Remove the conflicting asset
 - Report it as an issue if it seems like a bug
 

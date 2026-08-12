@@ -15,7 +15,7 @@ harness-ai-kit 的分阶段演进路线。每个阶段都有明确的交付物�
 | CLI core | init / add / sync / lock / resolve / graph / list / doctor / verify / remove / search |
 | Asset model | 6 kinds: skill, cli, mcp, plugin, hook, subagent |
 | Dependency solver | SAT-based via resolvelib, feature flags, scope overrides |
-| Lockfile | ai-kit.lock with SHA-256 integrity |
+| Lockfile | harness-ai-kit.lock with SHA-256 integrity |
 | Multi-runtime | Codex, Claude Code, Cursor, Kiro |
 | Install | GitHub direct install, atomic staging + rollback, offline mode |
 | Curated skills | 23 skills (expert bases, diagnostic playbooks, utilities) |

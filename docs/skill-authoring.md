@@ -45,8 +45,8 @@ Key rules:
 ## Creating a New Skill
 
 ```bash
-# Using ai-kit's built-in template (if available)
-ai-kit add skill --new my-skill
+# Using harness-ai-kit's built-in template (if available)
+harness-ai-kit add skill --new my-skill
 ```
 
 Or manually:
@@ -56,7 +56,7 @@ Or manually:
 3. Write `skill.json` — metadata
 4. Write `USAGE.md` — with at least one copy-pasteable prompt
 5. Write `CHANGELOG.md` — `## 0.1.0 — initial release`
-6. Test: `ai-kit validate` should pass
+6. Test: `harness-ai-kit validate` should pass
 
 ## Validation
 

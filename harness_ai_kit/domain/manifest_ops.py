@@ -299,7 +299,7 @@ def validate_sync_selection(args: argparse.Namespace, has_manifest: bool = False
     if install_all and skill_ids:
         raise ValueError("`--all` cannot be combined with explicit skill or CLI ids.")
     if not install_all and not skill_ids and not has_manifest:
-        raise ValueError("Specify one or more skill/CLI ids, or pass `--all`. Alternatively, create ai-kit.yml.")
+        raise ValueError("Specify one or more skill/CLI ids, or pass `--all`. Alternatively, create harness-ai-kit.yml.")
 
 
 

@@ -149,7 +149,7 @@ class ProjectManifestService:
             root = self._ports.infer_project_root_from_target_dir(request.target_dir) or Path.cwd()
             lock_path = self._ports.find_project_lockfile(root)
             if lock_path is None:
-                raise FileNotFoundError("No ai-kit.yml or ai-kit.lock found in the current project.")
+                raise FileNotFoundError("No harness-ai-kit.yml or harness-ai-kit.lock found in the current project.")
             lockfile = self._ports.read_lockfile(lock_path)
             manifest_path = self._ports.project_manifest_path(lock_path.parent)
             manifest = self._ports.project_manifest_from_lockfile(lockfile)
@@ -229,8 +229,8 @@ class ProjectManifestService:
         manifest_path, manifest = self._load_manifest_for_scope(scope, request.target_dir)
         if manifest_path is None or manifest is None:
             if scope == "global":
-                raise FileNotFoundError(f"No global ai-kit.yml found at {self._global_manifest_path()}.")
-            raise FileNotFoundError("No ai-kit.yml found in the current project.")
+                raise FileNotFoundError(f"No global harness-ai-kit.yml found at {self._global_manifest_path()}.")
+            raise FileNotFoundError("No harness-ai-kit.yml found in the current project.")
         if not self._ports.remove_asset_from_manifest(manifest, request.asset_kind, request.asset_id):
             raise KeyError(f"{request.asset_kind} {request.asset_id} is not declared in {manifest_path}.")
         self._ports.save_project_manifest(manifest_path, manifest)

@@ -148,7 +148,7 @@ def build_resolution_plan(
             try:
                 manifest = load_skill_manifest(root_dir)
             except (FileNotFoundError, OSError) as exc:
-                print(f"WARNING: skill '{skill_id}' declared in ai-kit.yml but skill.json not found at {root_dir}. Skipping local source; will try registry. ({exc})")
+                print(f"WARNING: skill '{skill_id}' declared in harness-ai-kit.yml but skill.json not found at {root_dir}. Skipping local source; will try registry. ({exc})")
                 manifest = None
             if manifest is not None:
                 manifest_namespace = manifest.namespace
@@ -245,7 +245,7 @@ def build_resolution_plan(
             f"  Constraints:\n{constraints_detail}\n\n"
             f"Hint: Some installed skills require conflicting CLI versions.\n"
             f"  Update or remove the skill with the outdated constraint, then retry.\n"
-            f"  Or clear the lockfile: rm -f ~/.harness-ai-kit/state/ai-kit.lock"
+            f"  Or clear the lockfile: rm -f ~/.harness-ai-kit/state/harness-ai-kit.lock"
         ) from exc
     candidate_map: dict[str, PackageCandidate] = {}
     manifest_map: dict[str, SkillManifest] = {}

@@ -14,7 +14,7 @@ Brief description of what this PR changes.
 ## Checklist
 
 - [ ] `python -c "import ai_kit"` works
-- [ ] `ai-kit --help` runs cleanly
+- [ ] `harness-ai-kit --help` runs cleanly
 - [ ] No internal hostnames / credentials (CI sensitive-scan will verify)
 - [ ] If adding a skill: `skill.json` is valid JSON
 - [ ] Commits are signed off (`git commit -s`)

@@ -2,7 +2,7 @@
 
 ## Asset Types
 
-ai-kit manages six asset types, all sharing a unified dependency model:
+harness-ai-kit manages six asset types, all sharing a unified dependency model:
 
 | Type | Description | Install Target |
 |------|-------------|----------------|
@@ -18,11 +18,11 @@ ai-kit manages six asset types, all sharing a unified dependency model:
 - Each asset declares typed dependencies with pinned versions (`==x.y.z`)
 - Optional dependencies must declare a `feature` name
 - The resolver uses `resolvelib` for SAT-based dependency resolution
-- Resolution result is captured in `ai-kit.lock` (the install contract)
+- Resolution result is captured in `harness-ai-kit.lock` (the install contract)
 
 ## Lockfile
 
-`ai-kit.lock` is a JSON snapshot containing:
+`harness-ai-kit.lock` is a JSON snapshot containing:
 - Root assets (what you asked to install)
 - Resolved versions (exact, pinned)
 - Source chosen for each node (GitHub repo, PyPI, registry)
@@ -35,12 +35,12 @@ ai-kit manages six asset types, all sharing a unified dependency model:
 |---------|--------------|--------------|
 | Codex | `.agents/skills/` | `~/.codex/skills/` |
 | Claude Code | `.claude/skills/` | `~/.claude/skills/` |
-| Kiro | `.kiro/steering/` + `ai-kit-skills/` | `~/.kiro/steering/` |
+| Kiro | `.kiro/steering/` + `harness-ai-kit-skills/` | `~/.kiro/steering/` |
 | Cursor | `.cursor/rules/` | (not supported) |
 
 ## Project Manifest
 
-`ai-kit.yml` is the project intent file — it declares what assets your project wants:
+`harness-ai-kit.yml` is the project intent file — it declares what assets your project wants:
 
 ```yaml
 schema_version: "2"
@@ -60,7 +60,7 @@ assets:
 The primary v0.1 installation path — no private registry required:
 
 ```bash
-ai-kit add skill https://github.com/OWNER/REPO/tree/main/path/to/skill
+harness-ai-kit add skill https://github.com/OWNER/REPO/tree/main/path/to/skill
 ```
 
 Supported source forms:

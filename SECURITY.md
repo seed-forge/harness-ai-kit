@@ -34,7 +34,7 @@ The following are in scope for security reports:
 
 ## Out of Scope
 
-- Vulnerabilities in third-party skills installed via `ai-kit add` (report to the skill author)
+- Vulnerabilities in third-party skills installed via `harness-ai-kit add` (report to the skill author)
 - Social engineering or phishing attacks
 - Denial of service against the PyPI registry or GitHub API
 

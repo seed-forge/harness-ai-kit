@@ -296,7 +296,7 @@ def main(argv: list[str] | None = None, *, product_key: str | None = None) -> in
 
 
 def ai_kit_main(argv: list[str] | None = None) -> int:
-    return main(argv, product_key="ai-kit")
+    return main(argv, product_key="harness-ai-kit")
 
 
 if __name__ == "__main__":

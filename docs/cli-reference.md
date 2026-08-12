@@ -43,7 +43,7 @@ Config path: `~/.harness-ai-kit/config.yaml`
 
 ### `harness-ai-kit init-project`
 
-Create `ai-kit.yml` (project manifest) in the current directory.
+Create `harness-ai-kit.yml` (project manifest) in the current directory.
 
 ```bash
 harness-ai-kit init-project
@@ -56,7 +56,7 @@ This declares your project's intent — which runtime, scope, and assets to use.
 Inspect or migrate the project manifest.
 
 ```bash
-harness-ai-kit manifest show           # show current ai-kit.yml
+harness-ai-kit manifest show           # show current harness-ai-kit.yml
 harness-ai-kit manifest migrate        # upgrade schema version
 ```
 
@@ -81,13 +81,13 @@ harness-ai-kit add skill diag-mysql-deadlock
 # Specify runtime and scope
 harness-ai-kit add skill my-skill --runtime claude-code --scope global
 
-# Add without installing (just update ai-kit.yml)
+# Add without installing (just update harness-ai-kit.yml)
 harness-ai-kit add skill my-skill --no-install
 ```
 
 ### `harness-ai-kit sync`
 
-Reconcile your project to match `ai-kit.yml`.
+Reconcile your project to match `harness-ai-kit.yml`.
 
 ```bash
 harness-ai-kit sync                    # install declared assets
@@ -104,7 +104,7 @@ harness-ai-kit remove skill my-skill   # remove from manifest + uninstall
 
 ### `harness-ai-kit uninstall`
 
-Remove an installed skill without touching `ai-kit.yml`.
+Remove an installed skill without touching `harness-ai-kit.yml`.
 
 ```bash
 harness-ai-kit uninstall my-skill
@@ -154,7 +154,7 @@ harness-ai-kit search mysql
 
 ### `harness-ai-kit lock`
 
-Resolve dependencies and write `ai-kit.lock`.
+Resolve dependencies and write `harness-ai-kit.lock`.
 
 ```bash
 harness-ai-kit lock                    # resolve + write lockfile
@@ -216,7 +216,7 @@ harness-ai-kit upgrade skills          # skills only
 
 ### `harness-ai-kit prune`
 
-Remove orphaned installs not declared in `ai-kit.yml`.
+Remove orphaned installs not declared in `harness-ai-kit.yml`.
 
 ```bash
 harness-ai-kit prune

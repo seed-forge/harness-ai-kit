@@ -86,7 +86,7 @@ RUNTIME_PROFILES: dict[str, RuntimeProfile] = {
 }
 
 # Default runtime priority: earlier entries take precedence over later ones.
-# Projects can override this in ai-kit.yml via the `runtime_priority` field.
+# Projects can override this in harness-ai-kit.yml via the `runtime_priority` field.
 DEFAULT_RUNTIME_PRIORITY: list[str] = [
     "codex",
     "qoder",

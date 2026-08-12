@@ -24,7 +24,7 @@ dependencies = [
 
 [project.scripts]
 harness-ai-kit = "harness_ai_kit.main:ai_kit_main"
-ai-kit = "harness_ai_kit.main:ai_kit_main"
+ai-kit = "harness_ai_kit.main:ai_kit_main"  # short alias
 
 [tool.setuptools]
 py-modules = []

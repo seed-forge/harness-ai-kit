@@ -27,5 +27,5 @@ Does this skill depend on any CLIs, MCPs, or other skills?
 ## Example Usage
 
 ```
-# paste an example ai-kit command or skill prompt
+# paste an example harness-ai-kit command or skill prompt
 ```

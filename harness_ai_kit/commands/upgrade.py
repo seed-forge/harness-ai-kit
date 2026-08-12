@@ -73,7 +73,7 @@ def command_outdated(args: argparse.Namespace, config_path: Path, context: Upgra
     config = context.effective_config(context.load_config(config_path))
     manifest_path, manifest = context.load_project_manifest_if_present()
     if manifest_path is None or manifest is None:
-        raise FileNotFoundError("No ai-kit.yml found in the current project.")
+        raise FileNotFoundError("No harness-ai-kit.yml found in the current project.")
     repo_root = context.resolve_repo_root_if_available(getattr(args, "repo_root", None), config, cwd=manifest_path.parent)
     repo_root_for_target = repo_root or manifest_path.parent
     lockfile = context.project_lockfile_from_manifest(
@@ -154,7 +154,7 @@ def command_diff(args: argparse.Namespace, config_path: Path, context: UpgradeCo
     config = context.effective_config(context.load_config(config_path))
     manifest_path, manifest = context.load_project_manifest_if_present()
     if manifest_path is None or manifest is None:
-        raise FileNotFoundError("No ai-kit.yml found in the current project.")
+        raise FileNotFoundError("No harness-ai-kit.yml found in the current project.")
     repo_root = context.resolve_repo_root_if_available(getattr(args, "repo_root", None), config, cwd=manifest_path.parent)
     repo_root_for_target = repo_root or manifest_path.parent
     runtime_id = getattr(args, "runtime", None) or manifest.runtime
@@ -222,8 +222,8 @@ def command_upgrade(args: argparse.Namespace, config_path: Path, context: Upgrad
         from harness_ai_kit.domain.lockfile_io import state_dir
         from harness_ai_kit.domain.manifest_ops import load_project_manifest, save_project_manifest, project_manifest_from_lockfile
         global_state = state_dir()
-        global_yml = global_state / "ai-kit.yml"
-        global_lock = global_state / "ai-kit.lock"
+        global_yml = global_state / "harness-ai-kit.yml"
+        global_lock = global_state / "harness-ai-kit.lock"
         if global_yml.exists():
             manifest_path = global_yml
             manifest = load_project_manifest(global_yml)

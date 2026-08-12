@@ -82,7 +82,7 @@ def command_lock(args: argparse.Namespace, config_path: Path, context: Resolutio
         print(project_sync_presentation.lockfile_written_line(lock_path))
         return 0
     if manifest is None or manifest_path is None:
-        raise ValueError("lock requires `skill <id>` or a ai-kit.yml in the current project.")
+        raise ValueError("lock requires `skill <id>` or a harness-ai-kit.yml in the current project.")
     runtime_id = context.manifest_aware_runtime(args, manifest)
     install_scope = context.manifest_aware_scope(args, manifest)
     lockfile = context.project_lockfile_from_manifest(

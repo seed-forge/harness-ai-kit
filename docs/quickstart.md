@@ -17,14 +17,14 @@ pip install harness-ai-kit
 Verify:
 
 ```bash
-ai-kit --version
-# Expected: ai-kit 0.1.0
+harness-ai-kit --version
+# Expected: harness-ai-kit 0.1.0
 ```
 
 ## Step 2: Initialize
 
 ```bash
-ai-kit init
+harness-ai-kit init
 ```
 
 This creates `~/.ai-kit/config.yaml` and clones the skill repository.
@@ -32,7 +32,7 @@ This creates `~/.ai-kit/config.yaml` and clones the skill repository.
 Verify:
 
 ```bash
-ai-kit doctor
+harness-ai-kit doctor
 # Expected: all checks pass (git, config, checkout, runtime)
 ```
 
@@ -40,15 +40,15 @@ ai-kit doctor
 
 ```bash
 cd your-project
-ai-kit add skill https://github.com/anthropics/skills/tree/main/skills/skill-creator
+harness-ai-kit add skill https://github.com/anthropics/skills/tree/main/skills/skill-creator
 ```
 
-This downloads the skill and records it in `ai-kit.yml`.
+This downloads the skill and records it in `harness-ai-kit.yml`.
 
 ## Step 4: Sync
 
 ```bash
-ai-kit sync
+harness-ai-kit sync
 ```
 
 This installs the skill into your AI runtime's skill directory.
@@ -73,7 +73,7 @@ The AI agent reads the SKILL.md from the installed directory and follows its ins
 
 ## What's Next?
 
-- **Browse curated skills**: `ai-kit list` — 23 production-tested skills included
+- **Browse curated skills**: `harness-ai-kit list` — 23 production-tested skills included
 - **See all commands**: [CLI Reference](cli-reference.md)
 - **Real-world examples**: [examples/](../examples/README.md) — team sync, multi-runtime, offline mode
 - **Trouble?**: [Troubleshooting guide](troubleshooting.md)
@@ -83,27 +83,27 @@ The AI agent reads the SKILL.md from the installed directory and follows its ins
 
 ```bash
 # Codex (default) — installs to .agents/skills/
-ai-kit add skill <id> --runtime codex
+harness-ai-kit add skill <id> --runtime codex
 
 # Claude Code — installs to .claude/skills/
-ai-kit add skill <id> --runtime claude-code
+harness-ai-kit add skill <id> --runtime claude-code
 
 # Cursor — installs to .cursor/rules/
-ai-kit add skill <id> --runtime cursor
+harness-ai-kit add skill <id> --runtime cursor
 
-# Kiro — installs to .kiro/steering/ + ai-kit-skills/
-ai-kit add skill <id> --runtime kiro
+# Kiro — installs to .kiro/steering/ + harness-ai-kit-skills/
+harness-ai-kit add skill <id> --runtime kiro
 ```
 
 ## Team Workflow
 
 ```bash
 # Team lead: pin skills for the project
-ai-kit init-project
-ai-kit add skill diag-mysql-deadlock
-ai-kit lock
-git add ai-kit.yml ai-kit.lock && git commit -m "pin team skills"
+harness-ai-kit init-project
+harness-ai-kit add skill diag-mysql-deadlock
+harness-ai-kit lock
+git add harness-ai-kit.yml harness-ai-kit.lock && git commit -m "pin team skills"
 
 # Team members: get identical state
-ai-kit sync
+harness-ai-kit sync
 ```

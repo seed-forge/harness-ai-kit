@@ -595,7 +595,7 @@ def uninstall_manifest_removed_line(*, asset_kind: str, asset_id: str, manifest_
 
 
 def uninstall_manifest_not_found_line() -> str:
-    return "Note: no ai-kit.yml found in scope; skipping manifest cleanup."
+    return "Note: no harness-ai-kit.yml found in scope; skipping manifest cleanup."
 
 
 def uninstall_manifest_not_declared_line(*, asset_kind: str, asset_id: str, manifest_path: Path) -> str:

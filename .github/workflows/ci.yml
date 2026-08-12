@@ -25,9 +25,9 @@ jobs:
         run: python -c "import ai_kit; print('import OK')"
       - name: CLI smoke test
         run: |
-          ai-kit --version
-          ai-kit --help
-          ai-kit doctor
+          harness-ai-kit --version
+          harness-ai-kit --help
+          harness-ai-kit doctor
       - name: Validate skills
         run: |
           if [ -d skills ]; then

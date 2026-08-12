@@ -260,10 +260,10 @@ def print_non_skill_requirements(lockfile: pm.Lockfile) -> None:
         print(f"Verify command: {command}")
 
 
-_INJECT_MARKER_BEGIN = "<!-- ai-kit:inject {skill_id} -->"
-_INJECT_MARKER_END = "<!-- /ai-kit:inject {skill_id} -->"
+_INJECT_MARKER_BEGIN = "<!-- harness-ai-kit:inject {skill_id} -->"
+_INJECT_MARKER_END = "<!-- /harness-ai-kit:inject {skill_id} -->"
 _INJECT_BLOCK_RE = re.compile(
-    r"<!-- ai-kit:inject (\S+) -->.*?<!-- /ai-kit:inject \1 -->",
+    r"<!-- harness-ai-kit:inject (\S+) -->.*?<!-- /harness-ai-kit:inject \1 -->",
     re.DOTALL,
 )
 
@@ -414,7 +414,7 @@ def resolve_asset_plan(
                 raise  # No new IDs to remove, re-raise
             accumulated_failed.update(failed_ids)
             for fid in sorted(failed_ids):
-                print(f"WARNING: {asset_kind} '{fid}' declared in ai-kit.yml could not be resolved (not found in local repo or registry). Skipping.")
+                print(f"WARNING: {asset_kind} '{fid}' declared in harness-ai-kit.yml could not be resolved (not found in local repo or registry). Skipping.")
             current_ids = [rid for rid in current_ids if rid not in failed_ids]
             if not current_ids:
                 raise

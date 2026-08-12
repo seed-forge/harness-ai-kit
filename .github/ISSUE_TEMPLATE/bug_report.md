@@ -26,12 +26,12 @@ What actually happened.
 ## Environment
 
 ```
-ai-kit --version:
+harness-ai-kit --version:
 python --version:
 OS:
 Runtime (codex / claude-code / cursor / kiro):
 ```
 
-## `ai-kit doctor` Output
+## `harness-ai-kit doctor` Output
 
-Paste the output of `ai-kit doctor` here.
+Paste the output of `harness-ai-kit doctor` here.
