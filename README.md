@@ -232,7 +232,7 @@ See [ROADMAP.md](ROADMAP.md) for the full plan with milestone criteria.
 
 ```
 harness-ai-kit/
-├── ai_kit/              # CLI source code
+├── harness_ai_kit/      # CLI source code
 │   ├── commands/        # Command handlers (install, resolve, lock, ...)
 │   ├── domain/          # Domain models (manifest, lockfile, resolver, ...)
 │   ├── infrastructure/   # Infrastructure (git ops, registry client, ...)
