@@ -3,13 +3,13 @@
 ## 1. 安装
 
 ```bash
-ai-kit install skill devlab-ai-kit-miner
+harness-ai-kit install skill devlab-ai-kit-miner
 ```
 
 建议同时安装基础复盘能力：
 
 ```bash
-ai-kit install skill post-task-skill-miner
+harness-ai-kit install skill post-task-skill-miner
 ```
 
 ## 2. 研发会话后复盘

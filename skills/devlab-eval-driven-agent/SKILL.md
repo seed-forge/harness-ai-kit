@@ -71,7 +71,7 @@ description: eval 自评测体系驱动的 AI Agent 生产体系方法论。以�
 | `evalctl feedback` | 回流人工标注/运营反馈到评测集 |
 | `evalctl report` | 生成分模块质量报告（可对接看板） |
 
-> CLI 立项时须配套 operator skill 并遵循 ai-kit CLI 规范（pinned 依赖、config 治理、doctor 子命令）。
+> CLI 立项时须配套 operator skill 并遵循 harness-ai-kit CLI 规范（pinned 依赖、config 治理、doctor 子命令）。
 
 ## 工作流
 

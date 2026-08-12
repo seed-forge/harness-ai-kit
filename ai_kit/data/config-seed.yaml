@@ -1,5 +1,0 @@
-# ai-kit global config seed
-# Merged into ~/.ai-kit/config.yaml by `ai-kit init`.
-# The OSS build ships no internal endpoints; point these at your own services if needed.
-
-global: {}

@@ -475,7 +475,7 @@ import { baseTest, expect } from './fixtures';
 ---
 
 <!-- TRELLIS:START -->
-Managed by Trellis. This skill follows the `ai-kit` asset pattern for web E2E testing specialization.
+Managed by Trellis. This skill follows the `harness-ai-kit` asset pattern for web E2E testing specialization.
 Last updated: 2026-07-22
 Author: AI-assisted implementation based on enterprise best practices.
 <!-- TRELLIS:END -->

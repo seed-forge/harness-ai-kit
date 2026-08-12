@@ -5,7 +5,7 @@ real work, how do these skills get pulled into the loop?** This page answers tha
 
 There are two distinct usage models, one for **skills** and one for **loops**.
 
-> **No lock-in:** every skill is a plain Markdown+JSON folder. You can have your agent fetch it, `npx`-style pull it, or copy it by hand — ai-kit is not required to *use* a skill. What ai-kit adds is the **asset manifest** (`ai-kit.yml` + `ai-kit.lock`) plus reproducible `sync`, which is what makes the team flow in the [README](../README.md#team-collaboration--commit-the-manifest-not-the-assets) work.
+> **No lock-in:** every skill is a plain Markdown+JSON folder. You can have your agent fetch it, `npx`-style pull it, or copy it by hand — harness-ai-kit is not required to *use* a skill. What harness-ai-kit adds is the **asset manifest** (`ai-kit.yml` + `ai-kit.lock`) plus reproducible `sync`, which is what makes the team flow in the [README](../README.md#team-collaboration--commit-the-manifest-not-the-assets) work.
 
 ---
 
@@ -48,9 +48,9 @@ You: "重构这个模块的数据访问层，消除 god-class"
 
 **Flow 1 — Feature/refactor with spec discipline**
 ```bash
-ai-kit add skill devlab-spec-driven-dev
-ai-kit add skill devlab-tech-debt-ops
-ai-kit sync
+harness-ai-kit add skill devlab-spec-driven-dev
+harness-ai-kit add skill devlab-tech-debt-ops
+harness-ai-kit sync
 ```
 Then in your SDD framework: *"按 spec 驱动方式做这个重构：先出 requirements/design/tasks，我确认后再执行。"*
 The framework loads `devlab-spec-driven-dev` for the workflow discipline and
@@ -58,18 +58,18 @@ The framework loads `devlab-spec-driven-dev` for the workflow discipline and
 
 **Flow 2 — Production incident**
 ```bash
-ai-kit add skill diag-mysql-deadlock
-ai-kit add skill public-mysql-expert-base
-ai-kit sync
+harness-ai-kit add skill diag-mysql-deadlock
+harness-ai-kit add skill public-mysql-expert-base
+harness-ai-kit sync
 ```
 Ask your agent: *"MySQL 又死锁了，帮我诊断。"* — `diag-mysql-deadlock` walks the
 lock-chain analysis, backed by the `public-mysql-expert-base` knowledge.
 
 **Flow 3 — Building an AI application**
 ```bash
-ai-kit add skill devlab-ai-agent-engineering
-ai-kit add skill devlab-eval-driven-agent
-ai-kit sync
+harness-ai-kit add skill devlab-ai-agent-engineering
+harness-ai-kit add skill devlab-eval-driven-agent
+harness-ai-kit sync
 ```
 The SDD framework uses `devlab-ai-agent-engineering` to shape the architecture and
 `devlab-eval-driven-agent` to install the quality gates.

@@ -3,7 +3,7 @@
 A categorized index of all skills shipped with harness-ai-kit. Install any with:
 
 ```bash
-ai-kit add skill <id>
+harness-ai-kit add skill <id>
 ```
 
 > **How are these used day-to-day?** See [docs/usage-scenarios.md](docs/usage-scenarios.md).

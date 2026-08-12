@@ -13,7 +13,7 @@ description: Review completed dev sessions to decide whether work should be dist
 - 研发场景特有的**多资产类型决策**（Skill / CLI / MCP / Loop / Subagent）
 - `devlab-*` 命名规范
 - 团队仓库 vs 项目级的沉淀位置决策
-- 与 `ai-kit` 工具链的集成指引
+- 与 `harness-ai-kit` 工具链的集成指引
 
 ## 输入
 
@@ -21,7 +21,7 @@ description: Review completed dev sessions to decide whether work should be dist
 - 本次 session 中与该任务相关的连续历史
 - 最终产物（代码、文档、配置、命令记录）
 - 执行过程中重复出现的步骤、判断、工具链或约束
-- 可选：现有 Skill 清单（`ai-kit/skills/` + `.claude/skills/`）
+- 可选：现有 Skill 清单（`harness-ai-kit/skills/` + `.claude/skills/`）
 
 ## 输出
 
@@ -64,7 +64,7 @@ description: Review completed dev sessions to decide whether work should be dist
   否 → 项目级 (.claude/skills/)
   是 → 是否依赖私有上下文？
     是 → 项目级
-    否 → 团队共享 (ai-kit/skills/)
+    否 → 团队共享 (harness-ai-kit/skills/)
 ```
 
 ## 命名规范
@@ -90,7 +90,7 @@ description: Review completed dev sessions to decide whether work should be dist
 | Loop 提炼 | 内置 6 信号评分 + 字段映射 Rubric | 复用上游评分，增加研发 Loop 子类型判定 |
 | 命名规范 | 无 | `devlab-srv/web/tool` 二级前缀 |
 | 沉淀位置 | 不区分 | 项目级 vs 团队共享 |
-| 工具链集成 | 无 | ai-kit (skill.json, USAGE.md, CHANGELOG.md) |
+| 工具链集成 | 无 | harness-ai-kit (skill.json, USAGE.md, CHANGELOG.md) |
 
 **依赖链**：`devlab-ai-kit-miner` → `post-task-skill-miner`（通用判断 + Loop 提炼）。
 
@@ -116,7 +116,7 @@ ai-kit-forge 接收草案 → 生成骨架 → validate → publish
 ## 约束
 
 - 不要为了体系化而强行沉淀。证据不足时明确说"暂不建议"。
-- 先检查 `ai-kit/skills/` 和 `.claude/skills/` 是否已有可复用资产。
+- 先检查 `harness-ai-kit/skills/` 和 `.claude/skills/` 是否已有可复用资产。
 - 沉淀到团队仓库必须有对应的 metadata 文件 + `USAGE.md` + `CHANGELOG.md`。
 - 涉及私有路径、凭证、个人习惯的内容不得进入团队共享。
 - 不要只根据最后一轮消息做复盘；默认结合 session 连续历史。

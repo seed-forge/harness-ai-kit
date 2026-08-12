@@ -77,5 +77,5 @@ description: {一句话说明}. Triggers on "{触发词}".
 
 | 条件 | 位置 |
 |------|------|
-| 输入输出稳定 + 不依赖私有上下文 | 团队共享 `ai-kit/skills/` |
+| 输入输出稳定 + 不依赖私有上下文 | 团队共享 `harness-ai-kit/skills/` |
 | 输入输出不稳定 或 依赖私有上下文 | 项目级 `.claude/skills/` |

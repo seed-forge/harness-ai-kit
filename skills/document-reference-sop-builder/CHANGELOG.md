@@ -10,7 +10,7 @@
 
 ## 0.1.0 - 2026-05-09
 
-- onboarded `document-reference-sop-builder` into `ai-kit`
+- onboarded `document-reference-sop-builder` into `harness-ai-kit`
 - added team metadata and dependency declarations for companion skills
 - bundled the reference checklist used to extract reusable document rules
 

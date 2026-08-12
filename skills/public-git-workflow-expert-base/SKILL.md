@@ -98,7 +98,7 @@ refactor/simplify-auth-flow
 
 - **02-工程工作空间**：大部分子项目使用 Trunk-based 或 GitHub Flow
 - **fleet-platform / 控制仓**：必须 PR + review，禁止直推 main
-- **ai-kit skills 仓库**：PR + CI gate，merge 后自动 publish
+- **harness-ai-kit skills 仓库**：PR + CI gate，merge 后自动 publish
 
 References:
 - [team-branch-strategy](references/REFERENCE-TEAM-BRANCH-STRATEGY.md)

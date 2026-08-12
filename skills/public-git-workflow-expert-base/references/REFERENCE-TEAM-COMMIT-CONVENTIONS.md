@@ -16,7 +16,7 @@ scope 使用**组件/模块 ID**，保持与代码库中的标识一致：
 
 | scope 示例 | 含义 |
 |------------|------|
-| `cli` | ai-kit CLI 工具链 |
+| `cli` | harness-ai-kit CLI 工具链 |
 | `homelab-compose-app-deploy` | Homelab Compose 部署技能 |
 | `ai-kit-forge` | Forge 资产创造器 |
 | `infra-datasource-ops` | 数据源运维技能 |
@@ -25,7 +25,7 @@ scope 使用**组件/模块 ID**，保持与代码库中的标识一致：
 ## 实际示例
 
 ```
-feat(cli): ai-kit v0.7.4 — 新增 shared-resources 命令
+feat(cli): harness-ai-kit v0.7.4 — 新增 shared-resources 命令
 
 添加 shared-resources 子命令，支持查询和同步跨空间共享资源清单。
 ```

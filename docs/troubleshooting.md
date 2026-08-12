@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Common issues and how to fix them. Run `ai-kit doctor` first — it catches most problems.
+Common issues and how to fix them. Run `harness-ai-kit doctor` first — it catches most problems.
 
 ## Installation Issues
 
@@ -36,13 +36,13 @@ python -m venv .venv && .venv\Scripts\activate && pip install harness-ai-kit
 
 ## Setup Issues
 
-### `ai-kit doctor` reports "git not found"
+### `harness-ai-kit doctor` reports "git not found"
 
-ai-kit requires `git` for cloning skill repositories.
+harness-ai-kit requires `git` for cloning skill repositories.
 
 Fix: Install git from https://git-scm.com/ and restart your terminal.
 
-### `ai-kit init` fails with network error
+### `harness-ai-kit init` fails with network error
 
 ```
 ERROR: Could not clone repository
@@ -59,37 +59,37 @@ Fix for proxy:
 ```bash
 # PowerShell
 $env:HTTPS_PROXY = "http://proxy.company.com:8080"
-ai-kit init
+harness-ai-kit init
 
 # Bash
 export HTTPS_PROXY=http://proxy.company.com:8080
-ai-kit init
+harness-ai-kit init
 ```
 
 ---
 
 ## Skill Installation Issues
 
-### `ai-kit add skill` fails with "skill not found"
+### `harness-ai-kit add skill` fails with "skill not found"
 
 The skill ID doesn't exist in the curated library.
 
-Fix: Check available skills with `ai-kit list`, or use a GitHub URL:
+Fix: Check available skills with `harness-ai-kit list`, or use a GitHub URL:
 
 ```bash
-ai-kit list                              # browse curated skills
-ai-kit add skill https://github.com/OWNER/REPO/tree/main/path/to/skill
+harness-ai-kit list                              # browse curated skills
+harness-ai-kit add skill https://github.com/OWNER/REPO/tree/main/path/to/skill
 ```
 
-### `ai-kit sync` fails with "checksum mismatch"
+### `harness-ai-kit sync` fails with "checksum mismatch"
 
 The downloaded content doesn't match the lockfile's SHA-256.
 
 Fix: Re-lock and re-sync.
 
 ```bash
-ai-kit lock --refresh    # re-resolve from source
-ai-kit sync
+harness-ai-kit lock --refresh    # re-resolve from source
+harness-ai-kit sync
 ```
 
 ### Skills not appearing in your AI tool
@@ -97,8 +97,8 @@ ai-kit sync
 Check that the runtime and scope are correct:
 
 ```bash
-ai-kit doctor runtimes    # verify runtime adapter is healthy
-ai-kit diff               # compare declared vs installed state
+harness-ai-kit doctor runtimes    # verify runtime adapter is healthy
+harness-ai-kit diff               # compare declared vs installed state
 ```
 
 Common mistake: installed with `--scope global` but the AI tool reads project scope, or vice versa.
@@ -107,7 +107,7 @@ Common mistake: installed with `--scope global` but the AI tool reads project sc
 
 ## Lock & Dependency Issues
 
-### `ai-kit lock` fails with "conflict"
+### `harness-ai-kit lock` fails with "conflict"
 
 Two assets require incompatible versions of the same dependency.
 
@@ -116,9 +116,9 @@ Fix: Check the conflict message, then either:
 - Remove the conflicting asset
 - Report it as an issue if it seems like a bug
 
-### `ai-kit resolve` shows unexpected dependencies
+### `harness-ai-kit resolve` shows unexpected dependencies
 
-Run `ai-kit why <dependency>` to understand why it was pulled in.
+Run `harness-ai-kit why <dependency>` to understand why it was pulled in.
 
 ---
 
@@ -129,7 +129,7 @@ Run `ai-kit why <dependency>` to understand why it was pulled in.
 Verify the install directory:
 
 ```bash
-ai-kit doctor runtimes    # should show codex target path
+harness-ai-kit doctor runtimes    # should show codex target path
 ls .agents/skills/        # should contain your skills
 ```
 
@@ -149,14 +149,14 @@ ls ~/.claude/skills/      # global scope
 ### Stale cache causing problems
 
 ```bash
-ai-kit cache clean
-ai-kit sync
+harness-ai-kit cache clean
+harness-ai-kit sync
 ```
 
 ---
 
 ## Still Stuck?
 
-1. Run `ai-kit doctor --json` and save the output
+1. Run `harness-ai-kit doctor --json` and save the output
 2. Check [existing issues](https://github.com/seed-forge/harness-ai-kit/issues)
 3. Open a [new issue](https://github.com/seed-forge/harness-ai-kit/issues/new?template=bug_report.md) with the doctor output attached

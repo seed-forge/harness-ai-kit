@@ -50,7 +50,7 @@ cli/{id}/
 
 ```
 1. bump version in cli.json + pyproject.toml
-2. ai-kit publish-cli {id}
+2. harness-ai-kit publish-cli {id}
 3. 回读 Nexus index.json 确认 latest_version
 4. 本地 pip install --upgrade 验证
 ```

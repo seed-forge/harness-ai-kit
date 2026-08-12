@@ -32,7 +32,7 @@ harness-ai-kit 的分阶段演进路线。每个阶段都有明确的交付物�
 | Loop framework | Declarative loop assets for recurring AI workflows |
 | Hooks | Pre/post-install and pre/post-sync lifecycle hooks |
 | Skill authoring toolkit | Scaffold, validate, and test new skills locally |
-| ai-kit upgrade | Self-update with rollback |
+| harness-ai-kit upgrade | Self-update with rollback |
 | Rich search | Full-text search across skill name, description, tags |
 | Config profiles | Named configuration profiles for multi-project workflows |
 

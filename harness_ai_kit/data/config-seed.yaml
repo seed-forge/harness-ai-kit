@@ -1,0 +1,5 @@
+# harness-ai-kit global config seed
+# Merged into ~/.harness-ai-kit/config.yaml by `harness-ai-kit init` (alias: `ai-kit init`).
+# The OSS build ships no internal endpoints; point these at your own services if needed.
+
+global: {}

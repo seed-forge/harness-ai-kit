@@ -7,7 +7,7 @@
 **教训**：初次搜索现有 skill 时，`Glob **/devlab-*` 只匹配到目录名而非目录下的 SKILL.md，误判为"无现有 devlab-* skill"，差点新建重复 skill。
 
 **规则**：搜索现有资产时必须同时检查：
-1. `ai-kit/skills/` 下所有目录名
+1. `harness-ai-kit/skills/` 下所有目录名
 2. 每个目录下的 `SKILL.md` 内容（至少读标题和用途段）
 3. 关键词搜索（Grep 名称、库名、技术名词）
 

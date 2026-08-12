@@ -12,20 +12,20 @@
 
 ## Before Opening an Issue
 
-1. Run `ai-kit doctor` and attach the output
+1. Run `harness-ai-kit doctor` and attach the output
 2. Check [existing issues](https://github.com/seed-forge/harness-ai-kit/issues) for duplicates
 3. Read the [Quickstart](docs/quickstart.md) and [Concepts](docs/concepts.md) guides
 
 ## FAQ
 
 **Q: Which AI runtimes are supported?**
-A: Codex, Claude Code, Cursor, and Kiro. See `ai-kit list runtimes` for details.
+A: Codex, Claude Code, Cursor, and Kiro. See `harness-ai-kit list runtimes` for details.
 
-**Q: Can I use ai-kit without a private registry?**
-A: Yes. `ai-kit add skill <github-url>` installs directly from any GitHub repo.
+**Q: Can I use harness-ai-kit without a private registry?**
+A: Yes. `harness-ai-kit add skill <github-url>` installs directly from any GitHub repo.
 
 **Q: How do I install skills globally (not per-project)?**
-A: Use `ai-kit add skill <source> --scope global`.
+A: Use `harness-ai-kit add skill <source> --scope global`.
 
 **Q: Is there an offline mode?**
-A: Yes. After the first sync, `ai-kit sync --offline` uses the local cache.
+A: Yes. After the first sync, `harness-ai-kit sync --offline` uses the local cache.

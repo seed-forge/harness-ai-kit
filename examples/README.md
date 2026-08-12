@@ -1,6 +1,6 @@
 # Examples
 
-Real-world usage patterns for ai-kit.
+Real-world usage patterns for harness-ai-kit.
 
 ## 1. Solo Developer — Codex + MySQL Diagnostics
 
@@ -8,14 +8,14 @@ You use Codex and want MySQL troubleshooting skills in your project.
 
 ```bash
 pip install harness-ai-kit
-ai-kit init
+harness-ai-kit init
 cd my-backend-project
 
 # Add the MySQL deadlock diagnostic skill
-ai-kit add skill diag-mysql-deadlock
+harness-ai-kit add skill diag-mysql-deadlock
 
 # Verify
-ai-kit doctor
+harness-ai-kit doctor
 ls .agents/skills/diag-mysql-deadlock/SKILL.md
 ```
 
@@ -30,11 +30,11 @@ Your team uses Claude Code. Everyone needs the same skills, pinned to exact vers
 **Team lead** (one-time setup):
 
 ```bash
-ai-kit init-project
-ai-kit add skill public-mysql-expert-base --runtime claude-code
-ai-kit add skill diag-mysql-slow-query --runtime claude-code
-ai-kit add skill diag-k8s-pod-crashloop --runtime claude-code
-ai-kit lock
+harness-ai-kit init-project
+harness-ai-kit add skill public-mysql-expert-base --runtime claude-code
+harness-ai-kit add skill diag-mysql-slow-query --runtime claude-code
+harness-ai-kit add skill diag-k8s-pod-crashloop --runtime claude-code
+harness-ai-kit lock
 git add ai-kit.yml ai-kit.lock
 git commit -m "chore: pin team AI skills"
 ```
@@ -43,7 +43,7 @@ git commit -m "chore: pin team AI skills"
 
 ```bash
 pip install harness-ai-kit
-ai-kit sync
+harness-ai-kit sync
 # Done — same skills, same versions, same SHAs
 ```
 
@@ -55,10 +55,10 @@ Install a skill from any GitHub repo without cloning.
 
 ```bash
 # Anthropic's skill-creator
-ai-kit add skill https://github.com/anthropics/skills/tree/main/skills/skill-creator
+harness-ai-kit add skill https://github.com/anthropics/skills/tree/main/skills/skill-creator
 
 # Custom skill from your own repo
-ai-kit add skill myorg/ai-skills --subpath skills/code-reviewer --ref v1.0
+harness-ai-kit add skill myorg/ai-skills --subpath skills/code-reviewer --ref v1.0
 ```
 
 ---
@@ -69,12 +69,12 @@ You switch between Codex and Claude Code and want the same skills in both.
 
 ```bash
 # Install for Codex (project scope)
-ai-kit add skill base-goal-execution --runtime codex
+harness-ai-kit add skill base-goal-execution --runtime codex
 
 # Also install for Claude Code (project scope)
-ai-kit add skill base-goal-execution --runtime claude-code
+harness-ai-kit add skill base-goal-execution --runtime claude-code
 
-ai-kit sync
+harness-ai-kit sync
 ```
 
 Skills are installed to both `.agents/skills/` and `.claude/skills/`.
@@ -87,24 +87,24 @@ Your CI or air-gapped environment has no internet access.
 
 ```bash
 # On a machine with internet — warm the cache
-ai-kit sync
-# Copy ~/.ai-kit/cache/ to the offline machine
+harness-ai-kit sync
+# Copy ~/.harness-ai-kit/cache/ to the offline machine
 
 # On the offline machine
-ai-kit sync --offline
+harness-ai-kit sync --offline
 ```
 
 ---
 
 ## 6. Kiro — Steering + Skill Hybrid
 
-Kiro uses steering files, not skill directories. ai-kit handles the mapping.
+Kiro uses steering files, not skill directories. harness-ai-kit handles the mapping.
 
 ```bash
-ai-kit add skill diag-k8s-node-pressure --runtime kiro
-ai-kit sync
+harness-ai-kit add skill diag-k8s-node-pressure --runtime kiro
+harness-ai-kit sync
 
-# Skill is now at .kiro/steering/ + ai-kit-skills/
+# Skill is now at .kiro/steering/ + harness-ai-kit-skills/
 ```
 
 ---

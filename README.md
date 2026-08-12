@@ -1,4 +1,4 @@
-# ai-kit
+# harness-ai-kit
 
 [![PyPI](https://img.shields.io/pypi/v/harness-ai-kit.svg?color=blue)](https://pypi.org/project/harness-ai-kit/)
 [![Python](https://img.shields.io/pypi/pyversions/harness-ai-kit.svg)](https://pypi.org/project/harness-ai-kit/)
@@ -11,20 +11,20 @@
 
 ## Why
 
-As AI agents proliferate, teams accumulate reusable prompts, skills, CLIs and MCP servers — but there's no `npm` for these assets. `ai-kit` fills that gap: one CLI to install, resolve, lock, validate and govern AI agent assets across multiple runtimes.
+As AI agents proliferate, teams accumulate reusable prompts, skills, CLIs and MCP servers — but there's no `npm` for these assets. `harness-ai-kit` fills that gap: one CLI to install, resolve, lock, validate and govern AI agent assets across multiple runtimes.
 
 ### Why not just copy SKILL.md files?
 
-| | Copy-paste | ai-kit |
+| | Copy-paste | harness-ai-kit |
 |---|-----------|--------|
-| Install a skill | `git clone` → find the right dir → copy files | `ai-kit add skill <url>` |
+| Install a skill | `git clone` → find the right dir → copy files | `harness-ai-kit add skill <url>` |
 | Pin versions | Manual tracking | `ai-kit.lock` with SHA-256 |
-| Team consistency | "Works on my machine" | `ai-kit.yml` + `ai-kit sync` = identical state |
+| Team consistency | "Works on my machine" | `ai-kit.yml` + `harness-ai-kit sync` = identical state |
 | Multiple AI runtimes | Repeat for each tool | `--runtime codex/claude-code/cursor/kiro` |
 | Dependency conflicts | Silent breakage | SAT solver detects conflicts upfront |
-| Offline / air-gapped | Re-download everything | `ai-kit sync --offline` from cache |
+| Offline / air-gapped | Re-download everything | `harness-ai-kit sync --offline` from cache |
 
-### No lock-in — you don't have to use ai-kit
+### No lock-in — you don't have to use harness-ai-kit
 
 Every skill in the [catalog](CATALOG.md) is a plain folder of Markdown + JSON. If you don't want another CLI, you don't need one:
 
@@ -32,27 +32,27 @@ Every skill in the [catalog](CATALOG.md) is a plain folder of Markdown + JSON. I
 - **`npx` / one-off scripts** — pull a single `SKILL.md` straight from the repo, no install step.
 - **Copy the folder yourself** — drop it into `.agents/skills/` (Codex) or `.claude/skills/` (Claude Code) by hand.
 
-ai-kit is **not** a gatekeeper for the content. What it adds on top is the **asset manifest**: a curated, versioned, checksummed inventory (`ai-kit.yml` + `ai-kit.lock`) of *what* your project uses. If that inventory is useful to you, the CLI is the fastest way to manage it. If not, the skills work fine without it.
+harness-ai-kit is **not** a gatekeeper for the content. What it adds on top is the **asset manifest**: a curated, versioned, checksummed inventory (`ai-kit.yml` + `ai-kit.lock`) of *what* your project uses. If that inventory is useful to you, the CLI is the fastest way to manage it. If not, the skills work fine without it.
 
 ### Team collaboration — commit the manifest, not the assets
 
-The manifest is where ai-kit pays off most. The intended team flow:
+The manifest is where harness-ai-kit pays off most. The intended team flow:
 
 ```
 Member A (sets up)
-  ai-kit add skill devlab-spec-driven-dev
-  ai-kit add skill diag-mysql-deadlock
+  harness-ai-kit add skill devlab-spec-driven-dev
+  harness-ai-kit add skill diag-mysql-deadlock
   git add ai-kit.yml ai-kit.lock        # commit ONLY the manifest
   git commit -m "chore: pin team AI skills"
 
 Member B (joins / updates)
-  ai-kit sync                            # done — exact same assets, SHA-256 verified
+  harness-ai-kit sync                            # done — exact same assets, SHA-256 verified
 ```
 
 Two concrete benefits:
 
 1. **Nothing sensitive leaves the repo.** Member A commits only two small YAML/JSON files. The raw skill folders — which may carry local paths, personal runtime config, or credentials from a member's own machine — are never committed. Member B re-materializes them locally from the manifest.
-2. **Updates are cheap and non-destructive.** When the team bumps a skill version, members just `ai-kit sync` (or `ai-kit update`) to pull the latest. Because the lockfile records exactly what's managed by ai-kit, a member's own hand-added / custom skills are left untouched — sync reconciles the manifest, it doesn't wipe your local additions.
+2. **Updates are cheap and non-destructive.** When the team bumps a skill version, members just `harness-ai-kit sync` (or `harness-ai-kit update`) to pull the latest. Because the lockfile records exactly what's managed by harness-ai-kit, a member's own hand-added / custom skills are left untouched — sync reconciles the manifest, it doesn't wipe your local additions.
 
 In short: the manifest is the team's shared source of truth for "which AI assets we run", and `sync` is how everyone stays identical without sharing anything sensitive.
 
@@ -60,16 +60,18 @@ In short: the manifest is the team's shared source of truth for "which AI assets
 
 ```bash
 pip install harness-ai-kit
-ai-kit init
+harness-ai-kit init
 cd your-project
-ai-kit add skill https://github.com/anthropics/skills/tree/main/skills/skill-creator
-ai-kit sync
+harness-ai-kit add skill https://github.com/anthropics/skills/tree/main/skills/skill-creator
+harness-ai-kit sync
 ```
+
+> **Short alias:** every command is also available as `ai-kit` (e.g. `ai-kit sync`). Use whichever you prefer — both invoke the same CLI.
 
 Verify it worked:
 
 ```bash
-ai-kit doctor              # health check — should be all green
+harness-ai-kit doctor              # health check — should be all green
 ls .agents/skills/          # skill-creator should be here
 ```
 
@@ -79,16 +81,16 @@ The skill is now available to your AI agent. See [examples/](examples/README.md)
 
 | Command | What it does |
 |---------|-------------|
-| `ai-kit init` | First-time machine setup |
-| `ai-kit add skill <id-or-url>` | Add a skill to your project |
-| `ai-kit sync` | Install declared assets to runtime |
-| `ai-kit list` | Browse available skills |
-| `ai-kit show <id>` | Show skill metadata |
-| `ai-kit lock` | Pin exact versions to ai-kit.lock |
-| `ai-kit doctor` | Health check your environment |
-| `ai-kit remove skill <id>` | Remove a skill |
-| `ai-kit outdated` | Check for updates |
-| `ai-kit cache clean` | Clear local cache |
+| `harness-ai-kit init` | First-time machine setup |
+| `harness-ai-kit add skill <id-or-url>` | Add a skill to your project |
+| `harness-ai-kit sync` | Install declared assets to runtime |
+| `harness-ai-kit list` | Browse available skills |
+| `harness-ai-kit show <id>` | Show skill metadata |
+| `harness-ai-kit lock` | Pin exact versions to ai-kit.lock |
+| `harness-ai-kit doctor` | Health check your environment |
+| `harness-ai-kit remove skill <id>` | Remove a skill |
+| `harness-ai-kit outdated` | Check for updates |
+| `harness-ai-kit cache clean` | Clear local cache |
 
 Full reference: [docs/cli-reference.md](docs/cli-reference.md)
 
@@ -112,7 +114,7 @@ Requires Python >= 3.10 and `git`.
 
 ## Built-in Skill Library
 
-34 production-tested skills included. Install any with `ai-kit add skill <id>`. Full categorized index: **[CATALOG.md](CATALOG.md)**.
+34 production-tested skills included. Install any with `harness-ai-kit add skill <id>`. Full categorized index: **[CATALOG.md](CATALOG.md)**.
 
 > New here? Read [Usage Scenarios](docs/usage-scenarios.md) first — it explains how skills get pulled into real work via an SDD framework (e.g. Trellis), and how loops bind to a runtime.
 
@@ -195,7 +197,7 @@ Full catalog with install commands: **[CATALOG.md](CATALOG.md)** · usage patter
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                    ai-kit CLI                        │
+│                    harness-ai-kit CLI                        │
 │  init · add · install · sync · lock · resolve ·     │
 │  graph · why · validate · doctor · upgrade · cache  │
 ├─────────────────────────────────────────────────────┤

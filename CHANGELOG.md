@@ -11,7 +11,7 @@ Initial public release of harness-ai-kit — the package manager for AI agent as
 
 ### Added
 
-- **CLI core**: `ai-kit` command with init, add, sync, lock, resolve, graph, list, doctor, verify, remove, search subcommands
+- **CLI core**: `harness-ai-kit` command with init, add, sync, lock, resolve, graph, list, doctor, verify, remove, search subcommands
 - **Unified asset model**: six asset kinds (skill / cli / mcp / plugin / hook / subagent) sharing a single typed dependency graph
 - **Dependency solver**: SAT-based resolution via resolvelib with feature flags and scope overrides
 - **Lockfile**: `ai-kit.lock` with SHA-256 content integrity verification

@@ -10,4 +10,4 @@
 
 ## 0.1.0 - 2026-05-14
 
-- 从 03 工作空间迁入 patent-disclosure-workflow，补齐 ai-kit 元数据，明确与写作层、导出层 Skill 的依赖关系。
+- 从 03 工作空间迁入 patent-disclosure-workflow，补齐 harness-ai-kit 元数据，明确与写作层、导出层 Skill 的依赖关系。

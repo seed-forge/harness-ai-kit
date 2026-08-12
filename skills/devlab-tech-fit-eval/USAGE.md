@@ -6,7 +6,7 @@
 
 ## 前提条件
 
-- ai-kit CLI 已安装
+- harness-ai-kit CLI 已安装
 
 ## 推荐触发方式
 

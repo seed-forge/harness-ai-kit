@@ -65,7 +65,7 @@ PyPI 已按此模式落地，见 `Homelab/ansible-control/artifacts/nexus-pypi/R
 | **Go modules** | `GOPROXY=https://nexus.../repository/go-group/` | Nexus Go proxy（或 raw + 元数据，按实例配置） | `go mod download` @ pinned → upload hosted / 暖 proxy | 文档默认 **goproxy.cn**；**待** |
 | **Docker 基础镜像** | `FROM harbor.base...` | Harbor（常与 Nexus 并列，非同一 daemon） | `skopeo copy` / Harbor proxy cache；大镜像预 pull 到 Harbor | Harbor + Kaniko；与语言源**解耦** |
 | **apt / apk** | Dockerfile `sed` 换源 | Nexus raw/proxy（若已配）或 **L2 阿里云** | 一般**不**按包预热；大 deb 可考虑 private mirror | deploy-apps 多内联 **mirrors.aliyun** |
-| **raw（skill/cli）** | HTTP GET index | `raw-hosted-skill`、`raw-hosted-cli` | `ai-kit publish` 流程 | **已用于** ai-kit |
+| **raw（skill/cli）** | HTTP GET index | `raw-hosted-skill`、`raw-hosted-cli` | `harness-ai-kit publish` 流程 | **已用于** harness-ai-kit |
 
 **原则**：表中「待」项在 review `deploy-apps` 或新 Java/Node/Go 服务时，应优先排期 **group URL + manifest**，而不是再扩写一条「换 npmmirror / aliyun」的 Dockerfile。
 

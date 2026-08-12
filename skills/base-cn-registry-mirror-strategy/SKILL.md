@@ -81,7 +81,7 @@ description: 国内镜像源与代理分层策略（Docker / Debian / Alpine / N
 
 - **Nexus 全生态私服与预热（大依赖必看）**：`references/REFERENCE-NEXUS-ECOSYSTEM-PRELOAD.md`
 - **Homelab 执行编排**（manifest、波次 B、Harbor warm、Woodpecker inspect）：`infra-artifact-readiness-ops`
-- 长篇可复制片段与命令：`references/REFERENCE-MIRROR-RECIPES.md`（在 `ai-kit` 仓库内路径为 `skills/base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md`；若以「02-工程工作空间」为根，则为 `工程规范/ai-kit/skills/base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md`）
+- 长篇可复制片段与命令：`references/REFERENCE-MIRROR-RECIPES.md`（在 `harness-ai-kit` 仓库内路径为 `skills/base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md`；若以「02-工程工作空间」为根，则为 `工程规范/harness-ai-kit/skills/base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md`）
 - Homelab 宿主机出站 HTTP 代理（GitHub / Google 等 GFW 站点）：`homelab-worklab-ops/references/REFERENCE-HOMELAB-OUTBOUND-HTTP-PROXY.md`
 
 ## 维护建议

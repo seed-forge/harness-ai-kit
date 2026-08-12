@@ -21,4 +21,4 @@
 
 - added `post-task-skill-miner` as a shared retrospective skill for Codex and Claude Code style AI IDE workflows
 - defined a reusable rubric for deciding between knowledge-card only, project-level skill, and team-shared skill outcomes
-- aligned the deliverable shape with `ai-kit` skill packaging and governance expectations
+- aligned the deliverable shape with `harness-ai-kit` skill packaging and governance expectations

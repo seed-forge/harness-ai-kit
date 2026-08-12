@@ -23,13 +23,14 @@ dependencies = [
 ]
 
 [project.scripts]
-ai-kit = "ai_kit.main:ai_kit_main"
+harness-ai-kit = "harness_ai_kit.main:ai_kit_main"
+ai-kit = "harness_ai_kit.main:ai_kit_main"
 
 [tool.setuptools]
 py-modules = []
 
 [tool.setuptools.packages.find]
-include = ["ai_kit", "ai_kit.*"]
+include = ["harness_ai_kit", "harness_ai_kit.*"]
 
 [tool.setuptools.package-data]
-ai_kit = ["data/*.yaml"]
+harness_ai_kit = ["data/*.yaml"]
