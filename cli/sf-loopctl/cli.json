@@ -1,0 +1,18 @@
+{
+  "namespace": "community",
+  "id": "loopctl",
+  "name": "loopctl",
+  "owner": "seedforge",
+  "version": "0.1.0",
+  "status": "trial",
+  "package_type": "cli",
+  "summary": "Loop asset lifecycle CLI (list, validate, run, status, extract, promote) for harness-ai-kit loop assets.",
+  "package_name": "sf-loopctl",
+  "install_type": "python-package",
+  "publish_paths": [
+    "cli/sf-loopctl"
+  ],
+  "companion_docs": {
+    "usage": "README.md"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "namespace": "community",
+  "id": "mineructl",
+  "name": "mineructl",
+  "owner": "seedforge",
+  "version": "0.1.0",
+  "status": "trial",
+  "package_type": "cli",
+  "summary": "MinerU document-parsing service ops CLI: doctor, probe, version, submit, status, result, tasks.",
+  "package_name": "sf-mineructl",
+  "install_type": "python-package",
+  "publish_paths": [
+    "cli/sf-mineructl"
+  ],
+  "companion_docs": {
+    "usage": "README.md"
+  }
+}

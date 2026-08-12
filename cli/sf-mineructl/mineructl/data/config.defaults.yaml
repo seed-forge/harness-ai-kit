@@ -1,0 +1,5 @@
+$schema: harness-ai-kit-config/v1
+
+config: []
+# Populate with asset-specific config keys as needed.
+# See config-governance.md §3.1 for the format specification.

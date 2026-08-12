@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sf-loopctl"
+version = "0.1.0"
+description = "Loop asset lifecycle CLI (list, validate, run, status, extract, promote) for harness-ai-kit loop assets."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "SeedForge" }
+]
+dependencies = [
+  "harness-ai-kit>=0.2.0",
+  "click>=8.0",
+  "pydantic>=2.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/seed-forge/harness-ai-kit"
+Repository = "https://github.com/seed-forge/harness-ai-kit"
+
+[project.scripts]
+loopctl = "loopctl.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["loopctl", "loopctl.*"]
