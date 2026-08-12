@@ -1,0 +1,21 @@
+# <模块名> — 深度验收 SUMMARY
+
+> 本文件由 run.js 从 registry 终态自动生成聚合，**勿手写权威信息**（会被每轮运行覆盖）。
+> 根因/解锁命令/执行注写 registry 的 reason 与 `# 执行注:`，生成时自动带出。
+
+- 时间: <YYYY-MM-DD HH:mm:ss>
+- 总计: <N> 项 — <a> PASS / <b> FAIL / <c> BLOCKED（豁免 <e>）
+
+| 功能点 | 级别 | 状态 | 根因/说明 |
+|--------|------|------|-----------|
+| <prefix>-l1-load | L1 | PASS | |
+| <prefix>-l2-query | L2 | BLOCKED | 数据类——<根因>，解锁命令：<命令> |
+| <prefix>-l3-create | L3 | FAIL | <错误摘要> |
+
+## 豁免统计
+
+- <status> <url>（重试成功，已豁免）——<证据注释：为什么不是本页缺陷>
+
+## 造数记录
+
+- <日期>：node run.js <module> --seed（<造数内容摘要>，SQL 归档 sql-scripts/<file>）

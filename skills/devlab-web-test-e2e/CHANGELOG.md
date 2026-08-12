@@ -1,0 +1,18 @@
+# Changelog
+
+## 0.1.3 - 2026-08-06
+
+- 治理清欠：结构合规修复后版本抬升（usage_missing）。
+
+## 0.1.2 - 2026-07-26
+
+- **Bug Fix**: 修复 `runtime_requirements` 的 schema 格式错误
+  - 从对象数组改为字符串数组格式（pkg>=version）
+  - 符合 ai-kit 官方规范
+  - 解决 `publish-skill` 时报错 "Input should be a valid string"
+  
+## 0.1.1 - 2026-07-24
+
+- Initial release (trial status)
+- Web E2E 测试专家技能
+- 基于 Playwright + AI Agent 实现测试闭环

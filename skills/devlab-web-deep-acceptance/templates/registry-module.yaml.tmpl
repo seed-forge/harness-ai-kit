@@ -1,0 +1,47 @@
+# registry/<module>.yaml — 功能点唯一事实源（模板）
+# 填写要点：
+# 1. feature id 模块内全局唯一，多页模块带页面缩写前缀（如 ov-l1-load）
+# 2. registry 声明顺序即执行顺序；破坏性用例排在依赖它的用例之后
+# 3. blocked/fail 必须写 reason（五分类标签+解锁命令）
+# 4. "# 执行注:" 注释承载关键事实（等价替换/造数命令/豁免依据/假成功注记）——回写保注释
+module: <module-id>                     # 命名：<app-kebab>-<域>，如 system-management-log
+app: <AppName>                          # 前端一级 APP 锚点（routers 目录名）
+# app_path: <SubPath/ViewPath>          # 仅子域粒度模块需要
+name: <模块中文名>
+backend_mappers:                        # precheck 输入：后端 mapper/SQL 目录
+  - ../../<repo>/<service>/src/main/resources/mapper
+pages:
+  - id: <page-id>
+    name: <页面名>
+    route: '#/<routePath>'
+    data_requirement:
+      min_rows: 1                       # 造数输入（造数工厂读）
+    features:
+      - id: <prefix>-l1-load            # 页面缩写前缀
+        name: 页面加载
+        level: L1                       # L1加载 | L2只读交互 | L3写交互 | L4跨页联动
+        priority: P0                    # P0主链路 | P1高频 | P2低频 | P3边角
+        steps: 导航到目标路由
+        expect: 无JS错误、无API失败、数据渲染 ≥ min_rows、无 null/undefined/NaN 字面量
+        # 执行注：<等价替换说明/探针结论/造数命令>
+        status: todo                    # todo | pass | fail | blocked
+      - id: <prefix>-l2-query
+        name: 条件查询
+        level: L2
+        steps: 输入条件→点查询
+        expect: <目标API> 2xx 且响应体六态分诊=data（或 empty 走三分法甄别）；列表与条件匹配
+        status: todo
+      - id: <prefix>-l3-create
+        name: 新增记录
+        level: L3
+        steps: 点新增→填 AUTOTEST_ 前缀数据→保存
+        expect: 成功提示；列表复查可见；必要时 DB 直查复核
+        # 执行注：不可逆操作选影响最小分支；下发类降级到弹窗层验证
+        status: todo
+      - id: <prefix>-l4-jump
+        name: 行内跳转详情
+        level: L4
+        steps: 点行内链接→验证目标页加载
+        expect: hash 末尾精确匹配目标路由（勿用 includes——同词根前缀恒真）+ 目标页渲染
+        # 执行注：无数据时用 routerResolve 等价验证（验路由注册+routerPush 实测挂载）
+        status: todo

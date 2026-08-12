@@ -1,0 +1,89 @@
+{
+  "namespace": "community",
+  "id": "devlab-web-deep-acceptance",
+  "name": "devlab-web-deep-acceptance",
+  "owner": "seedforge",
+  "version": "0.1.1",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "e2e",
+    "acceptance",
+    "deep-test",
+    "registry",
+    "playwright",
+    "legacy-system",
+    "regression"
+  ],
+  "summary": "存量 Web 系统深度功能验收方法论：registry 功能点驱动 + 唯一入口执行器 + 假成功嗅探 + 三对齐审计 + L1-L4 分级 + 失败五分类路由，沉淀可重放回归资产。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "qoder"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "integrations": [
+    {
+      "target": "devlab-web-test-e2e",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "边界互补：存量深度验收走本技能，绿field 用例生成走对端；可先后衔接"
+    },
+    {
+      "target": "devlab-dao-sql-compat",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "后端-SQL 类 FAIL 的 mapper 方言修复移交对端（可选）"
+    },
+    {
+      "target": "devlab-test-expert",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "通用测试反模式知识库（可选 extends 源）"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example": "EXAMPLE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "node >= 18（执行器与 Playwright 运行）",
+    "playwright + js-yaml（test/e2e 下 npm i）"
+  ],
+  "post_install_hints": [
+    "拷贝 scripts/ 到项目 test/e2e/，从 e2e.config.example.js 生成 e2e.config.js 后先跑 --dry-run"
+  ],
+  "recommended_tools": [],
+  "contributors": [],
+  "skill_type": "workflow",
+  "agents_md_inject": "",
+  "updated_at": "2026-08-03",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": true,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
+}

@@ -1,0 +1,33 @@
+/**
+ * <feature-id>.case.js — <功能点名>（<级别>）
+ * 映射：registry/<module>.yaml 的 feature id ↔ cases/<module>/<feature-id>.case.js
+ *
+ * 编写要点：
+ * - monitor.reset() 在导航前调用（L1 用例勿放导航后，会清掉 mounted 期错误致假 PASS）
+ * - 依赖查询结果的断言必须解析响应体（captureApis + bodyVerdict 六态分诊），
+ *   不能只看 HTTP 状态码（code:500-in-200 吞错家族）
+ * - 前置不满足抛 Error('BLOCKED:<五分类>——<原因+解锁命令>')，不算失败
+ * - 返回一句话结论字符串（写入报告详情）
+ */
+const H = require('./_helpers');
+
+module.exports = {
+  async run({ page, monitor, assert, session, feature, config }) {
+    await H.gotoPage(page, session, feature.page.route);
+    monitor.reset();
+
+    // TODO: 交互与断言
+    // const collectApis = H.captureApis(page, [{ key: 'list', pattern: /\/api\/<service>\/query/ }]);
+    // await page.locator('button:has-text("查询")').click();
+    // await collectApis.waitForHit('list');           // 自动查询页必须等请求到达
+    // const apis = await collectApis();
+    // assert.ok(H.bodyVerdict(apis[0]) === 'data', `查询响应分诊: ${H.verdictSummary(apis)}`);
+    // assert.noErrors(monitor.collect());
+    // assert.noSwallowedErrors(monitor.collect(), { ignore: /\/api\/<合法空写接口>/ });
+
+    // 前置不满足示例：
+    // if (!precondition) throw new Error('BLOCKED:数据类——缺XX，解锁命令：node tools/xxx.js');
+
+    return '<一句话结论>';
+  },
+};

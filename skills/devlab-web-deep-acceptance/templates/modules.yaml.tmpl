@@ -1,0 +1,16 @@
+# registry/modules.yaml — 模块总账（多会话认领制）
+# 状态流转：todo → in_progress（认领）→ done | blocked | out_of_scope
+# 认领协议：写 claimed_by/claimed_at 后请用户 commit 抢占；claimed_at 超 2 天可僵尸接管
+# 范围核验：前端有入口但后端未部署的模块 → out_of_scope + note 依据
+modules:
+  - id: <module-id>
+    name: <模块中文名>
+    app: <AppName>                      # 前端一级 APP 锚点
+    route: '#/<routePath>'              # 线索不是事实，以 dry-run 实测为准
+    priority: P0                        # P0 | P1 | P2 | P3
+    status: todo
+    claimed_by: null                    # session-<YYYYMMDD>-<字母>
+    claimed_at: null
+    progress: ''
+    report: ''
+    note: ''

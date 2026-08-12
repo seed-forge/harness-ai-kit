@@ -1,0 +1,19 @@
+# Human Decisions（结构化，与 SKILL.md 末尾汇总表同源）
+# 用途：AI 回溯参考 + ai-kit-audit-ops 自动解析
+decisions:
+  - id: HD-1
+    point: 高危写操作真实提交
+    trigger: 用例涉及不可逆审批/设备下发/批量写等高危动作
+    options:
+      - 硬闸拦截，降级到弹窗/表单层验证（不触达真实提交）
+      - 用户显式批准后，仅对 AUTOTEST_ 前缀造数记录真实提交
+    default: 必问
+    rationale: 不可逆操作直接影响共享环境业务数据，真实提交必须人类批准；AUTOTEST_ 前缀是清理与追责锚点
+  - id: HD-2
+    point: 环境故障是否协助重启
+    trigger: preflight 探活失败（退出码 2）/ dev server 崩溃 / 后端服务 down / 网关不通
+    options:
+      - 停下上报等用户恢复，等待期间做不依赖环境的工作（写用例/盘点/报告）
+      - 用户明确授权后协助重启
+    default: 停下上报等恢复
+    rationale: 多会话竞相重启共享服务已实锤互相冲突；唯一例外是代码修复后的部署走 CI 流水线，不属于环境问题
