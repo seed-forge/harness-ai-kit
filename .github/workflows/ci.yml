@@ -20,9 +20,9 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[dev]" || pip install -e . && pip install ruff pytest
       - name: Lint (syntax errors only)
-        run: ruff check ai_kit/ --select=E9 || python -c "import py_compile; [py_compile.compile(f, doraise=True) for f in __import__('pathlib').Path('ai_kit').rglob('*.py')]"
+        run: ruff check harness_ai_kit/ --select=E9 || python -c "import py_compile; [py_compile.compile(f, doraise=True) for f in __import__('pathlib').Path('harness_ai_kit').rglob('*.py')]"
       - name: Import check
-        run: python -c "import ai_kit; print('import OK')"
+        run: python -c "import harness_ai_kit; print('import OK')"
       - name: CLI smoke test
         run: |
           harness-ai-kit --version
@@ -42,7 +42,7 @@ jobs:
         run: |
           set -e
           PATTERNS="askying|giteaee|nexus\.base|10\.147\.17|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\."
-          FOUND=$(grep -rnE "$PATTERNS" ai_kit/ skills/ 2>/dev/null || true)
+          FOUND=$(grep -rnE "$PATTERNS" harness_ai_kit/ skills/ 2>/dev/null || true)
           if [ -n "$FOUND" ]; then
             echo "ERROR: Internal references detected:"
             echo "$FOUND"
@@ -53,7 +53,7 @@ jobs:
         run: |
           set -e
           SECRET_PATTERNS="sk-[A-Za-z0-9]{20,}|password\s*[:=]\s*['\"][^'\"]{6,}|api[_-]?key\s*[:=]\s*['\"][^'\"]{8,}"
-          FOUND=$(grep -rnEi "$SECRET_PATTERNS" ai_kit/ skills/ 2>/dev/null || true)
+          FOUND=$(grep -rnEi "$SECRET_PATTERNS" harness_ai_kit/ skills/ 2>/dev/null || true)
           if [ -n "$FOUND" ]; then
             echo "WARNING: Potential secrets detected (review manually):"
             echo "$FOUND"

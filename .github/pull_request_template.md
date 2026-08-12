@@ -13,7 +13,7 @@ Brief description of what this PR changes.
 
 ## Checklist
 
-- [ ] `python -c "import ai_kit"` works
+- [ ] `python -c "import harness_ai_kit"` works
 - [ ] `harness-ai-kit --help` runs cleanly
 - [ ] No internal hostnames / credentials (CI sensitive-scan will verify)
 - [ ] If adding a skill: `skill.json` is valid JSON

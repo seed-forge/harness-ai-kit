@@ -19,7 +19,7 @@ All commits must be signed off (`git commit -s`). By signing off, you certify th
 
 1. Fork the repo and create a feature branch from `main`
 2. Make your changes — keep commits atomic and focused
-3. Ensure `python -c "import ai_kit"` works and `harness-ai-kit --help` runs cleanly
+3. Ensure `python -c "import harness_ai_kit"` works and `harness-ai-kit --help` runs cleanly
 4. If you add or modify skills, run the validation: `python -c "import json; [json.loads(open(f'skills/{d}/skill.json').read()) for d in __import__('os').listdir('skills') if __import__('os').path.isfile(f'skills/{d}/skill.json')]"`
 5. Submit a PR — CI will run lint, import check, CLI smoke test, and a sensitive-reference scan
 
