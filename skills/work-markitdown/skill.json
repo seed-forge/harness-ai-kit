@@ -1,0 +1,93 @@
+{
+  "namespace": "community",
+  "id": "work-markitdown",
+  "name": "work-markitdown",
+  "owner": "seedforge",
+  "version": "0.2.4",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "work",
+    "office",
+    "document",
+    "inflow",
+    "markitdown",
+    "conversion"
+  ],
+  "summary": "办公文档通用 Inflow 编排：15+ 格式 → Markdown 统一转换入口，extends 上游 markitdown，补充本地环境适配和批量转换工作流。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "qoder"
+  ],
+  "installation": {
+    "default_scope": "global"
+  },
+  "dependencies": [
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "markitdown",
+      "version": ">=0.1.0",
+      "scope": "required"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [
+      {
+        "name": "python",
+        "command": "python --version"
+      },
+      {
+        "name": "markitdown",
+        "command": "python -m markitdown --help"
+      }
+    ],
+    "python_strategy": "project-venv",
+    "python_packages": [
+      "markitdown>=0.1.5",
+      "openpyxl",
+      "pandas",
+      "pdfminer-six",
+      "pdfplumber",
+      "mammoth",
+      "xlrd"
+    ],
+    "fonts": [],
+    "verify_commands": [
+      "python -m markitdown --help"
+    ]
+  },
+  "runtime_requirements": [
+    "Do not use pip install markitdown[all] — may downgrade main package version.",
+    "Prefer .agents/tools/markitdown.cmd wrapper over direct markitdown command.",
+    "Always output to new filename (*.markitdown.md) to avoid overwriting existing .md files."
+  ],
+  "post_install_hints": [
+    "Verify python -m markitdown --help runs successfully.",
+    "Check that .agents/tools/markitdown.cmd exists in the target workspace."
+  ],
+  "updated_at": "2026-07-16",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
+}

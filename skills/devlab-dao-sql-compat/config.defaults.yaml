@@ -1,0 +1,55 @@
+$schema: ai-kit-config/v1
+
+# config.defaults.yaml — L1 资产默认配置（devlab-dao-sql-compat）
+# 优先级：L3 运行时参数 > L2 用户配置(~/.ai-kit/config.yaml / 环境变量 / .env.tak) > L1 本文件
+# 约束：本文件不得包含敏感值（凭据/连接串）
+
+config:
+  - key: adapter
+    type: string
+    required: false
+    sensitivity: normal
+    default: "auto"
+    env_var: SQLCOMPAT_ADAPTER
+    description: DAO 框架适配器 (mybatis|jpa|mybatis-plus|sqlalchemy|auto)。auto 为自动探测
+  - key: scan_dir
+    type: string
+    required: false
+    sensitivity: normal
+    default: "."
+    env_var: SQLCOMPAT_SCAN_DIR
+    description: 扫描根目录（对应脚本 --dir）
+  - key: module_glob
+    type: string
+    required: false
+    sensitivity: normal
+    default: ""
+    env_var: SQLCOMPAT_MODULE_GLOB
+    description: 模块目录 glob；留空时自动探测含 src/main/resources/mapper 的模块（对应脚本 --module-glob）
+  - key: report_path
+    type: string
+    required: false
+    sensitivity: normal
+    default: "./sql-compat-report.md"
+    env_var: SQLCOMPAT_REPORT_PATH
+    description: 扫描报告输出路径（对应脚本 --report）
+  - key: custom_procs_file
+    type: string
+    required: false
+    sensitivity: normal
+    default: ""
+    env_var: SQLCOMPAT_PROCS_FILE
+    description: 自定义存储过程/函数清单文件，每行一个函数名，'#' 开头为注释（对应脚本 --procs）
+  - key: fail_on_critical
+    type: bool
+    required: false
+    sensitivity: normal
+    default: false
+    env_var: SQLCOMPAT_FAIL_ON_CRITICAL
+    description: 发现 CRITICAL 模块时脚本以退出码 1 结束，用于 CI 集成（对应脚本 --fail-on-critical）
+  - key: verify_jdbc_url
+    type: string
+    required: false
+    sensitivity: sensitive
+    env_var: SQLCOMPAT_VERIFY_JDBC_URL
+    description: 可选库验证使用的 JDBC 连接串。敏感项：无默认值，仅通过 L2/L3 注入，禁止写入文档或提交到 Git

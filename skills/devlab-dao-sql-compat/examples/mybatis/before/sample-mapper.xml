@@ -1,0 +1,55 @@
+<!-- ============================================================= -->
+<!-- 修复前示例：PostgreSQL 方言混用的 MyBatis Mapper XML -->
+<!-- 来源：Tiny-EMAS v2 真实案例 -->
+<!-- ============================================================= -->
+
+<!-- 示例 1: PG 正则运算符 ~ / !~ -->
+<select id="queryByRegex" resultType="Map">
+    SELECT *
+    FROM acq_trml tt
+    WHERE 1=1
+      <if test="chipType == 1">
+          and (tt.carr_chip_manuf ~ '^[0-9]+$' or tt.carr_chip_manuf is null)
+      </if>
+      <if test="chipType == 2">
+          and tt.carr_chip_manuf !~ '[^0-9]+'
+      </if>
+      <if test="mgtOrgCode != null and mgtOrgCode != ''">
+          and q.mgt_org_code ~ '[^0-9]+'
+      </if>
+</select>
+
+<!-- 示例 2: coalesce(col, '') 空字符串陷阱 -->
+<select id="queryWithCoalesce" resultType="Map">
+    SELECT
+        'pap_r' || '~' || coalesce(tt.pap_r, '') || ',' ||
+        'rap_r' || '~' || coalesce(tt.rap_r, '') || ',' ||
+        'ia' || '~' || coalesce(tt.ia, '') || ',' ||
+        'ua' || '~' || coalesce(tt.ua, '') AS str
+    FROM acq_trml tt
+    WHERE tt.asset_no = #{assetNo}
+</select>
+
+<!-- 示例 3: to_date 拼接场景格式掩码不匹配 -->
+<select id="queryByStatDate" resultType="Map">
+    SELECT *
+    FROM stat_data sd
+    WHERE 1=1
+      <if test="statCyc == '02'">
+          and sd.data_date >= to_date(#{statDate} || '-01', 'yyyy-mm-dd hh24:mi:ss')
+          and sd.data_date &lt; to_date(#{statDate} || '-01', 'yyyy-mm-dd hh24:mi:ss') + interval '1' month
+      </if>
+      <if test="statCyc == '03'">
+          and sd.data_date >= to_date(#{statDate} || '-01-01', 'yyyy-mm-dd hh24:mi:ss')
+          and sd.data_date &lt; to_date(#{statDate} || '-01-01', 'yyyy-mm-dd hh24:mi:ss') + interval '1' year
+      </if>
+</select>
+
+<!-- 示例 4: to_date 直接参数绑定格式掩码不匹配 -->
+<select id="queryByDateRange" resultType="Map">
+    SELECT *
+    FROM task_data td
+    WHERE td.stat_date = to_date(#{statDate}, 'yyyy-mm-dd hh24:mi:ss')
+      AND td.start_date >= to_date(#{startDate}, 'yyyy-mm-dd hh24:mi:ss')
+      AND td.end_date &lt;= to_date(#{endDate}, 'yyyy-mm-dd hh24:mi:ss')
+</select>

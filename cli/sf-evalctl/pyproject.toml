@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sf-evalctl"
+version = "0.1.0"
+description = "Eval CLI for AI / data apps: run eval sets, diff regressions, ingest real-world samples, collect feedback, generate reports."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "SeedForge" }
+]
+dependencies = [
+  "harness-ai-kit>=0.2.0",
+  "pydantic>=2.0",
+  "httpx>=0.27",
+  "PyYAML>=6.0"
+]
+
+[project.optional-dependencies]
+sql = ["sqlparse>=0.5"]
+
+[project.urls]
+Homepage = "https://github.com/seed-forge/harness-ai-kit"
+Repository = "https://github.com/seed-forge/harness-ai-kit"
+
+[project.scripts]
+evalctl = "evalctl.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["evalctl", "evalctl.*"]

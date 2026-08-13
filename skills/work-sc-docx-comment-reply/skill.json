@@ -1,0 +1,73 @@
+{
+  "namespace": "community",
+  "id": "work-sc-docx-comment-reply",
+  "name": "work-sc-docx-comment-reply",
+  "owner": "seedforge",
+  "version": "0.2.5",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "work",
+    "office",
+    "docx",
+    "comment",
+    "reply",
+    "scenario"
+  ],
+  "summary": "Word 批注回复：提取批注上下文，生成回复并以 threaded replies 写回 docx。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "qoder"
+  ],
+  "installation": {
+    "default_scope": "global"
+  },
+  "dependencies": [
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "docx",
+      "source_url": "https://github.com/anthropics/skills/tree/main/skills/docx",
+      "version": "latest",
+      "scope": "required"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md"
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [
+      {
+        "name": "python",
+        "command": "python --version"
+      }
+    ],
+    "python_strategy": "project-venv",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "适用场景：专利/论文/合同/内部评审等需要逐条回复批注的文档"
+  ],
+  "post_install_hints": [],
+  "updated_at": "2026-07-16",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
+}

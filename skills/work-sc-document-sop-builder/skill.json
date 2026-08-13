@@ -1,0 +1,74 @@
+{
+  "namespace": "community",
+  "id": "work-sc-document-sop-builder",
+  "name": "work-sc-document-sop-builder",
+  "owner": "seedforge",
+  "version": "0.2.6",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "work",
+    "office",
+    "document",
+    "sop",
+    "template",
+    "scenario"
+  ],
+  "summary": "参考文档 SOP 提取：从参考文件中提取结构/内容/格式/导出规则，沉淀为可复用文档编制 SOP。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "qoder"
+  ],
+  "installation": {
+    "default_scope": "global"
+  },
+  "dependencies": [
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "docx",
+      "source_url": "https://github.com/anthropics/skills/tree/main/skills/docx",
+      "version": "latest",
+      "scope": "required"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "pdf",
+      "source_url": "https://github.com/anthropics/skills/tree/main/skills/pdf",
+      "version": "latest",
+      "scope": "required"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md"
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [],
+  "post_install_hints": [],
+  "updated_at": "2026-07-16",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "namespace": "community",
+  "id": "devlab-dao-sql-compat",
+  "name": "devlab-dao-sql-compat",
+  "owner": "seedforge",
+  "version": "0.4.1",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "summary": "DAO 层通用 SQL 方言兼容性检查 + 系统性修复工作流。支持 MyBatis/JPA/MyBatis-Plus/SQLAlchemy 四种持久层框架，扫描源码识别 Oracle/PostgreSQL/MySQL 方言混用风险，自动修复 80% 常见陷阱，剩余 20% 由 Agent 辅助人工确认。七阶段流程 + adapter 模式框架适配。",
+  "tags": [
+    "sql-dialect",
+    "oracle",
+    "postgresql",
+    "mysql",
+    "migration",
+    "compatibility",
+    "systematic-fix",
+    "auto-repair",
+    "to-date-format",
+    "mybatis",
+    "jpa",
+    "hibernate",
+    "mybatis-plus",
+    "sqlalchemy",
+    "dao",
+    "sql-compat"
+  ],
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "kiro"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "public-oracle-expert-base",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "oracle-dialect-knowledge"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "public-postgres-expert-base",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "postgres-dialect-knowledge"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "public-mysql-expert-base",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "mysql-dialect-knowledge"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "config_schema": "config.defaults.yaml",
+  "environment": {
+    "dependency_groups": [],
+    "system": [
+      {
+        "name": "bash",
+        "command": "bash --version"
+      },
+      {
+        "name": "grep",
+        "command": "grep --version"
+      },
+      {
+        "name": "find",
+        "command": "find --version"
+      }
+    ],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": [
+      "bash scripts/scan-sql-compat.sh --help",
+      "bash scripts/fix-sql-compat.sh --help"
+    ]
+  },
+  "runtime_requirements": [
+    "Requires bash with GNU grep/find/sed (regex scan and automated fixes).",
+    "Phase 4 automated fixes: regex-operator / coalesce-nullstr / todate-concat are bash-only sed commands.",
+    "Phase 4.4 todate-format analysis requires AI agent to infer parameter semantics from source code.",
+    "Fix phase is AI-driven: load only the references/dialects/ file matching the conversion direction.",
+    "Structural rewrites (CONNECT BY, MERGE INTO, etc.) must be flagged for human review.",
+    "verify_jdbc_url is sensitive: never write it into documents or commit it.",
+    "Adapter mode: --adapter mybatis|jpa|mybatis-plus|sqlalchemy|auto (default auto-detect)."
+  ],
+  "post_install_hints": [],
+  "updated_at": "2026-08-06",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

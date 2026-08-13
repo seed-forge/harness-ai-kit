@@ -1,0 +1,26 @@
+{
+  "namespace": "community",
+  "id": "devlab-contract-web-server",
+  "name": "devlab-contract-web-server",
+  "owner": "seedforge",
+  "version": "0.1.1",
+  "status": "trial",
+  "tags": [
+    "contract",
+    "web",
+    "server",
+    "frontend-backend",
+    "serialization",
+    "api-contract",
+    "config"
+  ],
+  "summary": "前后端契约规范技能（contract 技能簇首个，介于 srv 与 web 之间）：接口/序列化契约、字段类型一致性、配置分层与不过度设计，配契约校验与联调防错清单。",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}
