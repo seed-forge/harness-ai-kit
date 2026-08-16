@@ -1,0 +1,48 @@
+{
+  "namespace": "community",
+  "id": "infra-harbor-ops",
+  "name": "infra-harbor-ops",
+  "owner": "seedforge",
+  "version": "0.1.3",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "infra",
+    "harbor",
+    "registry",
+    "oci"
+  ],
+  "summary": "Harbor 平台运维：project/robot/proxy cache/registry token/runtime health；OCI 预热消费链仍归 infra-artifact-readiness-ops。",
+  "compatible_clients": [
+    "codex",
+    "claude-code"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [
+    "Use Harbor for OCI image registry/proxy cache; use Nexus for language package repositories."
+  ],
+  "post_install_hints": [
+    "Start with Harbor health and registry token runtime inspection before project or robot changes."
+  ],
+  "updated_at": "2026-08-14",
+  "config_schema": "config.defaults.yaml",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

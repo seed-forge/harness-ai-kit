@@ -1,0 +1,16 @@
+$schema: harness-ai-kit-config/v1
+
+config:
+  - key: harbor_registry
+    type: string
+    required: false
+    sensitivity: internal
+    description: "Harbor Registry 主机名（不含 https:// 前缀）"
+    default: ""
+
+  - key: harbor_url
+    type: string
+    required: false
+    sensitivity: public
+    description: "Harbor Web UI URL"
+    default: ""
