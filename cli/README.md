@@ -7,6 +7,8 @@ Companion command-line tools for [harness-ai-kit](https://github.com/seed-forge/
 | `sf-loopctl/` | `sf-loopctl` | `loopctl` | Loop asset lifecycle (list / validate / run / status / extract / promote) |
 | `sf-mineructl/` | `sf-mineructl` | `mineructl` | Ops CLI for a MinerU document-parsing service |
 | `sf-evalctl/` | `sf-evalctl` | `evalctl` | Eval loop for AI/data apps (run / diff / ingest / feedback / report) |
+| `sf-nexusctl/` | `sf-nexusctl` | `nexusctl` | Nexus repository ops (repo CRUD / blobstore / cleanup-policy / inventory / user/role) |
+| `sf-difyctl/` | `sf-difyctl` | `difyctl` | Dify usage-layer ops (DSL import / validate / version detect / provider config) |
 
 ## Install a CLI
 
@@ -14,6 +16,8 @@ Companion command-line tools for [harness-ai-kit](https://github.com/seed-forge/
 pip install sf-loopctl          # -> `loopctl` command
 pip install sf-mineructl        # -> `mineructl` command
 pip install sf-evalctl          # -> `evalctl` command
+pip install sf-nexusctl         # -> `nexusctl` command
+pip install sf-difyctl          # -> `difyctl` command
 ```
 
 Each CLI declares `harness-ai-kit` as a dependency and reuses its public `domain` / `infrastructure` layers.
