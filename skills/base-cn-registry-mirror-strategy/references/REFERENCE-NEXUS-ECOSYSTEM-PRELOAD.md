@@ -104,7 +104,7 @@ PyPI 已按此模式落地，见 `Homelab/ansible-control/artifacts/nexus-pypi/R
 | PyPI manifests | `Homelab/ansible-control/artifacts/nexus-pypi/manifests/` |
 | deploy-apps 示例 | `Homelab/gitea-repos/deploy-apps/*-deploy/prepare-upstream.sh`、`.woodpecker.yml` `no_proxy` |
 | 公共换源片段（L2） | `base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md` |
-| 出站代理 | `homelab-worklab-ops/references/REFERENCE-HOMELAB-OUTBOUND-HTTP-PROXY.md` |
+| 出站代理 | `内部出站代理配置（见团队内部文档，不在本仓库）` |
 
 ---
 

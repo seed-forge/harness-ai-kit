@@ -41,7 +41,7 @@ description: 国内镜像源与代理分层策略（Docker / Debian / Alpine / N
 | 层级 | 解决什么问题 | 典型手段 | 备注 |
 |------|----------------|----------|------|
 | L0 宿主机 / Runner | `docker pull`、`FROM` 拉取慢 | `/etc/docker/daemon.json` 的 `registry-mirrors`；或企业内 Harbor 前置缓存 | 影响**构建机**拉基础镜像，不写入 `Dockerfile` |
-| L1 CI 环境变量 | 构建阶段内的网络工具与 CLI | `HTTP_PROXY`/`HTTPS_PROXY`/`NO_PROXY`；`DOCKER_BUILDKIT=1` | Homelab 宿主机默认代理见 `homelab-worklab-ops/references/REFERENCE-HOMELAB-OUTBOUND-HTTP-PROXY.md` |
+| L1 CI 环境变量 | 构建阶段内的网络工具与 CLI | `HTTP_PROXY`/`HTTPS_PROXY`/`NO_PROXY`；`DOCKER_BUILDKIT=1` | Homelab 宿主机默认代理见 `内部出站代理配置（见团队内部文档，不在本仓库）` |
 | L2 Dockerfile `ARG` | 可重复、可审计的换源 | 各语言 `*_MIRROR` / `*_URL` 默认 + build-arg 覆盖 | **推荐**作为团队统一模式 |
 | L3 仅内网发布 | 出网受限 | `FROM` 与包源全部改为内网 registry / Nexus group | 与 `infra-source-image-pipeline-ops` 等流水线 skill 配合 |
 | L3b Nexus 预热 | 大 wheel/jar、钉死版本、镜像站缺包 | hosted 上传 + group 消费；manifest + Ansible（PyPI 已示范） | **Homelab deploy-apps / Woodpecker 标准路径**；见 `REFERENCE-NEXUS-ECOSYSTEM-PRELOAD.md` |
@@ -81,8 +81,8 @@ description: 国内镜像源与代理分层策略（Docker / Debian / Alpine / N
 
 - **Nexus 全生态私服与预热（大依赖必看）**：`references/REFERENCE-NEXUS-ECOSYSTEM-PRELOAD.md`
 - **Homelab 执行编排**（manifest、波次 B、Harbor warm、Woodpecker inspect）：`infra-artifact-readiness-ops`
-- 长篇可复制片段与命令：`references/REFERENCE-MIRROR-RECIPES.md`（在 `harness-ai-kit` 仓库内路径为 `skills/base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md`；若以「02-工程工作空间」为根，则为 `工程规范/harness-ai-kit/skills/base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md`）
-- Homelab 宿主机出站 HTTP 代理（GitHub / Google 等 GFW 站点）：`homelab-worklab-ops/references/REFERENCE-HOMELAB-OUTBOUND-HTTP-PROXY.md`
+- 长篇可复制片段与命令：`references/REFERENCE-MIRROR-RECIPES.md`（在 `harness-ai-kit` 仓库内路径为 `skills/base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md`；若以「02-工程工作空间」为根，则为 `仓库/skills/base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md`）
+- Homelab 宿主机出站 HTTP 代理（GitHub / Google 等 GFW 站点）：`内部出站代理配置（见团队内部文档，不在本仓库）`
 
 ## 维护建议
 

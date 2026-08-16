@@ -21,8 +21,7 @@ def embedded_ai_kit_skill_checkouts(project_root: Path, root_ids: list[str]) -> 
     for root_id in root_ids:
         _, base_id = pm.split_canonical_id(root_id)
         candidates = [
-            project_root / "工程规范" / "harness-ai-kit" / "skills" / base_id,
-            project_root / "harness-ai-kit" / "skills" / base_id,
+            project_root / "skills" / base_id,
         ]
         for candidate in candidates:
             if (candidate / "SKILL.md").is_file() or (candidate / "skill.json").is_file():

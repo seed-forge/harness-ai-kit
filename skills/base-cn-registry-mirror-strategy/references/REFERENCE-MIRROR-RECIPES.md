@@ -167,4 +167,4 @@ docker build \
 
 完整 `NO_PROXY` 基线、compose/CI 落点与验证命令见：
 
-`homelab-worklab-ops/references/REFERENCE-HOMELAB-OUTBOUND-HTTP-PROXY.md`
+`内部出站代理配置（见团队内部文档，不在本仓库）`
