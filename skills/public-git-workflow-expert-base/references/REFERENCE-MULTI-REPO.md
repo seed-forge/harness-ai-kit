@@ -10,7 +10,7 @@
 |----------|------|--------|
 | 工作空间 | 02-工程工作空间 | Gitea |
 | 控制仓 | fleet-platform | Gitea |
-| 应用仓 | 各 Homelab 应用 | Gitea |
+| 应用仓 | 各 Team 应用 | Gitea |
 | 技能仓 | harness-ai-kit skills | Gitea |
 | 开源/镜像 | GitHub 开源项目 | GitHub |
 | 基础设施 | server-apps | Gitea |

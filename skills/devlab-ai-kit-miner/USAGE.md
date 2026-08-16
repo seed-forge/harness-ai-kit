@@ -9,7 +9,7 @@ harness-ai-kit install skill devlab-ai-kit-miner
 建议同时安装基础复盘能力：
 
 ```bash
-harness-ai-kit install skill post-task-skill-miner
+harness-ai-kit install skill base-session-ai-kit-miner
 ```
 
 ## 2. 研发会话后复盘
@@ -27,14 +27,14 @@ harness-ai-kit install skill post-task-skill-miner
 - 沉淀位置：项目级 / 团队共享
 - 候选资产最小规格草案
 - 与现有 `devlab-*` 资产的关系（新增/补充/桥接/重复）
-- Loop 候选的 6 信号评分结果（由 post-task-skill-miner 提供）
+- Loop 候选的 6 信号评分结果（由 base-session-ai-kit-miner 提供）
 
 ## 4. 衔接创建
 
 复盘输出草案后，如需实际创建资产：
 
 ```text
-用 ai-kit-forge 按上面的草案创建资产。
+用 harness-ai-kit-forge 按上面的草案创建资产。
 ```
 
 ## 可直接复制的中文 Prompt

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.4 - 2026-08-14
+
+- frontmatter 规范化：SKILL.md 统一 LF / 无 BOM / 单一 YAML frontmatter 块，修复 AI IDE 加载告警（missing YAML frontmatter delimited by ---）。
 ## 0.1.3 - 2026-08-06
 
 - 治理清欠：结构合规修复后版本抬升（usage_missing）。
@@ -8,7 +11,7 @@
 
 - **Bug Fix**: 修复 `runtime_requirements` 的 schema 格式错误
   - 从对象数组改为字符串数组格式（pkg>=version）
-  - 符合 harness-ai-kit 官方规范
+  - 符合 team-ai-kit 官方规范
   - 解决 `publish-skill` 时报错 "Input should be a valid string"
   
 ## 0.1.1 - 2026-07-24

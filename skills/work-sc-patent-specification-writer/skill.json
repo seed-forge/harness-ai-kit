@@ -3,7 +3,7 @@
   "id": "work-sc-patent-specification-writer",
   "name": "work-sc-patent-specification-writer",
   "owner": "seedforge",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -37,7 +37,7 @@
   ],
   "sources": {
     "preferred": [
-      "skill-registry"
+      "team-skill-registry"
     ],
     "allow_fallback": true
   },
@@ -56,7 +56,7 @@
     "不负责权利要求书撰写"
   ],
   "post_install_hints": [],
-  "updated_at": "2026-07-16",
+  "updated_at": "2026-08-14",
   "execution_context": {
     "ide": true,
     "server": false,

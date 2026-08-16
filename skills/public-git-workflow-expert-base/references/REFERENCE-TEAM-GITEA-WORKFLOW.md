@@ -61,5 +61,5 @@ giteactl repo transfer --repo my-repo --new-owner other-org
 
 - Gitea API Token：Settings → Applications → Generate New Token
 - 所需权限：`repo`（完整仓库访问）、`user`（用户信息）
-- Token 存储在 `~/.ai-kit/config.yaml` 的 `assets.giteactl` 段
+- Token 存储在 `~/.harness-ai-kit/config.yaml` 的 `assets.giteactl` 段
 - 禁止硬编码在脚本或文档中

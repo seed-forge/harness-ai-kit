@@ -1,6 +1,6 @@
 ---
 name: public-mysql-expert-base
-description: MySQL/InnoDB 知识基座。覆盖 schema 设计、索引策略、查询调优、事务与锁、分区、运维操作。供 devlab-*-usage 技能通过 extends 继承。
+description: MySQL/InnoDB 知识基座。覆盖 schema 设计、索引策略、查询调优、事务与锁、分区、运维操作。供 devlab-middleware-expert 通过 extends 继承。
 ---
 
 # MySQL/InnoDB Knowledge Base

@@ -3,7 +3,7 @@
   "id": "public-git-workflow-expert-base",
   "name": "public-git-workflow-expert-base",
   "owner": "team",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "status": "draft",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -28,7 +28,7 @@
   "dependencies": [],
   "sources": {
     "preferred": [
-      "skill-registry",
+      "team-skill-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -65,5 +65,13 @@
     "Use giteactl/tea for Gitea operations; gh for GitHub."
   ],
   "post_install_hints": [],
-  "updated_at": "2026-07-23"
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
 }

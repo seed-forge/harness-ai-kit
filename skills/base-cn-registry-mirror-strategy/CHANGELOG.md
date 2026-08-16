@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.6 - 2026-08-14
+
+- frontmatter 规范化：SKILL.md 统一 LF / 无 BOM / 单一 YAML frontmatter 块，修复 AI IDE 加载告警（missing YAML frontmatter delimited by ---）。
 ## 0.1.5 - 2026-08-06
 
 - 治理清欠：结构合规修复后版本抬升（ref_link、ref_rename:README.md->REFERENCE-README.md、refs）。
@@ -15,10 +18,10 @@
 
 ## 0.1.2 - 2026-05-22
 
-- L1 proxy: cross-link Homelab <host-01>/<host-02> default Clash endpoints (`REFERENCE-HOMELAB-OUTBOUND-HTTP-PROXY.md`)
+- L1 proxy: cross-link Team node1/node2 default Clash endpoints (`REFERENCE-HOMELAB-OUTBOUND-HTTP-PROXY.md`)
 - `REFERENCE-MIRROR-RECIPES.md` §11: per-host HTTP_PROXY table
 
 ## 0.1.1 - 2026-05-15
 
-- rename `references/mirror-recipes.md` to `references/REFERENCE-MIRROR-RECIPES.md` to satisfy harness-ai-kit reference naming rules
+- rename `references/mirror-recipes.md` to `references/REFERENCE-MIRROR-RECIPES.md` to satisfy team-ai-kit reference naming rules
 - add this changelog so `skill.json` and `CHANGELOG.md` top versions stay aligned

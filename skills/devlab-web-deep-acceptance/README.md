@@ -1,6 +1,6 @@
 # devlab-web-deep-acceptance — Asset Router
 
-> **Harness-AI-Kit Router**：本文件是本 Skill 的**内部资产导航**，只列同级目录下的内部资产（references/scripts/templates）。
+> **AI-Kit Router**：本文件是本 Skill 的**内部资产导航**，只列同级目录下的内部资产（references/scripts/templates）。
 > 不列外部 skill/CLI/MCP（外部交互见 `SKILL.md` 的 `## Integration Points` 与 `skill.json` 的 `integrations`）。
 
 ## 内部资产地图

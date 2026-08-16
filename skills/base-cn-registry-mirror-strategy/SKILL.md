@@ -1,4 +1,4 @@
-﻿---
+---
 name: base-cn-registry-mirror-strategy
 description: 国内镜像源与代理分层策略（Docker / Debian / Alpine / Node / Python / Maven / Gradle / Go），用于 Dockerfile 与 CI 的可维护加速。
 ---
@@ -32,7 +32,7 @@ description: 国内镜像源与代理分层策略（Docker / Debian / Alpine / N
 
 1. **单一事实源**：对外发布的 `Dockerfile` 里用 `ARG` 暴露镜像 URL，默认值可以指向公共镜像；团队内部在 CI 或 `docker build --build-arg` 中注入组织制品库地址，避免在仓库里硬编码易失效的第三方 URL 且无出口替换。
 2. **公共镜像 ≠ 长期承诺**：域名、路径、同步延迟会变；本 skill 提供**维护节奏**（建议每季度巡检 + 出问题时切换 `ARG`），不保证某一第三方站点永久可用。
-3. **合规优先**：若公司有「仅允许内网源」或审计要求，以安全与合规为准，本 skill 中的公共地址仅作开发/Homelab 基线参考。
+3. **合规优先**：若公司有「仅允许内网源」或审计要求，以安全与合规为准，本 skill 中的公共地址仅作开发/Team 基线参考。
 4. **Docker Hub 与语言源解耦**：`docker pull` / `FROM` 慢，与 `apt`、`npm`、`pip` 慢是不同链路；**不要**只配一种就以为全覆盖。
 5. **大依赖优先 Nexus 预热，而非仅 CN 公网镜像**：凡 Nexus 能承接的生态（pip、npm、Maven、Gradle、Go 等），若存在大体积或 CI 关键路径依赖，应建议 **Nexus group 统一入口 + hosted/manifest 预热**；仅把 `ARG` 改成 npmmirror / 阿里云 / goproxy.cn 仍可能很慢（公网 CDN、代理、镜像站滞后）。决策表与分生态清单见 `references/REFERENCE-NEXUS-ECOSYSTEM-PRELOAD.md`。
 
@@ -41,14 +41,14 @@ description: 国内镜像源与代理分层策略（Docker / Debian / Alpine / N
 | 层级 | 解决什么问题 | 典型手段 | 备注 |
 |------|----------------|----------|------|
 | L0 宿主机 / Runner | `docker pull`、`FROM` 拉取慢 | `/etc/docker/daemon.json` 的 `registry-mirrors`；或企业内 Harbor 前置缓存 | 影响**构建机**拉基础镜像，不写入 `Dockerfile` |
-| L1 CI 环境变量 | 构建阶段内的网络工具与 CLI | `HTTP_PROXY`/`HTTPS_PROXY`/`NO_PROXY`；`DOCKER_BUILDKIT=1` | Homelab 宿主机默认代理见 `内部出站代理配置（见团队内部文档，不在本仓库）` |
+| L1 CI 环境变量 | 构建阶段内的网络工具与 CLI | `HTTP_PROXY`/`HTTPS_PROXY`/`NO_PROXY`；`DOCKER_BUILDKIT=1` | Team 宿主机默认代理见 `team-ops/references/REFERENCE-HOMELAB-OUTBOUND-HTTP-PROXY.md` |
 | L2 Dockerfile `ARG` | 可重复、可审计的换源 | 各语言 `*_MIRROR` / `*_URL` 默认 + build-arg 覆盖 | **推荐**作为团队统一模式 |
 | L3 仅内网发布 | 出网受限 | `FROM` 与包源全部改为内网 registry / Nexus group | 与 `infra-source-image-pipeline-ops` 等流水线 skill 配合 |
-| L3b Nexus 预热 | 大 wheel/jar、钉死版本、镜像站缺包 | hosted 上传 + group 消费；manifest + Ansible（PyPI 已示范） | **Homelab deploy-apps / Woodpecker 标准路径**；见 `REFERENCE-NEXUS-ECOSYSTEM-PRELOAD.md` |
+| L3b Nexus 预热 | 大 wheel/jar、钉死版本、镜像站缺包 | hosted 上传 + group 消费；manifest + Ansible（PyPI 已示范） | **Team deploy-apps / Woodpecker 标准路径**；见 `REFERENCE-NEXUS-ECOSYSTEM-PRELOAD.md` |
 
 ## 默认候选（占位，可被 ARG 覆盖）
 
-以下仅为**常见公共加速**（L2 应急或小依赖）；**Homelab CI 与大依赖场景默认应改为 Nexus group**，勿把本段当作 deploy-apps 终态。团队应在内网文档固定一套；多选一即可，不必同时使用。
+以下仅为**常见公共加速**（L2 应急或小依赖）；**Team CI 与大依赖场景默认应改为 Nexus group**，勿把本段当作 deploy-apps 终态。团队应在内网文档固定一套；多选一即可，不必同时使用。
 
 - **Debian apt**：`https://mirrors.aliyun.com/debian`（主）/ `https://mirrors.tuna.tsinghua.edu.cn/debian`（备）
 - **Alpine apk**：`https://mirrors.aliyun.com/alpine/`（注意版本目录 `v3.xx/main` 等）
@@ -60,10 +60,10 @@ description: 国内镜像源与代理分层策略（Docker / Debian / Alpine / N
 
 ## 工作流（助手执行顺序）
 
-1. 确认栈与基镜像；若属 Homelab `deploy-apps`、Woodpecker/Kaniko 或复用构建：先读 `REFERENCE-NEXUS-ECOSYSTEM-PRELOAD.md`，标出大依赖是否需 manifest 预热。
+1. 确认栈与基镜像；若属 Team `deploy-apps`、Woodpecker/Kaniko 或复用构建：先读 `REFERENCE-NEXUS-ECOSYSTEM-PRELOAD.md`，标出大依赖是否需 manifest 预热。
 2. 选择 L0～L3b 中**最小必要集**（能内网 Nexus group 则优先 L3/L3b，L2 仅作无 Nexus 时的默认）。
 3. 在 `Dockerfile` 顶部声明 `ARG`（带合理默认值），`RUN` 中只引用变量，避免魔法字符串散落；group URL 默认值优先于公网镜像站。
-4. 在 CI 中注入 `build-arg` 或环境变量，与 `NO_PROXY`（含 `nexus.example.example.com`、`.base.example.com`）一并核对。
+4. 在 CI 中注入 `build-arg` 或环境变量，与 `NO_PROXY`（含 `<nexus-url>`、`.<internal-domain>`）一并核对。
 5. 产出变更说明：group/manifest 名、preflight/预热命令、构建示例、回退方式。
 
 ## 推荐输出格式
@@ -80,9 +80,9 @@ description: 国内镜像源与代理分层策略（Docker / Debian / Alpine / N
 ## 专题引用
 
 - **Nexus 全生态私服与预热（大依赖必看）**：`references/REFERENCE-NEXUS-ECOSYSTEM-PRELOAD.md`
-- **Homelab 执行编排**（manifest、波次 B、Harbor warm、Woodpecker inspect）：`infra-artifact-readiness-ops`
-- 长篇可复制片段与命令：`references/REFERENCE-MIRROR-RECIPES.md`（在 `harness-ai-kit` 仓库内路径为 `skills/base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md`；若以「02-工程工作空间」为根，则为 `仓库/skills/base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md`）
-- Homelab 宿主机出站 HTTP 代理（GitHub / Google 等 GFW 站点）：`内部出站代理配置（见团队内部文档，不在本仓库）`
+- **Team 执行编排**（manifest、波次 B、Harbor warm、Woodpecker inspect）：`infra-artifact-readiness-ops`
+- 长篇可复制片段与命令：`references/REFERENCE-MIRROR-RECIPES.md`（在 `harness-ai-kit` 仓库内路径为 `skills/base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md`；若以「02-工程工作空间」为根，则为 `{checkout_dir}/skills/base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md`）
+- Team 宿主机出站 HTTP 代理（GitHub / Google 等 GFW 站点）：`team-ops/references/REFERENCE-HOMELAB-OUTBOUND-HTTP-PROXY.md`
 
 ## 维护建议
 

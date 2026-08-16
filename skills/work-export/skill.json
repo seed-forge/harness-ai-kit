@@ -3,7 +3,7 @@
   "id": "work-export",
   "name": "work-export",
   "owner": "team",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -60,7 +60,7 @@
   ],
   "sources": {
     "preferred": [
-      "skill-registry",
+      "team-skill-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -98,5 +98,13 @@
   "post_install_hints": [
     "Verify node and python are available."
   ],
-  "updated_at": "2026-07-16"
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
 }

@@ -1,4 +1,4 @@
-﻿---
+---
 name: patent-review
 description: Multi-round cyclic rigorous review of Chinese patent technical disclosure documents. Supports multi-dimension review (data flow closure, terminology consistency, state transition, formula completeness, error code routing, text-diagram consistency), round-by-round convergence, and optional auto-fix (default off, severe issues require human confirmation).
 argument-hint: "<patent disclosure .md files...> [--fix] [--rounds N] [--dimensions dataflow,terminology,statemachine,formula,errorcode,diagram]"

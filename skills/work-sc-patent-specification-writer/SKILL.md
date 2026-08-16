@@ -1,4 +1,4 @@
-﻿---
+---
 name: work-sc-patent-specification-writer
 description: "专利说明书撰写：起草发明/实用新型/外观专利说明书主体章节，含背景技术、技术方案、术语一致性。depends on docx（社区上游）。用户提到'专利说明书''背景技术''技术方案撰写'时使用。"
 argument-hint: "<technical scheme / invention disclosure / patent topic>"
@@ -210,4 +210,3 @@ Before delivering, verify:
 - the innovation points are specific rather than slogan-like
 - the technical effects correspond to the identified defects
 - the document does not drift into claim drafting
-

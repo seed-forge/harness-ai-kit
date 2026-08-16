@@ -26,7 +26,7 @@ module.exports = {
   // ============ DB 通道（precheck 与造数用） ============
   // 只读查询代理端点（dbserver 类 HTTP 代理；直连 JDBC 项目需自行适配 lib/precheck.js dbQuery）
   // 留空则 precheck 的 DB 段自动降级为仅静态方言扫描。
-  dbServerUrl: process.env.E2E_DBSERVER || '',   // 例: 'http://<db-proxy-host>:<port>/oracle'
+  dbServerUrl: process.env.E2E_DBSERVER || '',   // 例: 'http://10.0.0.1:14041/oracle'
 
   // ============ 间歇抖动豁免表（每条必须附证据注释） ============
   // URL 命中且同路径稍后 2xx（重试成功）才记豁免不记失败；持续失败照常 FAIL

@@ -147,4 +147,4 @@ Recommendations
 
 ## 专题引用
 
-无外部 references。如需节点运维，联动 `homelab-ansible-control` 或 `infra-observability-ops`。
+无外部 references。如需节点运维，联动 `ansible-control` 或 `infra-observability-ops`。

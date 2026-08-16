@@ -57,7 +57,7 @@ hotfix:   A → h1 (from main) → merge to main + develop
 | 02-工程工作空间 | Trunk-based | 工作空间级别，变更频繁 |
 | fleet-platform | GitHub Flow | 控制仓，必须 PR + review |
 | harness-ai-kit skills | GitHub Flow | PR + CI gate → publish |
-| Homelab 应用仓库 | GitHub Flow | PR + CI + ansible deploy |
+| Team 应用仓库 | GitHub Flow | PR + CI + ansible deploy |
 | 个人脚本/工具 | Trunk-based | 轻量管理 |
 
 ## 分支命名规范

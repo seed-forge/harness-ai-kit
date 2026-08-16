@@ -14,7 +14,7 @@
 | # | 资产 | 类型 | 沉淀位置 | 理由 |
 |---|------|------|---------|------|
 | 1 | `devlab-web-xyflow-usage` | Skill (`*-usage`) | 团队共享 | XYFlow 自定义节点的 6 条踩坑经验，高频复用 |
-| 2 | `xyflow-troubleshoot-loop` | Loop | 团队共享 | 循环排障流程，HUMAN-ON-THE-LOOP 模式 |
+| 2 | `devlab-xyflow-troubleshoot-loop` | Loop | 团队共享 | 循环排障流程，HUMAN-ON-THE-LOOP 模式 |
 
 ### 不建议沉淀的部分
 

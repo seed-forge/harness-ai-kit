@@ -8,7 +8,7 @@ PR 标题遵循 Conventional Commits 格式：
 ```
 feat(cli): add shared-resources command
 fix(infra-ingress-ops): OpenResty reload 后未验证证书链
-docs(ai-kit-forge): 补充 MCP Server 创建示例
+docs(harness-ai-kit-forge): 补充 MCP Server 创建示例
 ```
 
 ### PR Body 结构

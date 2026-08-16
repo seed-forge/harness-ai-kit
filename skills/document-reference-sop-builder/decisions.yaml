@@ -1,7 +1,0 @@
-decisions:
-  - id: HD-1
-    point: 文档导出确认
-    trigger: 参考 SOP 文档整理完成、进入导出之前
-    options: [用户确认后导出 / 退回修改]
-    default: 必问
-    rationale: 导出为交付物，需用户确认内容后再生成

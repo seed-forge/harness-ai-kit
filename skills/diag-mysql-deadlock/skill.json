@@ -3,7 +3,7 @@
   "id": "diag-mysql-deadlock",
   "name": "diag-mysql-deadlock",
   "owner": "team",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "status": "draft",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -26,7 +26,7 @@
   "sources": {
     "preferred": [
       "repo-checkout",
-      "skill-registry"
+      "team-skill-registry"
     ],
     "allow_fallback": true
   },
@@ -56,5 +56,13 @@
   ],
   "contributors": [],
   "skill_type": "diagnostic",
-  "updated_at": "2026-07-08"
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
 }

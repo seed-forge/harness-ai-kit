@@ -2,13 +2,13 @@
 
 ## 一句话
 
-Kafka 知识基座，被 devlab-kafka-usage 通过 extends 继承。一般不直接使用。
+Kafka 知识基座，被 devlab-middleware-expert 通过 extends 继承。一般不直接使用。
 
 ## 触发场景
 
 | 你说的话 | AI 自动执行 |
 |----------|-------------|
-| 被 extends 继承 | devlab-kafka-usage 自动合并本技能的 Topics/Consumer/Producer 等章节 |
+| 被 extends 继承 | devlab-middleware-expert 自动合并本技能的 Topics/Consumer/Producer 等章节 |
 | 直接使用 | 安装后获取 Kafka 通用知识参考 |
 
 ## 可直接复制的中文 Prompt

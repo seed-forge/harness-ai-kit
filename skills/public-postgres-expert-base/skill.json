@@ -3,7 +3,7 @@
   "id": "public-postgres-expert-base",
   "name": "public-postgres-expert-base",
   "owner": "team",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "status": "draft",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -27,7 +27,7 @@
   "dependencies": [],
   "sources": {
     "preferred": [
-      "skill-registry",
+      "team-skill-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -50,5 +50,13 @@
     "Use appropriate index types: B-Tree for equality/range, GIN for JSONB/fulltext, GiST for geometry."
   ],
   "post_install_hints": [],
-  "updated_at": "2026-07-09"
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
 }

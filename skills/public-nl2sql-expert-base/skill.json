@@ -3,7 +3,7 @@
   "id": "public-nl2sql-expert-base",
   "name": "public-nl2sql-expert-base",
   "owner": "team",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "status": "draft",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -29,7 +29,7 @@
   "dependencies": [],
   "sources": {
     "preferred": [
-      "skill-registry",
+      "team-skill-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -56,5 +56,13 @@
     "Typically hidden from IDE listings and merged into extending skills.",
     "Load reference files per topic area as needed."
   ],
-  "updated_at": "2026-07-24"
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
 }

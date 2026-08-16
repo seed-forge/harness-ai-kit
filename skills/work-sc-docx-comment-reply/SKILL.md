@@ -1,4 +1,4 @@
-﻿---
+---
 name: work-sc-docx-comment-reply
 description: "Word 批注回复：提取 Word 文档批注上下文，生成回复并以 threaded replies 写回 docx。depends on docx（社区上游）。用户提到'回复批注''批注回复''逐条回复'时使用。"
 ---
@@ -72,4 +72,3 @@ python ..\\docx\\ooxml\\scripts\\validate.py "outputs\\<unpacked_dir>" --origina
 1. 先跑提取脚本得到 `comment_context.json`
 2. 以 comment_id 分片给子代理写回复（每个子代理 prompt 末尾加 `$vibe`）
 3. 合并为一个 replies JSON，再执行 `apply_comment_replies.py`
-

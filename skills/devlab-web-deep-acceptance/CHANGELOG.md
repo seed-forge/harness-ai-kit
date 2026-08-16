@@ -1,5 +1,8 @@
 # 变更记录
 
+## 0.1.2 - 2026-08-14
+
+- frontmatter 规范化：SKILL.md 统一 LF / 无 BOM / 单一 YAML frontmatter 块，修复 AI IDE 加载告警（missing YAML frontmatter delimited by ---）。
 ## 0.1.1 - 2026-08-07
 
 - 修复 skill.json `relates_to` 条目 `target` 字段后缺失逗号的 JSON 语法问题。

@@ -3,7 +3,7 @@
   "id": "work-sc-docx-comment-reply",
   "name": "work-sc-docx-comment-reply",
   "owner": "seedforge",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -37,7 +37,7 @@
   ],
   "sources": {
     "preferred": [
-      "skill-registry"
+      "team-skill-registry"
     ],
     "allow_fallback": true
   },
@@ -61,7 +61,7 @@
     "适用场景：专利/论文/合同/内部评审等需要逐条回复批注的文档"
   ],
   "post_install_hints": [],
-  "updated_at": "2026-07-16",
+  "updated_at": "2026-08-14",
   "execution_context": {
     "ide": true,
     "server": false,

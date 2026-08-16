@@ -66,7 +66,7 @@ Breaking change: Add `!` after type or `BREAKING CHANGE:` in footer.
 
 在通用 Conventional Commits 基础上，团队额外约定：
 
-1. **scope 使用组件/模块 ID**：如 `feat(cli):`, `fix(homelab-compose-app-deploy):`, `docs(ai-kit-forge):`
+1. **scope 使用组件/模块 ID**：如 `feat(cli):`, `fix(compose-app-deploy):`, `docs(harness-ai-kit-forge):`
 2. **description 使用中文或英文均可**，但同一 PR 内保持一致
 3. **多变更拆原子 commit**：一个 commit 做一件事，便于 bisect 和 revert
 4. **commit body 说明 why**：type+scope 说明 what，body 说明 why（非显而易见时）
@@ -196,7 +196,7 @@ References:
 
 ### 团队叠加
 
-- **Woodpecker CI**：Homelab 项目主要 CI，使用 `.woodpecker.yml`
+- **Woodpecker CI**：Team 项目主要 CI，使用 `.woodpecker.yml`
 - **Jenkins**：Java 项目 + shared library，使用 Jenkinsfile
 - **Git mirror sync**：Gitea ↔ GitHub 双向镜像，注意 `--mirror` 会覆盖所有 refs
 

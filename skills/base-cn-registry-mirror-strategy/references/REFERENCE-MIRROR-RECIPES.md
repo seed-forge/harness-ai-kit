@@ -2,7 +2,7 @@
 
 以下片段假定使用 `ARG` 作为唯一换源入口；团队可将默认值改为内网地址。
 
-**Homelab / Woodpecker / 大依赖**：优先将默认值设为 **Nexus group** 并做 manifest 预热，不要仅依赖本节中的 npmmirror / 阿里云 / goproxy.cn。见同目录 `REFERENCE-NEXUS-ECOSYSTEM-PRELOAD.md`。
+**Team / Woodpecker / 大依赖**：优先将默认值设为 **Nexus group** 并做 manifest 预热，不要仅依赖本节中的 npmmirror / 阿里云 / goproxy.cn。见同目录 `REFERENCE-NEXUS-ECOSYSTEM-PRELOAD.md`。
 
 ---
 
@@ -156,15 +156,15 @@ docker build \
 
 ---
 
-## 11. Homelab 宿主机默认 HTTP 代理（GFW 站点）
+## 11. Team 宿主机默认 HTTP 代理（GFW 站点）
 
-在 **<your-server>01 / <your-server>02** 上为 GitHub、Google 等配置 `HTTP_PROXY` 时，**不要**临时猜地址；按主机使用 Clash 混合端口 **7890**：
+在 **node1 / node2** 上为 GitHub、Google 等配置 `HTTP_PROXY` 时，**不要**临时猜地址；按主机使用 Clash 混合端口 **7890**：
 
 | 主机 | `HTTP_PROXY` / `HTTPS_PROXY` |
 |------|------------------------------|
-| <your-server>01 (<host-01>) | `http://clash-112.example.com:7890` |
-| <your-server>02 (<host-02>) | `http://clash-119.example.com:7890`（备选 `http://clash.example.com:7890`） |
+| node1 (node1) | `http://<proxy-url>:7890` |
+| node2 (node2) | `http://<proxy-url>:7890`（备选 `http://<proxy-url>:7890`） |
 
 完整 `NO_PROXY` 基线、compose/CI 落点与验证命令见：
 
-`内部出站代理配置（见团队内部文档，不在本仓库）`
+`team-ops/references/REFERENCE-HOMELAB-OUTBOUND-HTTP-PROXY.md`

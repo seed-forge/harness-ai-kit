@@ -1,4 +1,4 @@
-# document-reference-sop-builder Usage
+# work-sc-document-sop-builder Usage
 
 ## When To Use
 - Use this skill when you need to 从参考文档中提取结构、内容、表达、版式与导出规则，并沉淀为可复用的文档编制 SOP 或项目级 Skill.
@@ -14,7 +14,7 @@
 ## 可直接复制的中文 Prompt
 ### 场景 1：直接调用技能
 ```text
-请使用 `document-reference-sop-builder` 这个技能处理我的任务。
+请使用 `work-sc-document-sop-builder` 这个技能处理我的任务。
 输入材料：<在这里补充文件、链接、原始文本或项目背景>。
 目标：<在这里补充你要完成的结果>。
 要求：先判断这个技能是否适合；如果缺少关键输入，先列出缺口；执行时遵循 `SKILL.md` 的规则。

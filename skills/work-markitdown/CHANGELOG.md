@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.5 - 2026-08-14
+
+- frontmatter 规范化：SKILL.md 统一 LF / 无 BOM / 单一 YAML frontmatter 块，修复 AI IDE 加载告警（missing YAML frontmatter delimited by ---）。
 ## 0.2.4 - 2026-08-06
 
 - 治理清欠：结构合规修复后版本抬升（changelog_entry、changelog_missing、usage_prompt）。

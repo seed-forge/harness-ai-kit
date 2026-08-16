@@ -8,7 +8,7 @@ MySQL/InnoDB 知识基座，被 devlab-*-usage 技能通过 extends 继承。一
 
 | 场景 | 说明 |
 |------|------|
-| 被 extends 继承 | devlab-mysql-usage 等技能通过 extends 自动合并本技能的 Schema/Indexing/Query 等章节 |
+| 被 extends 继承 | devlab-middleware-expert 通过 extends 自动合并本技能的 Schema/Indexing/Query 等章节 |
 | 直接使用 | 安装后获取 MySQL/InnoDB 通用知识参考 |
 
 ## 可直接复制的中文 Prompt

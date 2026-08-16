@@ -138,12 +138,12 @@ Windows 场景默认区分两类：
 
 | Playbook | 路径 | 说明 |
 |----------|------|------|
-| `deploy_monit_watchdog` | `Homelab/ansible-control/playbooks/infrastructure/deploy_monit_watchdog.yml` | Monit 统一看门狗一键部署 |
-| 模板目录 | `Homelab/ansible-control/playbooks/infrastructure/monit-templates/` | Jinja2 模板（monitrc、服务配置、告警脚本） |
+| `deploy_monit_watchdog` | `Team/ansible-control/playbooks/infrastructure/deploy_monit_watchdog.yml` | Monit 统一看门狗一键部署 |
+| 模板目录 | `Team/ansible-control/playbooks/infrastructure/monit-templates/` | Jinja2 模板（monitrc、服务配置、告警脚本） |
 
 调用方式：
 ```powershell
-.\Homelab\run-ansible-action.ps1 -Action deploy_monit_watchdog -Target <host> -ExtraArgs @('mm_token=<TOKEN>', 'mm_channel_id=<CHANNEL_ID>')
+.\Team\run-ansible-action.ps1 -Action deploy_monit_watchdog -Target <host> -ExtraArgs @('mm_token=<TOKEN>', 'mm_channel_id=<CHANNEL_ID>')
 ```
 
 ---

@@ -3,25 +3,65 @@
   "id": "diag-mysql-slow-query",
   "name": "diag-mysql-slow-query",
   "owner": "team",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "status": "draft",
   "entry": "SKILL.md",
   "package_type": "skill",
-  "tags": ["diag", "mysql", "slow-query", "performance", "diagnostic"],
+  "tags": [
+    "diag",
+    "mysql",
+    "slow-query",
+    "performance",
+    "diagnostic"
+  ],
   "summary": "MySQL 慢查询全链诊断：开启/分析 slow query log、定位 Top-N 慢 SQL、EXPLAIN 检查执行计划、识别缺失索引与全表扫描，输出结构化报告与优化建议。",
-  "compatible_clients": ["codex", "claude-code"],
-  "installation": { "default_scope": "project" },
+  "compatible_clients": [
+    "codex",
+    "claude-code"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
   "dependencies": [],
-  "sources": { "preferred": ["repo-checkout", "skill-registry"], "allow_fallback": true },
-  "companion_docs": { "usage": "USAGE.md", "example_required": false },
-  "environment": { "dependency_groups": [], "system": [], "python_strategy": "none", "python_packages": [], "fonts": [], "verify_commands": [] },
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "team-skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
   "runtime_requirements": [
     "MySQL PROCESS and SELECT on performance_schema required.",
     "Do not guess passwords; prompt user for connection info when missing."
   ],
-  "post_install_hints": ["Pair with infra-datasource-ops for MySQL connection string management."],
-  "recommended_tools": ["db_query", "db_get_status"],
+  "post_install_hints": [
+    "Pair with infra-datasource-ops for MySQL connection string management."
+  ],
+  "recommended_tools": [
+    "db_query",
+    "db_get_status"
+  ],
   "contributors": [],
   "skill_type": "diagnostic",
-  "updated_at": "2026-07-08"
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
 }

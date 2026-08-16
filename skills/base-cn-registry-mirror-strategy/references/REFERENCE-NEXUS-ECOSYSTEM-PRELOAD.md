@@ -1,6 +1,6 @@
 # Nexus 全生态私服与预热策略
 
-Homelab / Worklab 在 **Kaniko + Woodpecker + 跨境网络** 场景下，仅把构建指向国内公共镜像站（npmmirror、阿里云 Maven、goproxy.cn 等）往往**仍然很慢**：流量仍走公网 CDN、大制品重复下载、镜像站同步滞后、且经 Clash 代理时易 502/超时。
+Team / Team 在 **Kaniko + Woodpecker + 跨境网络** 场景下，仅把构建指向国内公共镜像站（npmmirror、阿里云 Maven、goproxy.cn 等）往往**仍然很慢**：流量仍走公网 CDN、大制品重复下载、镜像站同步滞后、且经 Clash 代理时易 502/超时。
 
 本 reference 规定：**凡 Nexus 能承接的依赖生态，只要存在「大依赖」或构建关键路径依赖，默认建议 `Nexus group（统一入口）+ hosted 预热`，而不是单独依赖 CN 公网代理镜像。**
 
@@ -12,7 +12,7 @@ Homelab / Worklab 在 **Kaniko + Woodpecker + 跨境网络** 场景下，仅把�
 | L3 Nexus group | **CI / deploy-apps 的单一事实源**（构建只认 group URL） |
 | L3 hosted 预热 | 大依赖、镜像站滞后、官方独占 index（如 PyTorch）的**显式落盘** |
 
-PyPI 已按此模式落地，见 `Homelab/ansible-control/artifacts/nexus-pypi/README.md`；其它生态应对齐同一抽象，而不是各写各的「换阿里云」。
+PyPI 已按此模式落地，见 `Team/ansible-control/artifacts/nexus-pypi/README.md`；其它生态应对齐同一抽象，而不是各写各的「换阿里云」。
 
 ---
 
@@ -23,7 +23,7 @@ PyPI 已按此模式落地，见 `Homelab/ansible-control/artifacts/nexus-pypi/R
 1. **单制品体积大**：例如 pip wheel / Maven jar / npm tarball / Go module zip 常态 **> 50 MiB**，或单次构建某生态下载 **> 5 分钟**。
 2. **版本钉死且重复拉取**：同一 `==` / lockfile 版本被多个 `deploy-apps`、多分支 CI、多阶段 `RUN` 反复下载。
 3. **公共镜像站不可靠**：`preflight` 在 group/proxy 上查不到 pinned 版本，或已知镜像站比 upstream 慢数日（PyPI 已有先例）。
-4. **构建在代理环境**：Woodpecker/Kaniko 配 `HTTP_PROXY` 时，外网 registry 常比内网 Nexus **更慢或更脆**；`NO_PROXY` 须含 `nexus.example.example.com`（及 `.base.example.com`）。
+4. **构建在代理环境**：Woodpecker/Kaniko 配 `HTTP_PROXY` 时，外网 registry 常比内网 Nexus **更慢或更脆**；`NO_PROXY` 须含 `<nexus-url>`（及 `.<internal-domain>`）。
 5. **官方独占源**：如 `download.pytorch.org`、部分 npm scope、企业私有 BOM——应进 **专用 hosted**，由 group 聚合，而不是让每次构建直连外网。
 
 以下情况可暂用 **仅 group（靠 proxy 被动缓存）** 或 L2 公共镜像，**不必**先 hosted：
@@ -45,7 +45,7 @@ PyPI 已按此模式落地，见 `Homelab/ansible-control/artifacts/nexus-pypi/R
 
 | 策略 | 适用 | 动作 |
 |------|------|------|
-| **cache** | pinned 版本已在 group simple/index 可见 | 在 <host-01> 经 group 执行 `pip download` / `mvn dependency:get` 等，填满 proxy 缓存 |
+| **cache** | pinned 版本已在 group simple/index 可见 | 在 node1 经 group 执行 `pip download` / `mvn dependency:get` 等，填满 proxy 缓存 |
 | **hosted** | 镜像站滞后、仅 upstream 有、或需专用 hosted 仓 | 从 upstream 拉取 → 上传到 `*-hosted-*` → 经 group 校验 |
 
 每个应用或技术栈维护一份 **manifest profile**（命名建议：`<stack>-<py|node|java|go>-<brief>.conf`），由 Ansible playbook 或受控脚本执行，**禁止**在 Kaniko 构建阶段临时从外网拉百 MB 制品「碰运气」。
@@ -54,9 +54,9 @@ PyPI 已按此模式落地，见 `Homelab/ansible-control/artifacts/nexus-pypi/R
 
 ## 3. 分生态建议（Nexus 可承接部分）
 
-基址示例：`http://nexus.example.example.com:19010`（内网解析；构建 `no_proxy` 必含该主机名）。
+基址示例：`http://<nexus-url>:19010`（内网解析；构建 `no_proxy` 必含该主机名）。
 
-| 生态 | 构建消费端配置 | group 入口形态（需在 Nexus 配置） | 预热手段（hosted 优先时） | Homelab 现状（2026-05） |
+| 生态 | 构建消费端配置 | group 入口形态（需在 Nexus 配置） | 预热手段（hosted 优先时） | Team 现状（2026-05） |
 |------|----------------|-----------------------------------|---------------------------|-------------------------|
 | **pip / uv** | `PIP_INDEX_URL`、`PIP_TRUSTED_HOST`；`uv pip` 同 index | `.../repository/pypi-group-repository-all/simple/` | `nexus_pypi_wheels_sync` + `artifacts/nexus-pypi/manifests/*.conf` | **已落地**（voice-pro、moneyprinter、video-analyzer 等） |
 | **npm / pnpm** | `.npmrc` `registry=`、`NPM_CONFIG_REGISTRY`；避免构建期 `corepack` 拉 npmjs | `.../repository/npm-group/`（命名以 Nexus 为准） | `npm pack` / `pnpm fetch` → hosted；或 CI `cache` 经 group 拉一次 | 部分仓仍 **npmmirror**（如 newsnow）；**待** group + profile |
@@ -81,7 +81,7 @@ PyPI 已按此模式落地，见 `Homelab/ansible-control/artifacts/nexus-pypi/R
 | 代理环境 | 易 502/SSL 问题 | 走内网，与 Harbor/Gitea 同域 |
 | 维护成本 | 低，但不可控 | manifest + playbook，可审计、可回滚 |
 
-**结论**：CN 镜像写进 `ARG` 默认值适合「没有 Nexus」的模板；**Homelab `deploy-apps` + Woodpecker 标准路径**应把默认值改为 **Nexus group**，大依赖用 **manifest 预热** 补齐。
+**结论**：CN 镜像写进 `ARG` 默认值适合「没有 Nexus」的模板；**Team `deploy-apps` + Woodpecker 标准路径**应把默认值改为 **Nexus group**，大依赖用 **manifest 预热** 补齐。
 
 ---
 
@@ -100,11 +100,11 @@ PyPI 已按此模式落地，见 `Homelab/ansible-control/artifacts/nexus-pypi/R
 
 | 用途 | 路径 |
 |------|------|
-| PyPI 预热 playbook | `Homelab/ansible-control/playbooks/nexus_pypi_wheels_sync.yml` |
-| PyPI manifests | `Homelab/ansible-control/artifacts/nexus-pypi/manifests/` |
-| deploy-apps 示例 | `Homelab/gitea-repos/deploy-apps/*-deploy/prepare-upstream.sh`、`.woodpecker.yml` `no_proxy` |
+| PyPI 预热 playbook | `Team/ansible-control/playbooks/nexus_pypi_wheels_sync.yml` |
+| PyPI manifests | `Team/ansible-control/artifacts/nexus-pypi/manifests/` |
+| deploy-apps 示例 | `Team/gitea-repos/deploy-apps/*-deploy/prepare-upstream.sh`、`.woodpecker.yml` `no_proxy` |
 | 公共换源片段（L2） | `base-cn-registry-mirror-strategy/references/REFERENCE-MIRROR-RECIPES.md` |
-| 出站代理 | `内部出站代理配置（见团队内部文档，不在本仓库）` |
+| 出站代理 | `team-ops/references/REFERENCE-HOMELAB-OUTBOUND-HTTP-PROXY.md` |
 
 ---
 
@@ -116,4 +116,4 @@ PyPI 已按此模式落地，见 `Homelab/ansible-control/artifacts/nexus-pypi/R
 4. **P2**：Go — `GOPROXY` group + 模块预热 playbook。
 5. **P2**：统一 reference `REFERENCE-DEPLOY-APPS-BUILD-STANDARD.md`（与 Woodpecker 分诊并列）。
 
-本文件为**策略与决策**事实源；具体 Nexus 仓库名以 `<your-server>01` Nexus UI / 运维台账为准，配置变更时同步更新上表「group 入口」列。
+本文件为**策略与决策**事实源；具体 Nexus 仓库名以 `node1` Nexus UI / 运维台账为准，配置变更时同步更新上表「group 入口」列。

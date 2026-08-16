@@ -1,5 +1,5 @@
 # Human Decisions（结构化，与 SKILL.md 末尾汇总表同源）
-# 用途：AI 回溯参考 + ai-kit-audit-ops 自动解析
+# 用途：AI 回溯参考 + harness-ai-kit-audit-ops 自动解析
 decisions:
   - id: HD-1
     point: 高危写操作真实提交

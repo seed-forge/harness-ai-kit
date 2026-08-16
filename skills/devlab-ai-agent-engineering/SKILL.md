@@ -125,7 +125,7 @@ Phase 5: 交接
 |-------|------|------|
 | `devlab-spec-driven-dev` | **上游** | 用 spec 驱动方式推进本方法论产出的架构落地 |
 | `devlab-eval-driven-agent` | **并行** | 提供评测闭环，验证本架构的正确率/回归 |
-| `devlab-troubleshooting` | **下游** | 运行期故障只读诊断 |
+| `devlab-srv-reliability-ops` | **下游** | 运行期故障只读诊断（Observe→Diagnose→Fix→Re-verify） |
 | `devlab-tech-combo-design` | **邻接** | 多工具组合选型时引用 |
 | `devlab-middleware-expert` | **知识源** | 数据源/中间件连接细节 |
 

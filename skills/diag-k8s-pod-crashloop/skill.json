@@ -3,22 +3,62 @@
   "id": "diag-k8s-pod-crashloop",
   "name": "diag-k8s-pod-crashloop",
   "owner": "team",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "status": "draft",
   "entry": "SKILL.md",
   "package_type": "skill",
-  "tags": ["diag","kubernetes","pod","crashloop","diagnostic"],
+  "tags": [
+    "diag",
+    "kubernetes",
+    "pod",
+    "crashloop",
+    "diagnostic"
+  ],
   "summary": "K8s Pod CrashLoopBackOff 全链排查：kubectl describe → events → logs → restart policy → resource limits → liveness probe，输出结构化报告与修复建议。",
-  "compatible_clients": ["codex", "claude-code"],
-  "installation": { "default_scope": "project" },
+  "compatible_clients": [
+    "codex",
+    "claude-code"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
   "dependencies": [],
-  "sources": { "preferred": ["repo-checkout", "skill-registry"], "allow_fallback": true },
-  "companion_docs": { "usage": "USAGE.md", "example_required": false },
-  "environment": { "dependency_groups": [], "system": [], "python_strategy": "none", "python_packages": [], "fonts": [], "verify_commands": [] },
-  "runtime_requirements": ["Do not execute destructive commands without explicit user confirmation."],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "team-skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "Do not execute destructive commands without explicit user confirmation."
+  ],
   "post_install_hints": [],
-  "recommended_tools": ["kubectl","k9s"],
+  "recommended_tools": [
+    "kubectl",
+    "k9s"
+  ],
   "contributors": [],
   "skill_type": "diagnostic",
-  "updated_at": "2026-07-08"
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
 }

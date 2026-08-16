@@ -3,7 +3,7 @@
   "id": "public-redis-expert-base",
   "name": "public-redis-expert-base",
   "owner": "team",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "status": "draft",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -27,7 +27,7 @@
   "dependencies": [],
   "sources": {
     "preferred": [
-      "skill-registry",
+      "team-skill-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -51,5 +51,13 @@
     "Always use connection pooling or multiplexing; never one connection per request."
   ],
   "post_install_hints": [],
-  "updated_at": "2026-07-09"
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
 }

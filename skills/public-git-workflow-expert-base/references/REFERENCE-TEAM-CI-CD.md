@@ -4,7 +4,7 @@
 
 | 平台 | 适用项目 | 配置文件 | 触发方式 |
 |------|----------|----------|----------|
-| Woodpecker CI | Homelab 应用、fleet-platform | `.woodpecker.yml` | Gitea webhook |
+| Woodpecker CI | Team 应用、fleet-platform | `.woodpecker.yml` | Gitea webhook |
 | Jenkins | Java 项目、shared library | `Jenkinsfile` | Gitea/GitHub webhook |
 | GitHub Actions | GitHub 开源项目 | `.github/workflows/*.yml` | GitHub event |
 
@@ -27,7 +27,7 @@ pipeline:
   publish:
     image: plugins/docker
     settings:
-      registry: harbor.base.example.com
+      registry: <harbor-url>
       repo: ${CI_REPO}
     when:
       branch: [main]
@@ -46,12 +46,12 @@ pipeline:
 团队 Jenkins 使用 shared library，Jenkinsfile 引用共享函数：
 
 ```groovy
-@Library('homelab-jenkins-shared-library') _
+@Library('jenkins-shared-library') _
 
 standardPipeline(
   appName: 'my-app',
   buildTool: 'maven',
-  deployTarget: '<host-02>'
+  deployTarget: 'node2'
 )
 ```
 

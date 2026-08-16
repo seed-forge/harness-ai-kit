@@ -1,6 +1,6 @@
 ---
 name: devlab-ai-kit-miner
-description: Review completed dev sessions to decide whether work should be distilled into devlab-* assets (skills, CLI tools, MCP servers, loops, subagents, or knowledge cards). Based on post-task-skill-miner, specialized for dev workflows (不局限于前后端，覆盖全栈研发场景). Triggers on "devlab-ai-kit-miner", "devlab skill miner", "研发复盘", "技能提炼", "沉淀决策".
+description: Review completed dev sessions to decide whether work should be distilled into devlab-* assets (skills, CLI tools, MCP servers, loops, subagents, or knowledge cards). Based on base-session-ai-kit-miner, specialized for dev workflows (不局限于前后端，覆盖全栈研发场景). Triggers on "devlab-ai-kit-miner", "devlab skill miner", "研发复盘", "技能提炼", "沉淀决策".
 ---
 
 # devlab-ai-kit-miner
@@ -9,7 +9,7 @@ description: Review completed dev sessions to decide whether work should be dist
 
 在一次较长的研发协作会话结束后，复盘本次工作中是否存在值得沉淀的资产。
 
-基于 post-task-skill-miner 的复盘能力，增加了：
+基于 base-session-ai-kit-miner 的复盘能力，增加了：
 - 研发场景特有的**多资产类型决策**（Skill / CLI / MCP / Loop / Subagent）
 - `devlab-*` 命名规范
 - 团队仓库 vs 项目级的沉淀位置决策
@@ -77,13 +77,13 @@ description: Review completed dev sessions to decide whether work should be dist
 | `devlab-web-*` | 网站 / Web 应用（页面、组件、前端框架） | `devlab-web-react-sop` |
 | `devlab-tool-*` | 开发工具（脚手架、代码生成、工程化脚本） | `devlab-tool-codegen-sop` |
 | `devlab-cicd-*` | CI/CD 编排（构建、部署、流水线配置） | `devlab-cicd-onboard` |
-| `devlab-*`（省略二级） | 不归属特定技术栈 | `devlab-troubleshooting` |
+| `devlab-*`（省略二级） | 不归属特定技术栈 | `devlab-srv-reliability-ops` |
 
 **判定规则**：后端服务 → `srv`；网站/Web → `web`；开发工具 → `tool`；CI/CD → `cicd`；不归属 → 省略。
 
-## 与 post-task-skill-miner 的关系
+## 与 base-session-ai-kit-miner 的关系
 
-| 维度 | post-task-skill-miner | devlab-ai-kit-miner |
+| 维度 | base-session-ai-kit-miner | devlab-ai-kit-miner |
 |------|----------------------|-------------------|
 | 适用范围 | 通用任务复盘 | 研发场景专用（全栈） |
 | 资产类型 | Skill / Loop / 知识卡片 | Skill / CLI / MCP / Loop / Subagent / 知识卡片 |
@@ -92,17 +92,17 @@ description: Review completed dev sessions to decide whether work should be dist
 | 沉淀位置 | 不区分 | 项目级 vs 团队共享 |
 | 工具链集成 | 无 | harness-ai-kit (skill.json, USAGE.md, CHANGELOG.md) |
 
-**依赖链**：`devlab-ai-kit-miner` → `post-task-skill-miner`（通用判断 + Loop 提炼）。
+**依赖链**：`devlab-ai-kit-miner` → `base-session-ai-kit-miner`（通用判断 + Loop 提炼）。
 
-## 与 ai-kit-forge 的接力
+## 与 harness-ai-kit-forge 的接力
 
-本技能负责**复盘提炼**阶段，输出资产草案。如需实际创建资产（骨架生成 → validate → publish），由 `ai-kit-forge` 接手。
+本技能负责**复盘提炼**阶段，输出资产草案。如需实际创建资产（骨架生成 → validate → publish），由 `harness-ai-kit-forge` 接手。
 
 ```
 devlab-ai-kit-miner 复盘输出草案
         │
         ▼ (用户确认后衔接)
-ai-kit-forge 接收草案 → 生成骨架 → validate → publish
+harness-ai-kit-forge 接收草案 → 生成骨架 → validate → publish
 ```
 
 ## 团队共享资产必要条件
@@ -157,7 +157,7 @@ ai-kit-forge 接收草案 → 生成骨架 → validate → publish
 ## 八、与审查流水线的关系
 
 本技能产出的沉淀候选建议作为草稿进入 Draft → Review → Merge 流水线（`historyminerctl push`），
-由 [`ai-kit-review-ops`](../ai-kit-review-ops/SKILL.md) 统一五维审查后融合，不直提交。
+由 [`harness-ai-kit-review-ops`](../harness-ai-kit-review-ops/SKILL.md) 统一五维审查后融合，不直提交。
 
 ## Human Decisions
 

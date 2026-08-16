@@ -1,4 +1,6 @@
-﻿---
+> **🛑 已退役**：该 Skill 已下线，不再维护。
+
+---
 name: base-goal-execution
 description: >
   Goal 驱动执行技能。将计划（Plan）转化为可追踪、可恢复、有验收标准的闭环执行流程。

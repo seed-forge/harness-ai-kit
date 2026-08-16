@@ -3,7 +3,7 @@
   "id": "devlab-tech-fit-eval",
   "name": "devlab-tech-fit-eval",
   "owner": "seedforge",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -27,7 +27,7 @@
   "sources": {
     "preferred": [
       "repo-checkout",
-      "skill-registry"
+      "team-skill-registry"
     ],
     "allow_fallback": true
   },
@@ -44,7 +44,7 @@
   },
   "runtime_requirements": [],
   "post_install_hints": [],
-  "updated_at": "2026-07-08",
+  "updated_at": "2026-08-14",
   "execution_context": {
     "ide": true,
     "server": true,

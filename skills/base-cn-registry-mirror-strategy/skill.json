@@ -3,7 +3,7 @@
   "id": "base-cn-registry-mirror-strategy",
   "name": "base-cn-registry-mirror-strategy",
   "owner": "team",
-  "version": "0.1.5",
+  "version": "0.1.7",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -32,7 +32,7 @@
   "dependencies": [],
   "sources": {
     "preferred": [
-      "skill-registry",
+      "team-skill-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -42,5 +42,13 @@
     "镜像站可用性会随时间变化；正文以「变量 + 默认候选」为主，团队应在内网文档或私有 registry 中维护最终落点。",
     "涉及公司合规时，优先使用组织提供的制品库与代理，而不是公共镜像。"
   ],
-  "updated_at": "2026-05-22"
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
 }

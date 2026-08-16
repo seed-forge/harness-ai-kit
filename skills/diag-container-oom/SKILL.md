@@ -194,4 +194,4 @@ Recommendations
 
 ## 专题引用
 
-无外部 references。如需容器部署运维，联动 `homelab-compose-app-deploy`。
+无外部 references。如需容器部署运维，联动 `compose-app-deploy`。

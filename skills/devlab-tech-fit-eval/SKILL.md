@@ -1,4 +1,4 @@
-﻿---
+---
 name: devlab-tech-fit-eval
 description: 评估技术库/框架与项目需求的适配度，识别结合点、约束和集成方案。适用于技术选型决策、库集成可行性分析、框架迁移评估。 Triggers on "tech fit", "技术适配", "库评估", "framework evaluation", "library fit", "技术选型评估".
 allowed-tools: Agent, AskUserQuestion, Read, Bash, Glob, Grep, Write, WebSearch
@@ -114,7 +114,7 @@ Phase 5: Synthesis & Recommendation → tech-fit-report.md
 ## Directory Setup
 
 ```javascript
-const workDir = `.devlab/tech-fit-eval`;
+const workDir = `.harness/devlab/tech-fit-eval`;
 
 Bash(`mkdir -p "${workDir}"`);
 ```
@@ -122,7 +122,7 @@ Bash(`mkdir -p "${workDir}"`);
 ## Output Structure
 
 ```
-.devlab/
+.harness/devlab/
 ├── tech-fit-eval/
 │   ├── project-context.md       # 项目上下文包
 │   ├── library-analysis.md      # 技术库分析报告

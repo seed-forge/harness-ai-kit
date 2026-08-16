@@ -1,6 +1,6 @@
 ---
 name: public-kafka-expert-base
-description: Kafka 知识基座。覆盖 Topics/Partitions、Consumer Groups、Producer/Consumer Config、Serialization、Exactly-Once、Rebalancing。供 devlab-kafka-usage 通过 extends 继承。
+description: Kafka 知识基座。覆盖 Topics/Partitions、Consumer Groups、Producer/Consumer Config、Serialization、Exactly-Once、Rebalancing。供 devlab-middleware-expert 通过 extends 继承。
 ---
 
 # Kafka Knowledge Base

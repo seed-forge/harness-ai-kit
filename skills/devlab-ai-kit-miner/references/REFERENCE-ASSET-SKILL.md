@@ -36,7 +36,7 @@ skills/{id}/
 
 ```json
 "dependencies": [
-  {"type": "skill", "namespace": "team", "id": "post-task-skill-miner", "version": ">=0.2.0", "scope": "required"}
+  {"type": "skill", "namespace": "team", "id": "base-session-ai-kit-miner", "version": ">=0.3.0", "scope": "required"}
 ]
 ```
 

@@ -3,7 +3,7 @@
   "id": "public-mysql-expert-base",
   "name": "public-mysql-expert-base",
   "owner": "team",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "status": "draft",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -27,7 +27,7 @@
   "dependencies": [],
   "sources": {
     "preferred": [
-      "skill-registry",
+      "team-skill-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -54,5 +54,13 @@
     "This skill is typically hidden from IDE listings and merged into extending skills.",
     "If used directly, load the reference files as needed for each topic area."
   ],
-  "updated_at": "2026-07-09"
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": null
+  }
 }

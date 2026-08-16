@@ -1,7 +1,7 @@
-$schema: ai-kit-config/v1
+$schema: harness-ai-kit-config/v1
 
 # config.defaults.yaml — L1 资产默认配置（devlab-dao-sql-compat）
-# 优先级：L3 运行时参数 > L2 用户配置(~/.ai-kit/config.yaml / 环境变量 / .env.tak) > L1 本文件
+# 优先级：L3 运行时参数 > L2 用户配置(~/.harness-ai-kit/config.yaml / 环境变量 / .env.tak) > L1 本文件
 # 约束：本文件不得包含敏感值（凭据/连接串）
 
 config:

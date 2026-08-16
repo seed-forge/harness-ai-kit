@@ -3,7 +3,7 @@
   "id": "devlab-eval-driven-agent",
   "name": "devlab-eval-driven-agent",
   "owner": "seedforge",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "status": "trial",
   "tags": [
     "eval",
@@ -14,7 +14,7 @@
     "methodology",
     "production"
   ],
-  "summary": "eval 自评测体系驱动的 AI Agent 生产体系：评测集组织、Mock 隔离、标准化比对、自动评测脚本与回归；预留与产品运营系统打通（真实数据反馈），并规划配套 evalctl CLI 做真实数据采集与反馈回流。",
+  "summary": "eval 自评测体系驱动的 AI Agent 生产体系：评测集组织、Mock 隔离、标准化比对、自动评测脚本与回归；L3 数据后端接 Langfuse（dataset/scores/LLM-as-judge），配套 evalctl CLI（0.2.x 已发布）承接 run/diff/ingest/feedback/report。",
   "execution_context": {
     "ide": true,
     "server": true,

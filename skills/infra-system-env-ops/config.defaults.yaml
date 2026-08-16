@@ -1,4 +1,4 @@
-$schema: ai-kit-config/v1
+$schema: harness-ai-kit-config/v1
 
 config: []
 # No runtime configuration required for this skill.

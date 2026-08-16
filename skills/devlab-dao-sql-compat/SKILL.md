@@ -34,9 +34,9 @@ description: "DAO 层通用 SQL 方言兼容性检查 + 系统性修复工作流
 
 ## 配置上下文
 
-本 Skill 的运行时配置遵循 ai-kit 配置治理规范的三级优先级：
+本 Skill 的运行时配置遵循 harness-ai-kit 配置治理规范的三级优先级：
 
-> L3 对话中用户明确声明的参数 > L2 用户配置（~/.ai-kit/config.yaml → 环境变量 → ~/.ai-kit/.env.tak）> L1 本目录 config.defaults.yaml
+> L3 对话中用户明确声明的参数 > L2 用户配置（~/.harness-ai-kit/config.yaml → 环境变量 → ~/.harness-ai-kit/.env.tak）> L1 本目录 config.defaults.yaml
 
 配置项见 `config.defaults.yaml`：adapter / scan_dir / module_glob / report_path / custom_procs_file / fail_on_critical / verify_jdbc_url。
 其中 verify_jdbc_url 为 sensitive：无默认值，只能经 L2/L3 注入，禁止写入任何文档或提交。

@@ -17,8 +17,8 @@ scope 使用**组件/模块 ID**，保持与代码库中的标识一致：
 | scope 示例 | 含义 |
 |------------|------|
 | `cli` | harness-ai-kit CLI 工具链 |
-| `homelab-compose-app-deploy` | Homelab Compose 部署技能 |
-| `ai-kit-forge` | Forge 资产创造器 |
+| `compose-app-deploy` | Team Compose 部署技能 |
+| `harness-ai-kit-forge` | Forge 资产创造器 |
 | `infra-datasource-ops` | 数据源运维技能 |
 | `public-git-workflow-expert-base` | 本知识基座 |
 
@@ -31,14 +31,14 @@ feat(cli): harness-ai-kit v0.7.4 — 新增 shared-resources 命令
 ```
 
 ```
-fix(homelab-compose-app-deploy): 修复 <your-panel>-network 外部网络检测逻辑
+fix(compose-app-deploy): 修复 1panel-network 外部网络检测逻辑
 
 之前的检测方式依赖 docker network inspect，当网络不存在时会报错。
 改用 docker network ls --filter name= 方式，返回空结果时自动创建。
 ```
 
 ```
-docs(ai-kit-forge): 补充 Loop 资产内容规范章节
+docs(harness-ai-kit-forge): 补充 Loop 资产内容规范章节
 
 添加 loop.json 必填字段表、LOOP.md/CHECK.md/USAGE.md 标准结构说明。
 ```

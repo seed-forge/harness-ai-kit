@@ -200,4 +200,4 @@ to_date(#{taskTime},'yyyy-mm-dd hh24:mi:ss')
 
 ## License
 
-内部团队工具，遵循 ai-kit 规范。
+内部团队工具，遵循 harness-ai-kit 规范。

@@ -1,4 +1,4 @@
-﻿---
+---
 name: patent-disclosure-workflow
 description: End-to-end project workflow for Chinese patent technical disclosure drafting, polishing, pre-review, and conditional Word export. Use for patent writing, structure alignment, anti-AI-tone polishing, client pre-review preparation, and export coordination.
 argument-hint: "<patent topic / markdown draft / disclosure materials>"
