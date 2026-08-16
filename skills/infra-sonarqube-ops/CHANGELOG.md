@@ -9,7 +9,7 @@
 
 ## 0.1.1 - 2026-07-24
 
-- 补全 Human Decision 结构（Skill 组织规范 §5）：新增 `decisions.yaml`（HD-1 删除项目 / HD-2 重置 Token）+ SKILL.md `## Human Decisions` 汇总表。（team-ai-kit-audit-ops HD 治理 P1 批）
+- 补全 Human Decision 结构（Skill 组织规范 §5）：新增 `decisions.yaml`（HD-1 删除项目 / HD-2 重置 Token）+ SKILL.md `## Human Decisions` 汇总表。（harness-ai-kit-audit-ops HD 治理 P1 批）
 
 ## 0.1.0 - 2026-07-21
 
