@@ -1,0 +1,71 @@
+{
+  "namespace": "community",
+  "id": "infra-nexus-ops",
+  "name": "infra-nexus-ops",
+  "owner": "seedforge",
+  "version": "0.3.4",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "config_schema": "config.defaults.yaml",
+  "tags": [
+    "infra",
+    "nexus",
+    "artifact",
+    "repository",
+    "crud",
+    "inventory",
+    "blobstore",
+    "cleanup-policy"
+  ],
+  "summary": "Nexus 平台运维：仓库 CRUD + update、blobstore 管理、cleanup-policy 查询、inventory 导出/漂移检测；消费预热归 infra-artifact-readiness-ops。",
+  "compatible_clients": [
+    "codex",
+    "claude-code"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [
+    {
+      "type": "cli",
+      "namespace": "team",
+      "id": "nexusctl",
+      "version": ">=0.3.0",
+      "scope": "required"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [
+    "Use infra-artifact-readiness-ops for build-time preload/readiness; use this skill for Nexus platform state."
+  ],
+  "post_install_hints": [
+    "Run `nexusctl doctor` before repository changes.",
+    "Use `nexusctl inventory summary` to overview repos.",
+    "Use `nexusctl inventory diff --against <ledger>` to detect drift.",
+    "Use `nexusctl blobstore list` to check blob stores."
+  ],
+  "updated_at": "2026-08-14",
+  "integrations": [
+    {
+      "target": "harness-ai-kit-maintainer",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "发布/废弃/同步、bump 版本、lock 刷新"
+    }
+  ],
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

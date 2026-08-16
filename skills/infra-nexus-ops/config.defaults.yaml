@@ -1,0 +1,24 @@
+$schema: harness-ai-kit-config/v1
+config:
+- key: nexus_base_url
+  type: string
+  required: false
+  sensitivity: public
+  description: Nexus Repository Manager 基础 URL
+  default: ""
+- key: nexus_user
+  type: string
+  required: false
+  sensitivity: sensitive
+  description: Nexus 用户名（admin 权限）
+- key: nexus_password
+  type: string
+  required: false
+  sensitivity: sensitive
+  description: Nexus 密码
+- key: nexus_profile
+  type: string
+  required: false
+  sensitivity: public
+  description: Profile 名称（~/.nexusctl/profiles.yaml）
+  default: default
