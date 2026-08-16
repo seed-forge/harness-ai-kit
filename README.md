@@ -13,6 +13,10 @@
 
 As AI agents proliferate, teams accumulate reusable prompts, skills, CLIs and MCP servers — but there's no `npm` for these assets. `harness-ai-kit` fills that gap: one CLI to install, resolve, lock, validate and govern AI agent assets across multiple runtimes.
 
+### Build Less, Compose More
+
+harness-ai-kit is a **composition layer, not another vertical toolkit**. It does **not** compete with well-known single-purpose community AI kits — it *composes* them. Where a focused community skill, CLI, or MCP server already does a job well, harness-ai-kit's role is to install, pin, and orchestrate it alongside everything else, never to reinvent it. Build less; reuse and compose more.
+
 ### Why not just copy SKILL.md files?
 
 | | Copy-paste | harness-ai-kit |

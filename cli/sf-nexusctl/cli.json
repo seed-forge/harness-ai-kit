@@ -1,0 +1,18 @@
+{
+  "namespace": "community",
+  "id": "nexusctl",
+  "name": "nexusctl",
+  "owner": "seedforge",
+  "version": "0.1.0",
+  "status": "trial",
+  "package_type": "cli",
+  "summary": "Nexus repository ops CLI: repo CRUD, blobstore, cleanup-policy, inventory export/diff, presets, user/role management.",
+  "package_name": "sf-nexusctl",
+  "install_type": "python-package",
+  "publish_paths": [
+    "cli/sf-nexusctl"
+  ],
+  "companion_docs": {
+    "usage": "README.md"
+  }
+}

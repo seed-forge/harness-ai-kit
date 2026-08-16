@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sf-nexusctl"
+version = "0.1.0"
+description = "Nexus repository ops CLI: repo CRUD, blobstore, cleanup-policy, inventory export/diff, presets, user/role management."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "SeedForge" }
+]
+dependencies = [
+  "harness-ai-kit>=0.2.0",
+  "nexus-api-client>=3.74.1,<4.0",
+  "PyYAML>=6.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/seed-forge/harness-ai-kit"
+Repository = "https://github.com/seed-forge/harness-ai-kit"
+
+[project.scripts]
+nexusctl = "nexusctl.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["nexusctl", "nexusctl.*"]
+
+[tool.setuptools.package-data]
+nexusctl = ["data/*.yaml"]

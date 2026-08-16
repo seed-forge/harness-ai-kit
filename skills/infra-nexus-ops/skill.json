@@ -29,7 +29,7 @@
   "dependencies": [
     {
       "type": "cli",
-      "namespace": "team",
+      "namespace": "community",
       "id": "nexusctl",
       "version": ">=0.3.0",
       "scope": "required"

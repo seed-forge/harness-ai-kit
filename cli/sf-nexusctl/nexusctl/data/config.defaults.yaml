@@ -1,0 +1,19 @@
+$schema: harness-ai-kit-config/v1
+
+config:
+  - key: base_url
+    description: Nexus base URL (legacy alias: nexus_base_url)
+    required: false
+    default: ""
+    env_var: NEXUS_BASE_URL
+    sensitivity: normal
+  - key: user
+    description: Nexus username
+    required: false
+    env_var: NEXUS_USER
+    sensitivity: normal
+  - key: password
+    description: Nexus password
+    required: false
+    env_var: NEXUS_PASSWORD
+    sensitivity: secret
