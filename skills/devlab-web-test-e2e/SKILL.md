@@ -432,8 +432,8 @@ devlab-test-onboard 检测到项目特征：Vue + Vite
 <!-- 在测试代码中添加引用注释 -->
 /**
  * Fixture Library Reference
- * Source: devlab-test-fixture-lib/fixtures/playwright-base.ts
- * See also: https://github.com/team/test-fixture-lib
+ * Source: vendored Playwright base fixture (adapted from an internal fixture library)
+ * (Fixture pattern adapted from an internal test-fixture library.)
  */
 import { baseTest, expect } from './fixtures';
 ```

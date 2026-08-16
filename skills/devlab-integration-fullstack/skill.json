@@ -1,7 +1,7 @@
 {
   "namespace": "community",
-  "id": "devlab-web-test-e2e",
-  "name": "DevLab Web E2E Test",
+  "id": "devlab-integration-fullstack",
+  "name": "DevLab Integration Fullstack Test",
   "owner": "seedforge",
   "version": "0.1.4",
   "status": "trial",
@@ -10,13 +10,12 @@
   "tags": [
     "devlab",
     "testing",
-    "e2e",
-    "playwright",
-    "vue",
-    "react",
-    "frontend"
+    "integration",
+    "fullstack",
+    "testcontainers",
+    "docker-compose"
   ],
-  "summary": "Web E2E 测试专家技能。专注 Vue/React 前端项目的浏览器端到端测试能力，基于 Playwright + AI Agent 实现测试计划生成 → 代码生成 → 失败修复的完整闭环。",
+  "summary": "全栈集成测试专家技能。支持多服务 Docker Compose 部署场景，基于 Testcontainers + Mock Server 实现端到端集成测试。",
   "compatible_clients": [
     "codex",
     "claude-code",
@@ -25,9 +24,7 @@
   "installation": {
     "default_scope": "project"
   },
-  "runtime_requirements": [
-    "@playwright/test>=1.40.0"
-  ],
+  "dependencies": [],
   "sources": {
     "preferred": [
       "repo-checkout",
@@ -46,6 +43,15 @@
     "fonts": [],
     "verify_commands": []
   },
+  "runtime_requirements": [
+    "@playwright/test>=1.40.0",
+    "jest>=29.0.0",
+    "supertest>=6.0.0",
+    "testcontainers>=10.0.0"
+  ],
+  "post_install_hints": [
+    "确保 Docker 运行（testcontainers 依赖 Docker）"
+  ],
   "skill_type": "workflow",
   "updated_at": "2026-08-14",
   "integrations": [

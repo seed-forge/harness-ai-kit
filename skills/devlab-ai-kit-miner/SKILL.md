@@ -73,9 +73,9 @@ description: Review completed dev sessions to decide whether work should be dist
 
 | 前缀 | 领域 | 示例 |
 |------|------|------|
-| `devlab-srv-*` | 后端 / 服务（API、业务逻辑、中间件集成） | `devlab-srv-spring-boot-sop` |
-| `devlab-web-*` | 网站 / Web 应用（页面、组件、前端框架） | `devlab-web-react-sop` |
-| `devlab-tool-*` | 开发工具（脚手架、代码生成、工程化脚本） | `devlab-tool-codegen-sop` |
+| `devlab-srv-*` | 后端 / 服务（API、业务逻辑、中间件集成） | `devlab-srv-test-api` |
+| `devlab-web-*` | 网站 / Web 应用（页面、组件、前端框架） | `devlab-web-test-e2e` |
+| `devlab-tool-*` | 开发工具（脚手架、代码生成、工程化脚本） | `nexusctl` |
 | `devlab-cicd-*` | CI/CD 编排（构建、部署、流水线配置） | `devlab-cicd-onboard` |
 | `devlab-*`（省略二级） | 不归属特定技术栈 | `devlab-srv-reliability-ops` |
 

@@ -1,4 +1,4 @@
-# devlab-mybatis-sql-compat
+# devlab-dao-sql-compat
 
 通用 MyBatis SQL 方言兼容性检查 + 系统性修复工作流。
 
@@ -85,7 +85,7 @@ bash scripts/scan-sql-compat.sh \
 直接对 AI 说：
 
 ```
-使用 devlab-mybatis-sql-compat 技能，自动修复本项目 Mapper XML 中的 SQL 方言陷阱。
+使用 devlab-dao-sql-compat 技能，自动修复本项目 Mapper XML 中的 SQL 方言陷阱。
 目标方言：Oracle（消除 PostgreSQL 语法）。
 先运行 fix-sql-compat.sh --dry-run 预览，确认后执行。
 to_date 格式掩码问题需要分析参数语义，不确定的列出来让我确认。
@@ -159,7 +159,7 @@ to_date(#{taskTime},'yyyy-mm-dd hh24:mi:ss')
 ## 文件结构
 
 ```
-.agents/skills/devlab-mybatis-sql-compat/
+.agents/skills/devlab-dao-sql-compat/
 ├── SKILL.md                    # 技能说明
 ├── USAGE.md                    # 使用指南
 ├── README.md                   # 本文件

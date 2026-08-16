@@ -1,0 +1,92 @@
+{
+  "namespace": "community",
+  "id": "devlab-test-onboard",
+  "name": "DevLab Test Onboard",
+  "owner": "seedforge",
+  "version": "0.1.4",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "devlab",
+    "testing",
+    "onboard",
+    "router",
+    "orchestration"
+  ],
+  "summary": "AI 驱动的分层测试体系顶层路由编排。根据项目特征（前端/后端/全栈/微服务）智能识别测试需求，路由到对应子技能（devlab-web-test-e2e / devlab-srv-test-api / devlab-integration-fullstack）。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "devlab-web-test-e2e",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "testing-e2e"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "devlab-srv-test-api",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "testing-api"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "devlab-integration-fullstack",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "testing-integration"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "devlab-test-expert",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "testing-knowledge"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md"
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [],
+  "post_install_hints": [
+    "根据项目类型选择子技能：前端 → devlab-web-test-e2e，后端 → devlab-srv-test-api，全栈 → devlab-integration-fullstack"
+  ],
+  "skill_type": "workflow",
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

@@ -1,0 +1,22 @@
+# 变更记录
+
+## 0.2.0 - 2026-08-15
+
+- 新增 `references/REFERENCE-PROPERTY-BASED-TESTING.md`：属性测试模式索引（roundtrip / inverse / idempotence / stateful / shrink / precondition），映射 fast-check / Hypothesis / jqwik / FsCheck 与官方文档。
+- SKILL.md 测试方法论索引表增加属性测试一行；references 根目录索引同步。
+- skill.json：version 0.2.0，tags 增加 `property-based-testing`，summary 补属性测试。
+
+## 0.1.2 - 2026-08-14
+
+- frontmatter 规范化：SKILL.md 统一 LF / 无 BOM / 单一 YAML frontmatter 块，修复 AI IDE 加载告警（missing YAML frontmatter delimited by ---）。
+## 0.1.1 - 2026-08-06
+
+- 治理清欠：结构合规修复后版本抬升（changelog_entry、changelog_missing、ref_link、ref_rename:README.md->REFERENCE-README.md、refs、usage_missing）。
+
+## 0.1.0 - 2026-08-06
+
+- 治理清欠：补齐伴生文档与结构合规（validate 存量债务清理）。
+
+## 0.1.0 - 2026-08-06
+
+- 治理清欠：补齐伴生文档与结构合规（validate 存量债务清理）。

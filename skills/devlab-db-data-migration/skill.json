@@ -1,0 +1,59 @@
+{
+  "package_type": "skill",
+  "environment": {
+    "verify_commands": [],
+    "system": [],
+    "dependency_groups": [],
+    "python_strategy": "none",
+    "fonts": [],
+    "python_packages": []
+  },
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "kiro",
+    "qoder"
+  ],
+  "companion_docs": {
+    "usage": "USAGE.md"
+  },
+  "sources": {
+    "preferred": [
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "namespace": "community",
+  "version": "0.1.3",
+  "installation": {
+    "default_scope": "project"
+  },
+  "owner": "seedforge",
+  "status": "trial",
+  "post_install_hints": [],
+  "summary": "Database data-layer safe migration: backup -> idempotent check -> migrate -> verify -> rollback. SQLite/MySQL dialect branches, rebuild-table path for constraint changes. Complements devlab-dao-sql-compat (syntax layer).",
+  "runtime_requirements": [
+    "Production migration MUST use standalone script with backup/dry-run/rollback"
+  ],
+  "name": "devlab-db-data-migration",
+  "updated_at": "2026-08-14",
+  "id": "devlab-db-data-migration",
+  "tags": [
+    "db-migration",
+    "schema-evolution",
+    "sqlite",
+    "mysql",
+    "data-safety",
+    "rollback"
+  ],
+  "entry": "SKILL.md",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

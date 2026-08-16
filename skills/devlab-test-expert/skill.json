@@ -1,0 +1,61 @@
+{
+  "namespace": "community",
+  "id": "devlab-test-expert",
+  "name": "DevLab Test Expert Knowledge",
+  "owner": "seedforge",
+  "version": "0.2.0",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "devlab",
+    "testing",
+    "expert",
+    "knowledge",
+    "best-practices",
+    "property-based-testing"
+  ],
+  "summary": "测试专家知识库。包含测试最佳实践、故障排查指南、测试策略设计、性能优化建议、属性测试（property-based testing）模式等专家级知识，供其他测试技能引用。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md"
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [],
+  "post_install_hints": [
+    "本技能为知识库，不直接执行测试",
+    "其他测试技能（如 devlab-web-test-e2e）会自动引用本知识库"
+  ],
+  "skill_type": "knowledge",
+  "updated_at": "2026-08-15",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

@@ -36,7 +36,7 @@
 
 ### 命名决策
 
-- `devlab-web-xyflow-usage` 而非 `devlab-frontend-xyflow`
+- `devlab-web-xyflow-usage` 而非 `frontend-xyflow`
 - 理由：`-usage` 后缀表示"使用指南"，是通用知识；不加后缀表示"组件实现"，是项目特定代码
 - 参考：`devlab-frontend-accordion`（组件实现）vs `devlab-web-xyflow-usage`（库使用指南）
 

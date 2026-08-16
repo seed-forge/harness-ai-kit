@@ -1,22 +1,22 @@
 {
   "namespace": "community",
-  "id": "devlab-web-test-e2e",
-  "name": "DevLab Web E2E Test",
+  "id": "devlab-srv-test-api",
+  "name": "DevLab Server API Test",
   "owner": "seedforge",
-  "version": "0.1.4",
+  "version": "0.1.3",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
   "tags": [
     "devlab",
     "testing",
-    "e2e",
-    "playwright",
-    "vue",
-    "react",
-    "frontend"
+    "api",
+    "backend",
+    "pytest",
+    "jest",
+    "supertest"
   ],
-  "summary": "Web E2E 测试专家技能。专注 Vue/React 前端项目的浏览器端到端测试能力，基于 Playwright + AI Agent 实现测试计划生成 → 代码生成 → 失败修复的完整闭环。",
+  "summary": "后端 API 测试专家技能。支持 Java（JUnit）/ Python（pytest）/ Node.js（supertest + jest）后端项目的接口测试、Mock 服务、测试数据管理。",
   "compatible_clients": [
     "codex",
     "claude-code",
@@ -25,9 +25,7 @@
   "installation": {
     "default_scope": "project"
   },
-  "runtime_requirements": [
-    "@playwright/test>=1.40.0"
-  ],
+  "dependencies": [],
   "sources": {
     "preferred": [
       "repo-checkout",
@@ -46,22 +44,23 @@
     "fonts": [],
     "verify_commands": []
   },
+  "runtime_requirements": [
+    "jest>=29.0.0",
+    "supertest>=6.0.0",
+    "msw>=2.0.0",
+    "@faker-js/faker>=8.0.0",
+    "zod>=3.22.0",
+    "pytest>=7.0.0",
+    "requests-mock>=1.11.0"
+  ],
   "skill_type": "workflow",
   "updated_at": "2026-08-14",
-  "integrations": [
-    {
-      "target": "harness-ai-kit-maintainer",
-      "type": "skill",
-      "direction": "outbound",
-      "contract": "发布/废弃/同步、bump 版本、lock 刷新"
-    }
-  ],
   "execution_context": {
     "ide": true,
-    "server": false,
+    "server": true,
     "requires_codebase": false,
-    "requires_browser": true,
+    "requires_browser": false,
     "requires_interactive": false,
-    "server_runtime": null
+    "server_runtime": "cli-direct"
   }
 }

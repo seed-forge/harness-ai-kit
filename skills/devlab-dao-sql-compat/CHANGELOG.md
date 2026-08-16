@@ -5,7 +5,7 @@
 - frontmatter 规范化：SKILL.md 统一 LF / 无 BOM / 单一 YAML frontmatter 块，修复 AI IDE 加载告警（missing YAML frontmatter delimited by ---）。
 ## [0.4.1] - 2026-08-11
 
-- config.defaults.yaml 迁移到 team-ai-kit-config/v1 schema（$schema 头 + config 列表格式，键位不变，validate 债务清欠）。
+- config.defaults.yaml 迁移到 harness-ai-kit-config/v1 schema（$schema 头 + config 列表格式，键位不变，validate 债务清欠）。
 
 ## [0.4.0] - 2026-08-06
 

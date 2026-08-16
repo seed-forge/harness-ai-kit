@@ -3,19 +3,20 @@
 One-line descriptions of every skill, CLI, and plugin bundled in this repo.
 Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>` / `harness-ai-kit add cli <id>` (CLIs).
 
-- **Skills: 42** across 8 categories
+- **Skills: 47** across 8 categories
 - **CLIs: 5** (pip-installable, published to PyPI as `sf-*`)
 - **Plugins: 1** (AI-harness plugins)
 
 > Build Less, Compose More — these assets compose open-source tools and community skills rather than reimplement them.
 
-## Skills (42)
+## Skills (47)
 
-### Database & Middleware Expertise (10)
+### Database & Middleware Expertise (11)
 
 | Skill | Description |
 |-------|-------------|
 | `devlab-dao-sql-compat` | DAO 层通用 SQL 方言兼容性检查 + 系统性修复工作流。支持 MyBatis/JPA/MyBatis-Plus/SQLAlchemy 四种持久层框架，扫描源码识别 Oracle/PostgreSQL/MySQL 方言混用风险，自动修复 80% 常见陷阱，剩余 20% 由 Agent 辅助人工确认。七阶段流程 + adapter 模式框架适配。 |
+| `devlab-db-data-migration` | Database data-layer safe migration: backup -> idempotent check -> migrate -> verify -> rollback. SQLite/MySQL dialect branches, rebuild-table path for constraint changes. Complements devlab-dao-sql-compat (syntax layer). |
 | `public-git-workflow-expert-base` | Git 工作流知识基座：extends netresearch/git-workflow-skill 上游通用 Git 知识，叠加团队 commit 规范、分支策略、Gitea 工作流、CI/CD 集成、镜像同步经验。供下游技能通过 extends 继承。 |
 | `public-kafka-expert-base` | Kafka 知识基座：Topics/Partitions、Consumer Groups、Producer Config、Serialization、Exactly-Once、Rebalancing。供 devlab-middleware-expert 通过 extends 继承。借鉴自 confluentinc/agent-skills。 |
 | `public-mongodb-expert-base` | MongoDB 知识基座：Document Model、Aggregation Pipeline、Indexes、Replica Sets、Change Streams。供 devlab-middleware-expert 通过 extends 继承。借鉴自 mongodb/agent-skills。 |
@@ -46,13 +47,17 @@ Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>`
 | `devlab-ai-kit-miner` | 研发会话后复盘提炼：分析已完成的研发会话，判断哪些经验值得沉淀为 Skill/CLI/MCP/Loop/Subagent/知识卡片，输出最小规格草案。基于 base-session-ai-kit-miner 二次定制，覆盖全资产类型决策和 devlab-* 命名规范。 |
 | `devlab-eval-driven-agent` | eval 自评测体系驱动的 AI Agent 生产体系：评测集组织、Mock 隔离、标准化比对、自动评测脚本与回归；L3 数据后端接 Langfuse（dataset/scores/LLM-as-judge），配套 evalctl CLI（0.2.x 已发布）承接 run/diff/ingest/feedback/report。 |
 
-### Software Engineering Methodology (3)
+### Software Engineering Methodology (7)
 
 | Skill | Description |
 |-------|-------------|
 | `devlab-contract-web-server` | 前后端契约规范技能（contract 技能簇首个，介于 srv 与 web 之间）：接口/序列化契约、字段类型一致性、配置分层与不过度设计，配契约校验与联调防错清单。 |
+| `devlab-integration-fullstack` | 全栈集成测试专家技能。支持多服务 Docker Compose 部署场景，基于 Testcontainers + Mock Server 实现端到端集成测试。 |
 | `devlab-spec-driven-dev` | 通用 spec 驱动的 AI 协作开发方法论：以 requirements/design/tasks 提案为事实源，提案审查→细化→分任务执行→回归；含提案质量约束与 human-on-the-loop 决策门禁。Kiro spec 作为一个具体 example。 |
+| `devlab-srv-test-api` | 后端 API 测试专家技能。支持 Java（JUnit）/ Python（pytest）/ Node.js（supertest + jest）后端项目的接口测试、Mock 服务、测试数据管理。 |
 | `devlab-tech-debt-ops` | 技术债清理/重构编排方法论（非业务债，侧重技术债）：现状梳理→拆分设计→引用清零安全移除→回归验证；附设计模式清单与典型模式示意性伪代码（点到即止，实操由 AI 给选项）。 |
+| `devlab-test-expert` | 测试专家知识库。包含测试最佳实践、故障排查指南、测试策略设计、性能优化建议、属性测试（property-based testing）模式等专家级知识，供其他测试技能引用。 |
+| `devlab-test-onboard` | AI 驱动的分层测试体系顶层路由编排。根据项目特征（前端/后端/全栈/微服务）智能识别测试需求，路由到对应子技能（devlab-web-test-e2e / devlab-srv-test-api / devlab-integration-fullstack）。 |
 
 ### Web & Frontend (2)
 
