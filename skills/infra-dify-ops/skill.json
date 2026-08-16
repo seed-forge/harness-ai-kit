@@ -1,0 +1,71 @@
+{
+  "namespace": "community",
+  "id": "infra-dify-ops",
+  "name": "infra-dify-ops",
+  "owner": "seedforge",
+  "version": "0.6.2",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "infra",
+    "dify",
+    "resource",
+    "workflow",
+    "dsl",
+    "app",
+    "cli"
+  ],
+  "summary": "Dify 平台使用层运维 Skill：DSL 创作/校验/双轨导入（Console API 优先，Playwright 兜底）、DSL 导出、app 检查、本地资源沉淀、workflow 草稿、模型 provider 配置与生产验收；不负责部署层。配套 CLI difyctl。",
+  "compatible_clients": [
+    "codex",
+    "claude-code"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [
+    {
+      "type": "cli",
+      "namespace": "community",
+      "id": "difyctl",
+      "version": ">=0.14.0",
+      "scope": "required"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [
+    "Use this skill for Dify app/workflow resource operations and DSL authoring at the usage layer, not for deployment or container lifecycle management.",
+    "Prefer `difyctl dsl import --via auto` (Console API first, Playwright fallback) over ad hoc manual clicking; only use `--via browser` when the API path is unavailable.",
+    "Always run `difyctl dsl validate` before importing a scaffolded or hand-edited DSL.",
+    "Prefer the local registry and workflow spec flow before introducing batch changes into Dify Studio.",
+    "Use database-level edits only as an explicitly approved break-glass recovery path when Studio or the imported graph is already unusable."
+  ],
+  "post_install_hints": [
+    "Install the paired CLI difyctl and initialize a project workspace before using the resource capture commands."
+  ],
+  "updated_at": "2026-08-14",
+  "config_schema": "config.defaults.yaml",
+  "integrations": [
+    {
+      "target": "harness-ai-kit-maintainer",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "发布/废弃/同步、bump 版本、lock 刷新"
+    }
+  ],
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": true,
+    "requires_interactive": true,
+    "server_runtime": "cli-direct"
+  }
+}

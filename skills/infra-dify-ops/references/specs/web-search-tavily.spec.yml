@@ -1,0 +1,50 @@
+# Web Search (single-stage, Tavily) workflow spec — scaffold with:
+#   difyctl workflow-create scaffold --spec <this> --output websearch-tavily.dify.yml
+#   difyctl dsl import --dsl websearch-tavily.dify.yml --via api --resource-id web-search-tavily --create-key
+#   difyctl app publish --app-id <id>
+#   difyctl app run --app-id <id> --mode workflow --inputs '{"query":"..."}'
+#
+# Single stage: Tavily 托管搜索 -> LLM 汇总（托管兜底，结果已为 LLM 清洗 + 带来源）。
+# Prereq: Tavily tool provider authorized (tavily_api_key). Retarget `answer` model as needed.
+# KEY: Tavily `include_answer`/`include_raw_content` are `select` with bool default -> MUST set
+#      a valid string option explicitly, else "value False not in options". Results populate `text`.
+version: 2
+workflow:
+  name: "Web Search (Tavily)"
+  mode: workflow
+  goal: "单阶段联网搜索：Tavily 托管搜索 → LLM 汇总（带来源）"
+  inputs:
+    - name: query
+      type: text-input
+      required: true
+  steps:
+    - id: tavily
+      name: "Tavily 搜索"
+      type: tool
+      provider_id: langgenius/tavily/tavily
+      tool_name: tavily_search
+      tool_label: TavilySearch
+      # static config -> raw values; include_answer/include_raw_content must be valid strings
+      tool_configurations:
+        max_results: 5
+        search_depth: advanced
+        include_answer: advanced
+        include_raw_content: "false"
+      tool_parameters:
+        query:
+          type: mixed
+          value: "{{#start.query#}}"
+    - id: answer
+      name: "LLM 汇总作答"
+      type: llm
+      model:
+        provider: langgenius/ollama/ollama
+        name: "qwen2.5:7b"
+        mode: chat
+        completion_params:
+          temperature: 0.4
+      instruction: "你是严谨的联网助手。仅依据下方【搜索结果】作答，给出最新准确的信息；结果不足则明说。用中文回答，末尾一行列出引用的来源 URL。"
+      user_prompt: "【搜索结果】\n{{#tavily.text#}}\n\n【问题】\n{{#start.query#}}"
+  outputs:
+    - name: text
+      value_selector: [answer, text]

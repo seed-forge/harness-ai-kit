@@ -1,0 +1,64 @@
+$schema: harness-ai-kit-config/v1
+
+# difyctl config schema. Values live in ~/.harness-ai-kit/config.yaml under
+# assets.difyctl (source of truth, priority over env vars). See
+# 工程规范/harness-ai-kit/docs/config-governance.md.
+config:
+  - key: base_url
+    type: string
+    required: true
+    sensitivity: internal
+    description: "Dify 服务 Base URL（Console/Studio 与 API 同源）"
+    default: ""
+
+  - key: studio_username
+    type: string
+    required: false
+    sensitivity: internal
+    description: "Dify Console/Studio 登录账号（邮箱）。用于 provider login / studio 浏览器登录，取代 DIFY_STUDIO_USERNAME 环境变量。"
+
+  - key: studio_password
+    type: string
+    required: false
+    sensitivity: sensitive
+    description: "Dify Console/Studio 登录密码。取代 DIFY_STUDIO_PASSWORD 环境变量；仅存于本地 ~/.harness-ai-kit/config.yaml，禁止入 Git。"
+
+  - key: app_api_key
+    type: string
+    required: false
+    sensitivity: sensitive
+    description: "Dify app-token（app-* API Key），用于 app 层端点操作。"
+
+  - key: workspace_dir
+    type: string
+    required: false
+    sensitivity: public
+    description: "本地 Dify 资源工作区目录（resource capture / DSL 归档根）。已并入 fleet-platform 台账。"
+    default: "C:\\Users\\Working\\Documents\\02-工程工作空间\\fleet-platform\\resources\\dify"
+
+  - key: timeout_seconds
+    type: string
+    required: false
+    sensitivity: public
+    description: "HTTP 超时秒数。长链（搜索+抓取+LLM）可能 50-65s，默认放宽到 120。"
+    default: "120"
+
+  - key: dsl_version
+    type: string
+    required: false
+    sensitivity: public
+    description: "Dify DSL version for scaffold (auto=detect from live app /version API; fallback to 0.6.0). Once set, used for all new workflows."
+    default: "auto"
+
+  - key: console_key
+    type: string
+    required: false
+    sensitivity: sensitive
+    description: "Console API session cookie header (access_token + csrf_token). Captured via `difyctl provider login`. Used by import/export/import workflows against Dify instance."
+
+  - key: app_keys
+    type: map
+    required: false
+    sensitivity: sensitive
+    description: "Map of app_id -> service API token (app-*). Written by `difyctl app keys create` / `dsl import --create-key`. Local plaintext only (never Git-tracked); ledger stores masked metadata only."
+

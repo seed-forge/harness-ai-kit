@@ -1,0 +1,72 @@
+# Dify Model Provider Configuration (v0.3.1)
+# ===========================================
+# Copy this file, fill in your values, and use with:
+#   difyctl provider add --from <path> [--dry-run]
+#
+# NEVER commit files containing real api_key values to Git.
+# Use ${ENV_VAR} syntax for secrets.
+#
+# Model naming conventions: see references/REFERENCE-MODEL-NAMING.md
+
+provider:
+  # Provider type — Dify CE v1.13.3 uses the full provider path.
+  # For NewAPI and OpenAI-compatible gateways:
+  type: langgenius/openai_api_compatible/openai_api_compatible
+
+  # Credential name — all models from the same gateway share this.
+  # Dify groups models under this credential in the UI.
+  name: "newapi-组织内部集群"
+
+  # API credentials (injected into every model under this credential)
+  credentials:
+    # API endpoint base URL
+    api_base: "http://<service-url>:13033/v1"
+    # API key — use ${ENV_VAR} syntax to avoid hardcoding secrets:
+    #   consumer key reference: infra-aimodel-ops/references/REFERENCE-CONSUMER-CREDENTIALS.md
+    api_key: "${NEWAPI_CONSUMER_KEY}"
+
+  # Model definitions — one entry per model.
+  # Each model is registered with its credentials in Dify.
+  models:
+    # ── LLM models (model_type defaults to "llm") ──
+    - model: "gpt-5.4"
+      max_tokens: 128000
+    - model: "gpt-5.5"
+      max_tokens: 128000
+    - model: "deepseek-v4-pro"
+      max_tokens: 128000
+    - model: "deepseek-v4-flash"
+      max_tokens: 128000
+
+    # ── Embedding models ──
+    - model: "bge-m3"
+      model_type: "text-embedding"
+
+    # ── Rerank models ──
+    - model: "bge-reranker-v2-m3"
+      model_type: "rerank"
+
+    # ── Speech models ──
+    - model: "SenseVoiceSmall"
+      model_type: "speech2text"
+    - model: "ChatTTS"
+      model_type: "tts"
+
+  # Optional settings
+  options:
+    load_balancing: true
+
+# ── Quick start ──
+#
+# 1. Login to get session cookie:
+#    difyctl --json provider login
+#
+# 2. Set credentials:
+#    $env:DIFY_CONSOLE_KEY = "<session_cookie from login>"
+#    $env:NEWAPI_CONSUMER_KEY = "sk-..."
+#
+# 3. Preview:
+#    difyctl --json --console-key $env:DIFY_CONSOLE_KEY provider add --from this-file.yaml --dry-run
+#
+# 4. Add:
+#    difyctl --json --console-key $env:DIFY_CONSOLE_KEY provider add --from this-file.yaml

@@ -1,0 +1,46 @@
+# Web Search (single-stage, SearXNG) workflow spec — scaffold with:
+#   difyctl workflow-create scaffold --spec <this> --output websearch-searxng.dify.yml
+#   difyctl dsl import --dsl websearch-searxng.dify.yml --via api --resource-id web-search-searxng --create-key
+#   difyctl app publish --app-id <id>
+#   difyctl app run --app-id <id> --mode workflow --inputs '{"query":"..."}'
+#
+# Single stage: SearXNG 元搜索 -> LLM 汇总（SearXNG 的 json 已含 content 摘要，无需读全文）。
+# 比两段式更快、无需 sandbox；深研全文读取用 deep-research-websearch.spec.yml。
+# Prereq: SearXNG tool provider authorized (searxng_base_url). Retarget `answer` model as needed.
+# KEY: SearXNG results live in `json` (array[object] with title/url/content), `text` is EMPTY.
+version: 2
+workflow:
+  name: "Web Search (SearXNG)"
+  mode: workflow
+  goal: "单阶段联网搜索：SearXNG 元搜索 → LLM 汇总（带来源）"
+  inputs:
+    - name: query
+      type: text-input
+      required: true
+  steps:
+    - id: searxng
+      name: "SearXNG 搜索"
+      type: tool
+      provider_id: langgenius/searxng/searxng
+      tool_name: searxng_search
+      tool_label: SearXNGSearch
+      tool_configurations:
+        search_type: general
+      tool_parameters:
+        query:
+          type: mixed
+          value: "{{#start.query#}}"
+    - id: answer
+      name: "LLM 汇总作答"
+      type: llm
+      model:
+        provider: langgenius/ollama/ollama
+        name: "qwen2.5:7b"
+        mode: chat
+        completion_params:
+          temperature: 0.4
+      instruction: "你是严谨的联网助手。仅依据下方【搜索结果JSON】(含 title/url/content) 作答，给出最新准确的信息；结果不足则明说。用中文回答，末尾一行列出引用的来源 URL。"
+      user_prompt: "【搜索结果JSON】\n{{#searxng.json#}}\n\n【问题】\n{{#start.query#}}"
+  outputs:
+    - name: text
+      value_selector: [answer, text]

@@ -1,0 +1,72 @@
+# Deep Research (two-stage web search) workflow spec — scaffold with:
+#   difyctl workflow-create scaffold --spec <this> --output deep-research.dify.yml
+#   difyctl dsl validate deep-research.dify.yml
+#   difyctl dsl import --dsl deep-research.dify.yml --via api --resource-id deep-research-websearch --create-key
+#   difyctl app publish --app-id <id>
+#   difyctl app run --app-id <id> --mode workflow --inputs '{"query":"..."}'   # default timeout 120s (0.12.2+)
+#
+# Two stages: SearXNG 元搜索(主) -> 取首条URL(template) -> Firecrawl 读全文(副) -> LLM 汇总.
+# Prereq (one-time, per instance): SearXNG + Firecrawl tool providers authorized in Dify
+#   (SearXNG cred: searxng_base_url; Firecrawl creds: base_url + firecrawl_api_key).
+# Retarget the `answer` step model to your instance's provider/name as needed.
+version: 2
+workflow:
+  name: "Deep Research (Web Search)"
+  mode: workflow
+  goal: "两阶段联网深度调研：SearXNG 搜索 → 取首条 URL → Firecrawl 读全文 → LLM 汇总（带来源）"
+  inputs:
+    - name: query
+      type: text-input
+      required: true
+  steps:
+    - id: searxng
+      name: "SearXNG 搜索"
+      type: tool
+      provider_id: langgenius/searxng/searxng
+      tool_name: searxng_search
+      tool_label: SearXNGSearch
+      # static config -> raw values (NOT wrapped); search_type is required
+      tool_configurations:
+        search_type: general
+      # runtime input -> wrapped {type,value}; SearXNG puts results in `json` (text is empty!)
+      tool_parameters:
+        query:
+          type: mixed
+          value: "{{#start.query#}}"
+    - id: pick_url
+      name: "取首条结果URL"
+      type: template-transform
+      template: "{{ arg1[0]['url'] if arg1 and arg1[0] and arg1[0]['url'] else '' }}"
+      variables:
+        - variable: arg1
+          value_selector: [searxng, json]
+    - id: firecrawl
+      name: "Firecrawl 读全文"
+      type: tool
+      provider_id: langgenius/firecrawl/firecrawl
+      tool_name: scrape
+      tool_label: Scrape
+      tool_configurations:
+        formats: markdown
+        onlyMainContent: true
+        timeout: 30000
+      tool_parameters:
+        url:
+          type: mixed
+          value: "{{#pick_url.output#}}"
+    - id: answer
+      name: "LLM 汇总作答"
+      type: llm
+      model:
+        provider: langgenius/ollama/ollama
+        name: "qwen2.5:7b"
+        mode: chat
+        completion_params:
+          temperature: 0.4
+      instruction: "你是严谨的联网深研助手。基于【网页正文】(来自搜索命中的首条结果) 回答问题；正文不足则明说。用中文回答，末尾一行给出来源URL。"
+      user_prompt: "【网页正文】\n{{#firecrawl.text#}}\n\n【来源URL】{{#pick_url.output#}}\n\n【问题】\n{{#start.query#}}"
+  outputs:
+    - name: text
+      value_selector: [answer, text]
+    - name: source_url
+      value_selector: [pick_url, output]

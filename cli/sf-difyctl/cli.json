@@ -1,0 +1,18 @@
+{
+  "namespace": "community",
+  "id": "difyctl",
+  "name": "difyctl",
+  "owner": "seedforge",
+  "version": "0.1.0",
+  "status": "trial",
+  "package_type": "cli",
+  "summary": "Dify usage-layer ops CLI: dual-track DSL import (Console API + Playwright), DSL version detect, DSL authoring/validation, provider config, resource ledger.",
+  "package_name": "sf-difyctl",
+  "install_type": "python-package",
+  "publish_paths": [
+    "cli/sf-difyctl"
+  ],
+  "companion_docs": {
+    "usage": "README.md"
+  }
+}
