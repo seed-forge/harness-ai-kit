@@ -1,0 +1,13 @@
+decisions:
+  - id: HD-1
+    point: 删除项目（delete project）
+    trigger: 准备删除 SonarQube 项目时
+    options: [用户确认后删除 / 取消]
+    default: 必问
+    rationale: 删除项目会丢失历史质量数据与门禁记录，不可逆
+  - id: HD-2
+    point: 重置 Token
+    trigger: 准备重置/重新生成 SonarQube Token 时
+    options: [用户确认后重置 / 取消]
+    default: 必问
+    rationale: 重置 Token 会使旧 Token 立即失效，可能中断依赖它的 CI 扫描

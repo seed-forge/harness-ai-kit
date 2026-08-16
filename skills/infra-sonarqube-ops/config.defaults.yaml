@@ -1,0 +1,14 @@
+$schema: harness-ai-kit-config/v1
+
+config:
+  - key: sonarqube_url
+    type: string
+    required: true
+    sensitivity: public
+    description: "SonarQube 服务 URL"
+    default: ""
+  - key: sonarqube_token
+    type: string
+    required: true
+    sensitivity: sensitive
+    description: "SonarQube User Token"
