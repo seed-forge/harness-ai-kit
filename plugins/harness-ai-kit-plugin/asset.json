@@ -1,0 +1,32 @@
+{
+  "namespace": "community",
+  "id": "harness-ai-kit-plugin",
+  "name": "harness-ai-kit-plugin",
+  "owner": "seedforge",
+  "version": "0.1.0",
+  "status": "trial",
+  "entry": "README.md",
+  "package_type": "plugin",
+  "tags": ["dsh", "harness-ai-kit", "plugin"],
+  "summary": "harness-ai-kit 的 dsh 宿主插件（工具 + 随包技能）",
+  "compatible_clients": ["dsh"],
+  "installation": {
+    "default_scope": "project",
+    "install_mode": "bundle"
+  },
+  "dependencies": [],
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": ["node --check src/index.js"]
+  },
+  "runtime_requirements": ["dsh", "harness-ai-kit"],
+  "updated_at": "2026-08-15"
+}

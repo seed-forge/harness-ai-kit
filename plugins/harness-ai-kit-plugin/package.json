@@ -1,0 +1,29 @@
+{
+  "name": "harness-ai-kit-plugin",
+  "version": "0.1.0",
+  "description": "harness-ai-kit dsh 插件：会话内查询/安装团队资产（list/search/info/install/doctor）+ 随包核心操作技能。",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "skills",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --check src/index.js"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "license": "MIT"
+}

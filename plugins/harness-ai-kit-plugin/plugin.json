@@ -1,0 +1,33 @@
+{
+  "id": "harness-ai-kit-plugin",
+  "name": "harness-ai-kit-plugin",
+  "owner": "team",
+  "version": "0.1.0",
+  "status": "trial",
+  "description": "harness-ai-kit 的 dsh 宿主插件：会话内 list/search/info/install/doctor 团队资产，并随包注册核心操作技能。",
+  "summary": "harness-ai-kit dsh 插件（工具 + 随包技能）",
+  "package_type": "plugin",
+  "hosts": ["dsh"],
+  "dsh": {
+    "bundle": {
+      "npm_name": "harness-ai-kit-plugin",
+      "patch": "./cordis.patch.yml",
+      "default_profile": "web"
+    }
+  },
+  "assets": {
+    "skills": ["harness-ai-kit-ops"],
+    "clis": ["harness-ai-kit"],
+    "mcps": [],
+    "hooks": [],
+    "loops": []
+  },
+  "tags": ["dsh", "harness-ai-kit", "plugin"],
+  "compatible_clients": ["dsh"],
+  "installation": {
+    "default_scope": "project",
+    "install_mode": "dsh-bundle"
+  },
+  "runtime_requirements": ["dsh", "harness-ai-kit"],
+  "updated_at": "2026-08-15"
+}
