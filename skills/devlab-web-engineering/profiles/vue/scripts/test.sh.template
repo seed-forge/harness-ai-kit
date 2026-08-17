@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# ── 测试脚本（自动检测框架，由 devlab-web-engineering 生成）──
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
+
+if grep -q '"vitest"' package.json 2>/dev/null; then
+  TEST_CMD="vitest run"
+elif grep -q '"jest"' package.json 2>/dev/null; then
+  TEST_CMD="jest --coverage"
+else
+  TEST_CMD="${TEST_CMD:-npm run test -- --coverage}"
+fi
+info "执行: $TEST_CMD"
+eval "$TEST_CMD"

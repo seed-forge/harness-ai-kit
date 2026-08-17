@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# ── 环境诊断（10 项检查，由 devlab-web-engineering 生成）──
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
+
+PASS=0; FAIL=0
+check() { if eval "$2" >/dev/null 2>&1; then success "$1"; PASS=$((PASS+1)); else warn "⚠️  $1"; FAIL=$((FAIL+1)); fi; }
+
+check "Node 版本"     "node -v"
+check "包管理器版本"  "${PKG_MANAGER:-npm} -v"
+check "依赖完整性"    "test -d node_modules"
+check "Git 状态"      "git rev-parse --is-inside-work-tree"
+check "磁盘空间"      "test \"\$(df -P . | tail -1 | awk '{print \$4}' | tr -d '0-9' | wc -c)\" -gt 0"
+check "端口可用"      "check_port ${PORT:-21010}"
+check "环境配置"      "ls .env* >/dev/null 2>&1"
+check "构建产物"      "test -d ${DIST_DIR:-dist}"
+check "Registry 连通" "curl -sf --max-time 3 \$(npm config get registry) >/dev/null"
+check "缓存异常"      "test ! -d node_modules/.cache || test \$(du -sm node_modules/.cache 2>/dev/null | cut -f1) -lt 500"
+
+echo
+info "诊断结果: $PASS 通过 / $FAIL 异常"
+[[ $FAIL -eq 0 ]] && success "环境健康" || { warn "存在异常项"; exit 1; }

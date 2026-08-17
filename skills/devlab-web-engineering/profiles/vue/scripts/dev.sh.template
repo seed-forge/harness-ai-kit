@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# ── 开发服务器生命周期脚本（由 devlab-web-engineering 生成）──
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
+
+PORT="${PORT:-21010}"
+NAME="${NAME:-$(basename "$PWD")}"
+PID_DIR="${PID_DIR:-$SCRIPT_DIR/.pid}"
+DEV_CMD=("${DEV_CMD[@]:-vite --port $PORT --host}")
+
+start() {
+  read_pid "$NAME" && { warn "已在运行 (PID: $(read_pid "$NAME"))"; return 1; }
+  check_port "$PORT" || { kill_port "$PORT" || return 1; }
+  use_node
+  install_deps_incremental
+  info "启动 $NAME @ $PORT ..."
+  nohup "${DEV_CMD[@]}" > "$SCRIPT_DIR/.dev.log" 2>&1 &
+  write_pid "$NAME" $!
+  wait_for_port "$PORT" 30 || { error "启动超时，查看 $SCRIPT_DIR/.dev.log"; return 1; }
+  success "访问: http://localhost:$PORT （局域网: http://$(hostname -I 2>/dev/null | awk '{print $1}'):$PORT）"
+}
+
+stop() {
+  local pid
+  pid=$(read_pid "$NAME") || { info "未在运行"; return 0; }
+  info "停止 $NAME (PID: $pid)..."
+  kill "$pid" 2>/dev/null || true
+  for _ in $(seq 1 10); do kill -0 "$pid" 2>/dev/null || break; sleep 1; done
+  kill -0 "$pid" 2>/dev/null && kill -9 "$pid" 2>/dev/null || true
+  success "已停止"
+}
+
+status() { read_pid "$NAME" && info "运行中 (PID: $(read_pid "$NAME"), 端口 $PORT)" || info "未运行"; }
+restart() { stop; start; }
+log() { tail -f "$SCRIPT_DIR/.dev.log" 2>/dev/null || error "无日志"; }
+clean() { rm -rf "$PID_DIR" .dev.log; }
+
+case "${1:-start}" in
+  start|stop|restart|status|log|clean) "$1" ;;
+  help|*) echo "用法: $0 {start|stop|restart|status|log|clean|help}";;
+esac

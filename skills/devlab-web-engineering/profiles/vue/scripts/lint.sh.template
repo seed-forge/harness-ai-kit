@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# ── 代码检查脚本（由 devlab-web-engineering 生成）──
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
+
+grep -q '"eslint"' package.json 2>/dev/null && { info "ESLint"; npx eslint src/ --ext .js,.ts,.vue --max-warnings 0; }
+grep -q '"prettier"' package.json 2>/dev/null && { info "Prettier"; npx prettier --check "src/**/*.{js,ts,vue,css,scss}" 2>/dev/null || true; }
+success "Lint 完成"

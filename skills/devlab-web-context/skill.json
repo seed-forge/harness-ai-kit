@@ -1,0 +1,78 @@
+{
+  "namespace": "community",
+  "id": "devlab-web-context",
+  "name": "devlab-web-context",
+  "owner": "seedforge",
+  "version": "0.1.0",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "project-context",
+    "frontend",
+    "web",
+    "onboarding",
+    "devlab",
+    "context"
+  ],
+  "summary": "前端项目上下文理解规则资产（<domain>-context 家族首个成员）：双模式（模式 A 规则包被 devlab-context-bootstrap 文件契约委托 / 模式 B 独立四步渐进式理解），产出前端 context 画像（7 固定键 + 置信度标注），供 bootstrap 消费填五件套台账。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "qoder"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "integrations": [
+    {
+      "target": "devlab-context-bootstrap",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "前端 context 画像（.harness/devlab/context/<project>-web-context.yaml）→ bootstrap 消费填五件套台账；模式 A 被其委托时按 profiles/ 规则执行扫描"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example": "examples/vue-microfrontend-project.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "Read-heavy workflow: 扫描前端项目配置与脚本，写入仅限 .harness/devlab/context/ 画像文件",
+    "敏感信息（密码/令牌/私钥）永不写入画像值，只写环境变量引用或详见 <config_file>"
+  ],
+  "post_install_hints": [
+    "模式 B：在目标前端项目根目录触发，产出前端 context 画像",
+    "模式 A：由 devlab-context-bootstrap 委托加载 profiles/ 规则",
+    "完整四原则全文在 devlab-context-bootstrap（本技能仅内嵌一句话摘要）"
+  ],
+  "recommended_tools": [],
+  "contributors": [],
+  "skill_type": "workflow",
+  "agents_md_inject": "",
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+# ── 前端工程公共函数库（由 devlab-web-engineering 生成）──
+# 用法: source scripts/common.sh
+set -euo pipefail
+
+# ── Node 版本管理器加载（多方案兼容）──
+use_node() {
+  local target_version="${1:-${NODE_VERSION:-}}"
+  # 方案 1: nvm
+  if [[ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]]; then
+    \. "${NVM_DIR:-$HOME/.nvm}/nvm.sh" --no-use
+    local current
+    current=$(node -v 2>/dev/null | sed 's/^v//' || echo "none")
+    if [[ -n "$target_version" && "$current" != "$target_version" ]]; then
+      nvm use "$target_version" 2>/dev/null || { warn "Node v$target_version 未安装，尝试安装..."; nvm install "$target_version" && nvm use "$target_version"; }
+    fi
+    return 0
+  fi
+  # 方案 2: fnm
+  if command -v fnm &>/dev/null; then
+    eval "$(fnm env --use-on-cd)"
+    [[ -n "$target_version" ]] && fnm use "$target_version" 2>/dev/null || fnm install "$target_version"
+    return 0
+  fi
+  # 方案 3: volta（自动读取 package.json engines）
+  if command -v volta &>/dev/null; then
+    info "使用 volta 管理 Node 版本（自动切换）"
+    return 0
+  fi
+  warn "未检测到 nvm/fnm/volta，使用系统 Node: $(node -v 2>/dev/null || echo '未安装')"
+}
+
+# ── 端口占用检测与处理 ──
+check_port() {
+  local port="$1"
+  if command -v lsof &>/dev/null; then
+    ! lsof -ti:"$port" >/dev/null 2>&1
+  elif command -v ss &>/dev/null; then
+    ! ss -tlnp 2>/dev/null | grep -q ":$port "
+  else
+    return 0
+  fi
+}
+
+kill_port() {
+  local port="$1" force="${2:-false}" pids proc_info
+  pids=$(lsof -t -i:"$port" 2>/dev/null || true)
+  [[ -z "$pids" ]] && return 0
+  proc_info=$(ps -p "$pids" -o comm= 2>/dev/null || echo "未知进程")
+  if [[ "$force" != "true" ]]; then
+    warn "端口 $port 被占用 (PID: $pids, 进程: $proc_info)"
+    read -r -p "是否强制终止? [y/N] " -n 1 -r
+    echo
+    [[ ! $REPLY =~ ^[Yy]$ ]] && return 1
+  fi
+  info "终止端口 $port 上的进程 $pids..."
+  echo "$pids" | xargs kill -9 2>/dev/null || true
+  sleep 1
+}
+
+# ── PID 文件管理（原子写 + 僵尸清理）──
+write_pid() {
+  local name="$1" pid="$2" tmp_file
+  mkdir -p "${PID_DIR:-.pid}"
+  tmp_file="${PID_DIR:-.pid}/${name}.pid.tmp.$$"
+  echo "$pid" > "$tmp_file"
+  mv -f "$tmp_file" "${PID_DIR:-.pid}/${name}.pid"
+  chmod 600 "${PID_DIR:-.pid}/${name}.pid"
+}
+
+read_pid() {
+  local name="$1" pid_file="${PID_DIR:-.pid}/${name}.pid"
+  [[ ! -f "$pid_file" ]] && return 1
+  local pid
+  pid=$(cat "$pid_file" 2>/dev/null)
+  if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+    echo "$pid"
+    return 0
+  fi
+  rm -f "$pid_file"
+  return 1
+}
+
+# ── Registry 配置（失败自动降级官方源）──
+setup_registry() {
+  local primary="${PRIVATE_REGISTRY:-}"
+  local fallback="https://registry.npmjs.org"
+  local pkg_mgr="${PKG_MANAGER:-npm}"
+  if [[ -z "$primary" ]]; then
+    info "使用官方 registry"
+    "$pkg_mgr" config set registry "$fallback"
+    return 0
+  fi
+  info "设置 registry: $primary"
+  "$pkg_mgr" config set registry "$primary" 2>/dev/null || { warn "私有源设置失败，降级官方源"; "$pkg_mgr" config set registry "$fallback"; }
+  if ! curl -sf --max-time 3 "$primary" >/dev/null 2>&1; then
+    warn "私有源不可达，已切换到官方源"
+    "$pkg_mgr" config set registry "$fallback"
+  fi
+}
+
+# ── 增量依赖安装（指纹比对）──
+install_deps_incremental() {
+  local pkg_json="package.json" lock_file cache_file current_hash cached_hash
+  lock_file=$(ls package-lock.json pnpm-lock.yaml yarn.lock 2>/dev/null | head -1 || true)
+  [[ -z "$lock_file" ]] && lock_file="package.json"
+  cache_file=".deps-installed.cache"
+  current_hash=$(cat "$pkg_json" "$lock_file" 2>/dev/null | sha256sum | cut -d' ' -f1)
+  if [[ -f "$cache_file" ]]; then
+    cached_hash=$(cat "$cache_file")
+    if [[ "$cached_hash" == "$current_hash" ]]; then
+      info "依赖无变化，跳过安装"
+      return 0
+    fi
+  fi
+  info "检测到依赖变化，重新安装..."
+  case "${PKG_MANAGER:-npm}" in
+    pnpm) pnpm install --frozen-lockfile ;;
+    yarn) yarn install --frozen-lockfile ;;
+    *)    npm ci ;;
+  esac || return 1
+  echo "$current_hash" > "$cache_file"
+  success "依赖安装完成"
+}
+
+# ── 彩色日志 ──
+info()  { printf "\033[36m[INFO]\033[0m  %s\n" "$*"; }
+success(){ printf "\033[32m[OK]\033[0m    %s\n" "$*"; }
+warn()  { printf "\033[33m[WARN]\033[0m  %s\n" "$*"; }
+error() { printf "\033[31m[ERROR]\033[0m %s\n" "$*"; }

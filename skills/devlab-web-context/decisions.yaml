@@ -1,0 +1,39 @@
+# devlab-web-context 结构同源决策
+version: 0.1.0
+decisions:
+  HD-W1:
+    name: 前端子类型判定
+    trigger: 信号文件多命中或模糊
+    default: 用户确认一句为准；默认 vue-microfrontend
+    note: 判定信号见 profiles/<type>.md 头部
+  HD-W2:
+    name: 敏感信息写入边界
+    trigger: 画像涉及密码/令牌/密钥
+    default: 必脱敏（环境变量引用或"详见 <config_file>"）；任何例外必问
+    note: 与 bootstrap HD-1 一致
+  HD-W3:
+    name: 是否委托 bootstrap 落台账
+    trigger: 模式 B 画像产出后
+    default: 用户需要台账时委托；否则只留画像
+    note: 镜像衔接：bootstrap 消费画像填五件套
+contracts:
+  profile:
+    path: ".harness/devlab/context/<project>-web-context.yaml"
+    keys:
+      - tech_stack
+      - dev_server
+      - module_registry
+      - dev_proxy
+      - routing
+      - build_deploy
+      - component_library
+    confidence_values:
+      - confirmed
+      - inferred
+      - todo
+    meta_fields:
+      - project_name
+      - profile_type
+      - generated_by
+      - generated_at
+      - overall_confidence

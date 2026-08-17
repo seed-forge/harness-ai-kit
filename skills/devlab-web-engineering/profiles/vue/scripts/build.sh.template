@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# ── 生产构建脚本（由 devlab-web-engineering 生成）──
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
+
+ENV="${1:-prod}"   # test / simulate / prod
+MODE_FLAG="--mode $ENV"
+BUILD_CMD=("${BUILD_CMD[@]:-vite build $MODE_FLAG}")
+
+use_node
+install_deps_incremental
+info "构建环境: $ENV"
+"${BUILD_CMD[@]}"
+
+# 构建验证
+DIST="${DIST_DIR:-dist}"
+[[ -d "$DIST" ]] || { error "构建产物目录 $DIST 不存在"; exit 1; }
+[[ -f "$DIST/index.html" ]] || { error "$DIST/index.html 缺失"; exit 1; }
+info "产物大小: $(du -sh "$DIST" | cut -f1)"
+success "构建完成: $DIST"

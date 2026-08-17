@@ -1,0 +1,16 @@
+decisions:
+  - id: HD-1
+    name: 工程配置修改确认（改造前）
+    trigger: Phase 0 分析现有工程配置后、修改 package.json/构建配置之前
+    options: [用户确认架构判断后再改造, 补充分析]
+    default: 必问
+  - id: HD-2
+    name: 工具版本卡片选择确认
+    trigger: 展示 Node 多版本工具卡片、需选定版本时
+    options: [用户确认版本选择, 采用推荐默认]
+    default: 必问
+  - id: HD-3
+    name: 已有脚本冲突处理
+    trigger: D7 检测到已有 scripts 时
+    options: [覆盖, 合并, 跳过]
+    default: 必问

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# ── monorepo 顶层编排（可选，由 devlab-web-engineering 生成）──
+# 自动发现 app 类型子包（有 dev/serve/start 脚本）
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+APPS=$(find . -maxdepth 3 -name package.json -not -path "*/node_modules/*" | while read -r f; do
+  grep -qE '"(dev|serve|start)"' "$f" && dirname "$f"
+done)
+
+start_all() {
+  for app in $APPS; do
+    (cd "$app" && pnpm dev >/dev/null 2>&1 &)
+    info "启动 $app"
+  done
+}
+
+stop_all() {
+  # 逆序停止：先子应用，再基座
+  for app in $(echo "$APPS" | tac); do
+    (cd "$app" && pkill -f "$(basename "$app")" 2>/dev/null || true)
+  done
+}
+
+case "${1:-start}" in
+  start) start_all ;;
+  stop)  stop_all ;;
+  status) ps aux | grep -E "vite|webpack" | grep -v grep || true ;;
+  *) echo "用法: $0 {start|stop|status}" ;;
+esac

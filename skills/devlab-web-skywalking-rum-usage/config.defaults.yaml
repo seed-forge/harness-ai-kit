@@ -1,0 +1,14 @@
+$schema: "harness-ai-kit-config/v1"
+# 默认配置（可被 config.yaml 覆盖）
+collector: ""          # OpenResty HTTPS 反代地址（必填）
+service: ""            # 应用标识（必填）
+service_version: ""    # 应用版本（必填）
+js_errors: true
+api_errors: true
+resource_errors: true
+use_web_vitals: true
+enable_spa: true
+trace_time_interval: 60000
+no_trace_origins:
+  - "localhost"
+  - "127.0.0.1"

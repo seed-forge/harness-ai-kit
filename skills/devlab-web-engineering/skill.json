@@ -1,0 +1,136 @@
+{
+  "namespace": "community",
+  "id": "devlab-web-engineering",
+  "name": "DevLab Web Engineering",
+  "owner": "seedforge",
+  "version": "0.1.0",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "devlab",
+    "web",
+    "engineering",
+    "bootstrap",
+    "build",
+    "packaging",
+    "vue",
+    "react",
+    "vite",
+    "webpack",
+    "micro-frontend",
+    "typescript"
+  ],
+  "summary": "Web / 前端工程化能力层。语言无关覆盖六域：Project Bootstrap、Build、Dependency、Packaging、Runtime/Environment、Engineering Convention。路由键 = 语言 × 框架 双维：TS 主线 / JS 兼容 / 语言维度扩展位 → 框架路由 profiles/vue（实战级：Vite 主线/Webpack 兼容 + 微前端场景层）、profiles/react（模板级），其余框架走 references 引用层。Capability Layer：原则沉淀 + 能力编排 + Profile + 工程质量要求；由 devlab-web-bootstrap 吸收升级而来。",
+  "compatible_clients": [
+    "codex"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "devlab-web-context",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "context-profile"
+    }
+  ],
+  "integrations": [
+    {
+      "target": "devlab-infra-usage",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "查询 registry 地址/凭据/API 推荐值 → 仓库与环境配置"
+    },
+    {
+      "target": "devlab-web-context",
+      "type": "skill",
+      "direction": "inbound",
+      "contract": "工程化改动前消费 context 画像（7 固定键）"
+    },
+    {
+      "target": "devlab-cicd-onboard",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "构建配置完成后 → CI/CD 管线接入"
+    },
+    {
+      "target": "devlab-project-bootstrap",
+      "type": "skill",
+      "direction": "inbound",
+      "contract": "Phase 4 编排路由 → 本技能执行前端工程化初始化"
+    },
+    {
+      "target": "devlab-web-qa-ops",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "工程化交付后 QA 验收（Quality Gate）"
+    },
+    {
+      "target": "devlab-ui-taste-ops",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "UI 精修/设计边界（组件工程结构归本技能，视觉/交互归 ui-taste-ops）"
+    },
+    {
+      "target": "devlab-web-extension-bootstrap",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "浏览器扩展场景路由"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [
+      {
+        "name": "node",
+        "command": "node --version",
+        "install_commands": [
+          "nvm install 20",
+          "apt-get install -y nodejs npm"
+        ]
+      },
+      {
+        "name": "bash",
+        "command": "bash --version",
+        "install_commands": [
+          "apt-get install -y bash"
+        ]
+      }
+    ],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "Node.js >= 18（项目按 .nvmrc / engines 决定）",
+    "Bash 4.0+（生成脚本）",
+    "shellcheck（验证可选）"
+  ],
+  "post_install_hints": [
+    "路由键 = 语言 × 框架 双维：TS 主线 / JS 兼容，框架 vue（实战级）/ react（模板级）",
+    "Vue 微前端（qiankun/micro-app）场景见 profiles/vue/REFERENCE-MICRO-FRONTEND.md",
+    "registry/API 地址通过 devlab-infra-usage 查询获取，不硬编码",
+    "生成脚本验证强制：bash -n + shellcheck"
+  ],
+  "recommended_tools": [],
+  "contributors": [],
+  "skill_type": "workflow",
+  "agents_md_inject": "",
+  "updated_at": "2026-08-14"
+}
