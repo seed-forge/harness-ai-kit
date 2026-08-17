@@ -35,7 +35,7 @@
   - LLM：v4 无 base URL 选项，自定义端点必须走 **generate callback**（ClientLLM）：`Stagehand.create({ browser, model: { generate } })`。
   - 回调契约：入参 `{ messages, systemPrompt?, temperature?, stopSequences?, responseFormat? }`；返回 `{ role: "assistant", content, outputFormat: "text" | "json_schema", structuredContent? }`（strict 校验，勿带多余字段）。
   - **newapi 结构化强制**：`response_format`（json_schema/json_object）对 mimo-v2.5-pro 渠道实测被忽略 → 结构化请求用 forced tool call（函数名 `extract_result`，`tool_choice` 强制），从 `tool_calls[0].function.arguments` 取 JSON；失败降级"提示词内嵌 schema + 手动解析"。工具调用消息双向转换：assistant `tool_use` ↔ OpenAI `tool_calls`；`tool_result` ↔ OpenAI `tool` role。
-- **配置**：`assets.devlab-web-visual-ops` 段：`stagehand_enabled` / `newapi_base_url` / `newapi_api_key`（secret）/ `stagehand_model`。LLM 选型与 key 引用 **infra-aimodel-ops**（scenario `chat_default`，默认 `mimo-v2.5-pro`）。
+- **配置**：`assets.devlab-web-visual-ops` 段：`stagehand_enabled` / `newapi_base_url` / `newapi_api_key`（secret）/ `stagehand_model`。LLM 走任一 OpenAI 兼容网关（chat 场景，默认 `mimo-v2.5-pro`）。
 - **输出协议**：操作意图 → 已执行操作 + 置信度；抽取结果按 schema 返回。
 - **降级路径**：LLM 不可用 → Playwright 显式选择器 + 静态分析；仍失败 → Vision 兜底。
 
@@ -54,7 +54,7 @@
 
 - **启用条件**：无 DOM 或 DOM 不可靠（canvas 渲染、复杂 iframe、图片型页面、深 Shadow DOM）；或需要纯视觉验证；或 Playwright/Stagehand 均不可用。
 - **实现（本地视觉驱动，零专用 CUA 模型依赖）**：
-  - 视觉模型：newapi 多模态（`vision_model`，默认 `mimo-v2.5-pro` → claude-sonnet-4.5 后端，图片理解实测通过；备选 `grok-chat-fast`）。选型与 key 引用 **infra-aimodel-ops**。
+  - 视觉模型：newapi 多模态（`vision_model`，默认 `mimo-v2.5-pro` → claude-sonnet-4.5 后端，图片理解实测通过；备选 `grok-chat-fast`）。
   - 浏览器：Playwright Chromium，**支持完整 Chromium 与轻量 `chromium_headless_shell`**（实测两项均全 PASS；headless shell 体积更小，适合 CI/无头环境）。
   - 输入：viewport 截图（PNG → `image_url` data URL）+ 任务提示。
   - 结构化输出：newapi 忽略 `response_format` → **必须 forced tool call（`vision_result`，机制同 HD-4）**；失败降级"提示词内嵌 schema + 手动解析"。

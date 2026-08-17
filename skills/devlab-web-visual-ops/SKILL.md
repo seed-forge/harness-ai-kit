@@ -16,7 +16,7 @@ description: "Web 视觉化操作（Web Visual Operations）：对 Web 应用做
 - 目标是有浏览器 UI 的 Web 应用（SPA / 微前端 / MPA 均可）；
 - 需要浏览器端到端执行的操作：视觉走查、UI 审查、页面调试、截图对比、视觉回归、浏览器自动化；
 - 执行环境可运行 Node ≥ 18 + Playwright。**浏览器获取方式可选（三选一）**：① `npx playwright install chromium` 自动下载到 ms-playwright 缓存；② 复用已有 ms-playwright 缓存；③ 系统 Chrome/Edge（`executablePath` 或 `channel`）。**无头模式默认可用**：Playwright 与 Vision/CUA 路径还可用更轻的 `chromium_headless_shell`（实测三项全 PASS）。
-- Stagehand AI 增强路径需 Node ≥ 22.18.0 + newapi 消费 key（`chat_default` 模型，见 infra-aimodel-ops）；**必须完整 Chromium（headless 模式即可，实测全 PASS），headless shell 不支持扩展注入（实测失败）**；
+- Stagehand AI 增强路径需 Node ≥ 22.18.0 + 任一 OpenAI 兼容网关的 API key（chat 模型）；**必须完整 Chromium（headless 模式即可，实测全 PASS），headless shell 不支持扩展注入（实测失败）**；
 - 无 DOM 或 DOM 不可靠的场景（canvas / 复杂 iframe / 纯视觉渲染）走 Vision/CUA 兜底。
 
 ## 核心设计：三层架构
