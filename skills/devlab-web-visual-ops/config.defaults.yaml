@@ -1,0 +1,52 @@
+$schema: harness-ai-kit-config/v1
+config:
+- key: preview_base_url
+  type: string
+  required: false
+  sensitivity: normal
+  description: 目标 Web 应用地址（视觉走查/调试目标）。按项目实际框架的开发服务器地址配置。
+- key: preview_start_command
+  type: string
+  required: false
+  sensitivity: normal
+  description: 启动预览服务的命令（在前端项目根目录执行）。缺失时跳过自动启动，提示用户先手动启动预览。
+- key: playwright_project_dir
+  type: string
+  required: false
+  sensitivity: normal
+  description: Playwright 配置文件/项目目录（含 playwright.config.*）。缺失时使用项目根目录。
+- key: stagehand_enabled
+  type: bool
+  required: false
+  sensitivity: normal
+  description: 是否启用 Stagehand AI 适配器。缺失时按需探测可用性后启用。
+- key: newapi_base_url
+  type: string
+  required: false
+  sensitivity: normal
+  description: Stagehand 本地模式的 LLM 端点（OpenAI 兼容，带 /v1，如 http://localhost:1234/v1）。
+- key: newapi_api_key
+  type: string
+  required: false
+  sensitivity: secret
+  description: Stagehand 本地模式所需 LLM 端点的 API key（OpenAI 兼容网关的 sk- token）。禁止写入正式文档。
+- key: stagehand_model
+  type: string
+  required: false
+  sensitivity: normal
+  description: Stagehand 本地模式使用的模型（chat_default，默认 mimo-v2.5-pro，见 infra-aimodel-ops 选型矩阵）。
+- key: vision_fallback_enabled
+  type: bool
+  required: false
+  sensitivity: normal
+  description: 是否启用 Vision/CUA 视觉兜底（本地视觉驱动：截图 + newapi 多模态模型）。缺失时默认启用。
+- key: vision_model
+  type: string
+  required: false
+  sensitivity: normal
+  description: Vision/CUA 使用的多模态模型（chat_default / vision 场景，默认 mimo-v2.5-pro，备选 grok-chat-fast；见 infra-aimodel-ops）。缺失时使用 stagehand_model。
+- key: artifact_dir
+  type: string
+  required: false
+  sensitivity: normal
+  description: 产物输出目录（截图/trace/har/报告）。缺失时默认 <项目根>/.visual-ops/artifacts。

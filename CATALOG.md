@@ -3,13 +3,13 @@
 One-line descriptions of every skill, CLI, and plugin bundled in this repo.
 Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>` / `harness-ai-kit add cli <id>` (CLIs).
 
-- **Skills: 47** across 8 categories
+- **Skills: 51** across 8 categories
 - **CLIs: 5** (pip-installable, published to PyPI as `sf-*`)
 - **Plugins: 1** (AI-harness plugins)
 
 > Build Less, Compose More — these assets compose open-source tools and community skills rather than reimplement them.
 
-## Skills (47)
+## Skills (51)
 
 ### Database & Middleware Expertise (11)
 
@@ -59,12 +59,16 @@ Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>`
 | `devlab-test-expert` | 测试专家知识库。包含测试最佳实践、故障排查指南、测试策略设计、性能优化建议、属性测试（property-based testing）模式等专家级知识，供其他测试技能引用。 |
 | `devlab-test-onboard` | AI 驱动的分层测试体系顶层路由编排。根据项目特征（前端/后端/全栈/微服务）智能识别测试需求，路由到对应子技能（devlab-web-test-e2e / devlab-srv-test-api / devlab-integration-fullstack）。 |
 
-### Web & Frontend (2)
+### Web & Frontend (6)
 
 | Skill | Description |
 |-------|-------------|
 | `devlab-web-deep-acceptance` | 存量 Web 系统深度功能验收方法论：registry 功能点驱动 + 唯一入口执行器 + 假成功嗅探 + 三对齐审计 + L1-L4 分级 + 失败五分类路由，沉淀可重放回归资产。 |
+| `devlab-web-echarts-usage` | ECharts 在 Astro/前端项目中的完整集成指南，包含 tree-shaking、IntersectionObserver 按需加载、自定义系列集成、拓扑图实现、雷达图配置、Astro Islands 数据传递、调试经验。 |
+| `devlab-web-extension-bootstrap` | 浏览器扩展（WebExtension/MV3）从零构建的团队工作流：可行性→逆向目标站点数据通道→WXT+Vue+MV3 选型→content/background/popup 三面架构→单测+Chrome-for-Testing 真实浏览器 e2e。尤其适用于从已有 Web 应用提取/下载/增强内容的扩展。 |
 | `devlab-web-test-e2e` | Web E2E 测试专家技能。专注 Vue/React 前端项目的浏览器端到端测试能力，基于 Playwright + AI Agent 实现测试计划生成 → 代码生成 → 失败修复的完整闭环。 |
+| `devlab-web-visual-ops` | Web 视觉化操作手册：Core（Observe/Navigate/Interact/Inspect/Validate/Capture）+ Router（Playwright/Stagehand/DevTools/Vision-CUA）+ Workflows（Debug/UI Review/Visual Regression/E2E/Browser Automation）。Stagehand 作为 Router 的 AI Adapter 而非底座，避免绑定单一框架。 |
+| `devlab-web-xyflow-usage` | @xyflow/react 使用指南：核心概念、自定义节点、Astro Islands 集成、6 条踩坑经验。 |
 
 ### Infrastructure Ops (5)
 

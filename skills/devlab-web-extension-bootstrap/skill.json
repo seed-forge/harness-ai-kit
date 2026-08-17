@@ -1,0 +1,80 @@
+{
+  "namespace": "community",
+  "id": "devlab-web-extension-bootstrap",
+  "name": "DevLab Web Extension Bootstrap",
+  "owner": "seedforge",
+  "version": "0.1.0",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "devlab",
+    "web",
+    "browser-extension",
+    "webextension",
+    "wxt",
+    "vue",
+    "manifest-v3",
+    "reverse-engineering",
+    "e2e"
+  ],
+  "summary": "浏览器扩展（WebExtension/MV3）从零构建的团队工作流：可行性→逆向目标站点数据通道→WXT+Vue+MV3 选型→content/background/popup 三面架构→单测+Chrome-for-Testing 真实浏览器 e2e。尤其适用于从已有 Web 应用提取/下载/增强内容的扩展。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "integrations": [
+    {
+      "target": "devlab-github-oss-ops",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "验证就绪的扩展代码 → 开源打包 + GitHub 发布自动化"
+    },
+    {
+      "target": "harness-ai-kit-maintainer",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "发布/废弃/同步、bump 版本、lock 刷新"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example": "",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": [
+      "pnpm test",
+      "pnpm build"
+    ]
+  },
+  "runtime_requirements": [
+    "wxt>=0.21.0",
+    "vue>=3.5.0",
+    "vitest>=2.0.0",
+    "puppeteer-core>=25.0.0"
+  ],
+  "post_install_hints": [],
+  "recommended_tools": [],
+  "contributors": [],
+  "skill_type": "workflow",
+  "agents_md_inject": "",
+  "updated_at": "2026-08-11"
+}

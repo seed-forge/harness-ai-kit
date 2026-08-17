@@ -1,0 +1,63 @@
+{
+  "namespace": "community",
+  "id": "devlab-web-echarts-usage",
+  "name": "devlab-web-echarts-usage",
+  "owner": "seedforge",
+  "version": "1.0.2",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "devlab",
+    "frontend",
+    "echarts",
+    "astro",
+    "charts",
+    "data-visualization",
+    "islands"
+  ],
+  "summary": "ECharts 在 Astro/前端项目中的完整集成指南，包含 tree-shaking、IntersectionObserver 按需加载、自定义系列集成、拓扑图实现、雷达图配置、Astro Islands 数据传递、调试经验。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [
+    "echarts npm package",
+    "Astro or frontend project"
+  ],
+  "post_install_hints": [
+    "npm i echarts"
+  ],
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

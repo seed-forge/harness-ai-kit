@@ -1,0 +1,20 @@
+# Human Decisions（结构化，与 SKILL.md 末尾汇总表同源）
+# 用途：AI 回溯参考 + harness-ai-kit-audit-ops 自动解析
+decisions:
+  - id: HD-1
+    point: 检测通道优先级
+    trigger: §2 逆向发现多个可用数据通道时
+    options:
+      - 按实证可靠性排序（SSR 注入 > 路径构造 > 同源 API > 被动兜底）
+      - 用户指定优先通道
+    default: 必问
+    rationale: 通道优先级直接决定跨页面类型/登录态的检测稳定性，需结合真实站点实证由人拍板
+  - id: HD-2
+    point: 目标浏览器与框架
+    trigger: §3 技术选型
+    options:
+      - Chrome MV3 + Vue（默认）
+      - 其他浏览器（Firefox/Edge）
+      - 其他前端框架
+    default: Chrome MV3 + Vue
+    rationale: 影响 manifest、构建 target 与 popup 技术栈，默认值覆盖多数场景但需用户确认

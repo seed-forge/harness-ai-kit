@@ -1,0 +1,113 @@
+{
+  "namespace": "community",
+  "id": "devlab-web-visual-ops",
+  "name": "DevLab Web Visual Ops",
+  "owner": "seedforge",
+  "version": "0.1.4",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "devlab",
+    "web",
+    "visual",
+    "playwright",
+    "stagehand",
+    "browser-automation",
+    "ui-review",
+    "visual-regression",
+    "debugging",
+    "frontend"
+  ],
+  "summary": "Web 视觉化操作手册：Core（Observe/Navigate/Interact/Inspect/Validate/Capture）+ Router（Playwright/Stagehand/DevTools/Vision-CUA）+ Workflows（Debug/UI Review/Visual Regression/E2E/Browser Automation）。Stagehand 作为 Router 的 AI Adapter 而非底座，避免绑定单一框架。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor",
+    "qoder",
+    "kiro",
+    "windsurf"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "integrations": [
+    {
+      "target": "devlab-web-test-e2e",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "E2E 用例生成/失败修复闭环；本技能提供观察/捕获/调试执行层"
+    },
+    {
+      "target": "devlab-web-deep-acceptance",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "深度验收浏览器执行层；registry 用例由 Observe/Interact 驱动"
+    },
+    {
+      "target": "devlab-ui-taste-ops",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "UI 精修编排：本技能视觉走查截图/问题清单 → UI Refine 定调与修复"
+    },
+    {
+      "target": "harness-ai-kit-maintainer",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "发布/废弃/同步、bump 版本、lock 刷新"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [
+      "browser"
+    ],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": [
+      "npx playwright --version"
+    ]
+  },
+  "runtime_requirements": [
+    "@playwright/test>=1.40.0",
+    "@browserbasehq/stagehand==4.0.0（可选：AI 增强适配器，缺失时降级为 Playwright 确定性路径）",
+    "Node >= 22.18.0（仅 Stagehand 本地模式需要）",
+    "Chromium 浏览器（Playwright 自带或系统安装）",
+    "newapi 消费 key + chat_default 模型（Stagehand 本地模式，见 infra-aimodel-ops）",
+    "newapi 多模态模型（Vision/CUA 视觉兜底，vision_model，默认 mimo-v2.5-pro，见 infra-aimodel-ops）"
+  ],
+  "post_install_hints": [
+    "在项目侧配置 preview_base_url / preview_start_command（~/.harness-ai-kit/config.yaml 的 assets.devlab-web-visual-ops 段）",
+    "Stagehand 本地模式：配置 newapi_base_url / newapi_api_key / stagehand_model（同 config.yaml assets 段）；无需 Browserbase key",
+    "首次执行前运行 npx playwright install chromium 安装浏览器",
+    "playwright CLI：项目侧 npm i -D playwright 或全局安装后，npx playwright --version 可验证；浏览器本体三选一（自动下载 / ms-playwright 缓存 / 系统 Chrome），无头模式默认可用",
+    "视觉回归基线存放在 artifact_dir/baselines/，更新基线需用户确认（HD-3）"
+  ],
+  "recommended_tools": [],
+  "contributors": [],
+  "agents_md_inject": "",
+  "config_schema": "config.defaults.yaml",
+  "skill_type": "workflow",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": false,
+    "requires_browser": true,
+    "requires_interactive": false,
+    "server_runtime": null
+  },
+  "updated_at": "2026-08-14"
+}

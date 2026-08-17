@@ -1,0 +1,45 @@
+# Human Decisions（结构化，与 SKILL.md 末尾汇总表同源）
+# 用途：AI 回滚参考 + harness-ai-kit-audit-ops 自动解析
+decisions:
+  - id: HD-5
+    point: CUA 自动执行边界
+    trigger: Vision/CUA 执行器准备在页面上执行动作时
+    options:
+      - 导航/点击类自动执行
+      - 不可逆操作（表单提交/删除/数据修改）必须 HD-1 确认
+    default: 导航/点击自动；不可逆操作必问
+    rationale: CUA 以坐标执行动作，无法区分操作后果；导航/点击类风险低可自动，不可逆操作沿用 HD-1 人工确认（spike 2026-08-14 验证坐标点击闭环）
+  - id: HD-4
+    point: Stagehand 结构化输出模式
+    trigger: Stagehand observe/extract 需要 LLM 返回结构化 JSON 时
+    options:
+      - forced tool call（extract_result，默认）
+      - response_format json_schema
+      - 提示词内嵌 schema + 手动解析（降级）
+    default: forced tool call
+    rationale: newapi（mimo-v2.5-pro→claude-sonnet-4.5 渠道）实测忽略 response_format，forced tool call 是唯一可靠的结构化强制路径（spike 2026-08-14 验证）
+  - id: HD-1
+    point: 写操作放行
+    trigger: 表单提交/删除/修改数据等不可逆操作前
+    options:
+      - 放行
+      - 仅截图
+      - 取消
+    default: 必问
+    rationale: 不可逆操作需要人工确认，避免自动化误操作
+  - id: HD-2
+    point: Router 降级切换
+    trigger: Playwright 确定性路径失败需 AI 推断（切 Stagehand/Vision）
+    options:
+      - 允许
+      - 停止并报告
+    default: 允许，记录原因
+    rationale: AI 推断路径成本与不确定性更高，但多数场景可接受；必须留痕
+  - id: HD-3
+    point: 视觉基线更新
+    trigger: 覆盖 baselines/ 中已有基线
+    options:
+      - 更新
+      - 保留旧基线
+    default: 必问
+    rationale: 基线覆盖会永久改变回归参照，需区分"无意回归/有意变更"
