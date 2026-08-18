@@ -7,7 +7,7 @@ Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>`
 - **CLIs: 6** (pip-installable, published to PyPI as `sf-*`)
 - **Plugins: 1** (AI-harness plugins)
 
-> Build Less, Compose More — these assets compose open-source tools and community skills rather than reimplement them.
+> Build Less, Compose More — the **REMIX** methodology (Reuse · Extend · Mix · Integrate · eXecute): these assets compose open-source tools and community skills rather than reimplement them.
 
 ## Skills (56)
 

@@ -13,9 +13,17 @@
 
 As AI agents proliferate, teams accumulate reusable prompts, skills, CLIs and MCP servers — but there's no `npm` for these assets. `harness-ai-kit` fills that gap: one CLI to install, resolve, lock, validate and govern AI agent assets across multiple runtimes.
 
-### Build Less, Compose More
+### Build Less, Compose More (a.k.a. the REMIX methodology)
 
 harness-ai-kit is a **composition layer, not another vertical toolkit**. It does **not** compete with well-known single-purpose community AI kits — it *composes* them. Where a focused community skill, CLI, or MCP server already does a job well, harness-ai-kit's role is to install, pin, and orchestrate it alongside everything else, never to reinvent it. Build less; reuse and compose more.
+
+We call this composition-first stance the **REMIX** methodology:
+
+- **R**euse — pull in existing community skills / CLIs / MCP servers instead of rebuilding them.
+- **E**xtend — when something is close, extend it (via the `extends` mechanism) rather than fork-and-rewrite.
+- **M**ix — combine assets across types (skill × CLI × MCP × loop) into one coherent workflow.
+- **I**ntegrate — install, pin, lock and version everything through a single manifest (`harness-ai-kit.yml` + `.lock`).
+- e**X**ecute — orchestrate the composed assets across runtimes (Codex, Claude Code, Cursor, Kiro).
 
 ### Why not just copy SKILL.md files?
 
