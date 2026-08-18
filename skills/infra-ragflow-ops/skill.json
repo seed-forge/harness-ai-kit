@@ -1,0 +1,63 @@
+{
+  "namespace": "community",
+  "id": "infra-ragflow-ops",
+  "name": "infra-ragflow-ops",
+  "owner": "seedforge",
+  "version": "0.2.4",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "infra",
+    "ragflow",
+    "rag",
+    "ai-platform"
+  ],
+  "summary": "RAGFlow 平台运维：服务健康、模型/向量库/对象存储依赖、知识库 API 探活与数据源消费边界。",
+  "compatible_clients": [
+    "codex",
+    "claude-code"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [
+    {
+      "type": "cli",
+      "namespace": "community",
+      "id": "ragflowctl",
+      "version": ">=0.5.0",
+      "scope": "required"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "skill-registry"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [
+    "Consume models via any OpenAI-compatible gateway and use your own database/vector store for external dependencies."
+  ],
+  "post_install_hints": [
+    "Run `ragflowctl doctor --profile default --json` before dataset or knowledge-base operations."
+  ],
+  "updated_at": "2026-08-16",
+  "integrations": [
+    {
+      "target": "harness-ai-kit-maintainer",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "发布/废弃/同步、bump 版本、lock 刷新"
+    }
+  ],
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

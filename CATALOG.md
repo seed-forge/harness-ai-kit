@@ -3,13 +3,13 @@
 One-line descriptions of every skill, CLI, and plugin bundled in this repo.
 Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>` / `harness-ai-kit add cli <id>` (CLIs).
 
-- **Skills: 55** across 8 categories
-- **CLIs: 5** (pip-installable, published to PyPI as `sf-*`)
+- **Skills: 56** across 8 categories
+- **CLIs: 6** (pip-installable, published to PyPI as `sf-*`)
 - **Plugins: 1** (AI-harness plugins)
 
 > Build Less, Compose More — these assets compose open-source tools and community skills rather than reimplement them.
 
-## Skills (55)
+## Skills (56)
 
 ### Database & Middleware Expertise (11)
 
@@ -74,13 +74,14 @@ Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>`
 | `devlab-web-visual-ops` | Web 视觉化操作手册：Core（Observe/Navigate/Interact/Inspect/Validate/Capture）+ Router（Playwright/Stagehand/DevTools/Vision-CUA）+ Workflows（Debug/UI Review/Visual Regression/E2E/Browser Automation）。Stagehand 作为 Router 的 AI Adapter 而非底座，避免绑定单一框架。 |
 | `devlab-web-xyflow-usage` | @xyflow/react 使用指南：核心概念、自定义节点、Astro Islands 集成、6 条踩坑经验。 |
 
-### Infrastructure Ops (5)
+### Infrastructure Ops (6)
 
 | Skill | Description |
 |-------|-------------|
 | `infra-dify-ops` | Dify 平台使用层运维 Skill：DSL 创作/校验/双轨导入（Console API 优先，Playwright 兜底）、DSL 导出、app 检查、本地资源沉淀、workflow 草稿、模型 provider 配置与生产验收；不负责部署层。配套 CLI difyctl。 |
 | `infra-harbor-ops` | Harbor 平台运维：project/robot/proxy cache/registry token/runtime health；OCI 预热消费链仍归 infra-artifact-readiness-ops。 |
 | `infra-nexus-ops` | Nexus 平台运维：仓库 CRUD + update、blobstore 管理、cleanup-policy 查询、inventory 导出/漂移检测；消费预热归 infra-artifact-readiness-ops。 |
+| `infra-ragflow-ops` | RAGFlow 平台运维：服务健康、模型/向量库/对象存储依赖、知识库 API 探活与数据源消费边界。 |
 | `infra-sonarqube-ops` | SonarQube 代码质量平台 day-2 运维：探活、项目管理、质量门禁、扫描触发与结果解读、Token 管理。配套 CLI sonarqubectl。 |
 | `infra-system-env-ops` | 基础设施系统环境运维 Skill。v1 覆盖端口转发/iptables/portproxy/SSH tunnel，v2 扩展 Monit 统一看门狗、服务崩溃自愈、系统资源监控和 Mattermost 告警集成。 |
 
@@ -106,7 +107,7 @@ Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>`
 |-------|-------------|
 | `base-cn-registry-mirror-strategy` | 国内镜像源与代理分层策略：覆盖 Docker 拉取、Debian/Alpine 包管理、Node/npm、Python/pip、Maven/Gradle 与 Go 模块，便于 Dockerfile 与 CI 统一维护。 |
 
-## Companion CLIs (5)
+## Companion CLIs (6)
 
 | PyPI package | Command | Description |
 |--------------|---------|-------------|
@@ -115,6 +116,7 @@ Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>`
 | `sf-loopctl` | `loopctl` | Loop asset lifecycle CLI (list, validate, run, status, extract, promote) for harness-ai-kit loop assets. |
 | `sf-mineructl` | `mineructl` | MinerU document-parsing service ops CLI: doctor, probe, version, submit, status, result, tasks. |
 | `sf-nexusctl` | `nexusctl` | Nexus repository ops CLI: repo CRUD, blobstore, cleanup-policy, inventory export/diff, presets, user/role management. |
+| `sf-ragflowctl` | `ragflowctl` | RAGFlow ops CLI: doctor, dataset/document/ingest/retrieval, LLM model provider governance (v0.26 HTTP API). Companion of infra-ragflow-ops. |
 
 Each CLI depends on `harness-ai-kit` and is published via `.github/workflows/publish-clis.yml` (auto-discovered).
 

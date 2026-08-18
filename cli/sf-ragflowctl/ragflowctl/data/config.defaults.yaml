@@ -1,0 +1,23 @@
+$schema: harness-ai-kit-config/v1
+
+config:
+  - key: base_url
+    type: string
+    required: true
+    sensitive: false
+    default: ""
+    description: RAGFlow 服务地址（自建实例的 HTTP API 入口，如 http://<host>:9380）
+  - key: api_key
+    type: string
+    required: true
+    sensitive: true
+    description: RAGFlow API Key（RAGFlow UI 右上角头像 → API → 生成）
+  - key: timeout
+    type: integer
+    required: false
+    default: 60
+    description: HTTP 超时秒数
+  - key: embedding_model
+    type: string
+    required: false
+    description: 默认 embedding 模型名（须在 RAGFlow 中已注册，如 bge-large-zh-v1.5@…）

@@ -1,0 +1,9 @@
+$schema: harness-ai-kit-config/v1
+
+config:
+  - key: ragflow_url
+    type: string
+    required: true
+    sensitivity: public
+    description: "RAGFlow 服务 URL"
+    default: ""

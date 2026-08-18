@@ -118,7 +118,7 @@ Requires Python >= 3.10 and `git`.
 
 ## Built-in Skill Library
 
-55 production-tested skills + 5 companion CLIs included. Install any with `harness-ai-kit add skill <id>` (or `pip install sf-<cli>`). Full categorized index: **[CATALOG.md](CATALOG.md)**.
+56 production-tested skills + 6 companion CLIs included. Install any with `harness-ai-kit add skill <id>` (or `pip install sf-<cli>`). Full categorized index: **[CATALOG.md](CATALOG.md)**.
 
 > New here? Read [Usage Scenarios](docs/usage-scenarios.md) first — it explains how skills get pulled into real work via an SDD framework (e.g. Trellis), and how loops bind to a runtime.
 

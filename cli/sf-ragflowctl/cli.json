@@ -1,0 +1,18 @@
+{
+  "namespace": "community",
+  "id": "ragflowctl",
+  "name": "ragflowctl",
+  "owner": "seedforge",
+  "version": "0.5.1",
+  "status": "trial",
+  "package_type": "cli",
+  "summary": "RAGFlow ops CLI: doctor, dataset/document/ingest/retrieval, LLM model provider governance (v0.26 HTTP API). Companion of infra-ragflow-ops.",
+  "package_name": "sf-ragflowctl",
+  "install_type": "python-package",
+  "publish_paths": [
+    "cli/sf-ragflowctl"
+  ],
+  "companion_docs": {
+    "usage": "README.md"
+  }
+}
