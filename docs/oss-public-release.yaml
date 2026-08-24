@@ -9,9 +9,9 @@ public:
 # reviewed staging baseline and its committed release manifest. The baseline
 # can intentionally skip private-only versions.
 source_snapshot:
-  source_revision: 69bce8663b91a568c5e538535323c7a1d4dacc56
+  source_revision: 0a4db1feaa6bdbabf413430d1fd5f34e9b529347
   staging_manifest: docs/oss-staging-manifest.json
-  staging_manifest_sha256: 0685f1d6c295ac87a93d1f2afec46b6f17a463a940e59bc10bdf43e74443203c
+  staging_manifest_sha256: 5e8f35e837782725e57eef9074937ada6fb9af710e5b350e98cf097ee7777e83
 
 channels:
   testpypi:

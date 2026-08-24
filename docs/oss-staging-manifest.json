@@ -3,46 +3,46 @@
     {
       "id": "harness-ai-kit",
       "package_name": "harness-ai-kit",
-      "tree_sha256": "141df405f98626e685ce97a448beb76c2cd7ee6bcd34b58f67711c4664d69241",
+      "tree_sha256": "570a7ceb9fb5994b332c079c5e4bdb514fc275e22860d3db63cd5783a80b263b",
       "version": "0.2.1"
     },
     {
       "id": "sf-difyctl",
       "package_name": "sf-difyctl",
-      "tree_sha256": "ddde9d30cc3ea73dd9d6a60959b1fab1d2fe06052891f9163746db1489627c92",
+      "tree_sha256": "2b0d1618250ba9b03ab4190162cebb3f9946088c2b6981d137eacf372cb4744a",
       "version": "0.15.0"
     },
     {
       "id": "sf-evalctl",
       "package_name": "sf-evalctl",
-      "tree_sha256": "11be8ae8de0acc5bc9e744b41e6981709a6295b9b4c5ed1ab14177d21c5d3310",
+      "tree_sha256": "eaabff9fc81908b5d9741af38c169a8f0fe72403d065f46a0c5976a39cfdface",
       "version": "0.1.1"
     },
     {
       "id": "sf-loopctl",
       "package_name": "sf-loopctl",
-      "tree_sha256": "fdf7b3ec047955a6a665ceafcd2766bde040f004106e496448e96c56a0cc9d43",
+      "tree_sha256": "b04ad01d99c4e9b289bbe462cd25cc55c9104bfcf3323f0b1a11b60f630dfe33",
       "version": "0.1.0"
     },
     {
       "id": "sf-mineructl",
       "package_name": "sf-mineructl",
-      "tree_sha256": "e8c077f93a5c5ff9d5285cb9eeef9fe17f464c6300b9239d521478984635d75b",
+      "tree_sha256": "c1d4afd6f7221885e77c837682e2609afff758f5a643e0f2d4b5508e31f6a175",
       "version": "0.1.1"
     },
     {
       "id": "sf-nexusctl",
       "package_name": "sf-nexusctl",
-      "tree_sha256": "3daf4f07a137bd11afcdba0b2631dfcba9f887516938a5a302142f682e847593",
+      "tree_sha256": "76ec5a401d3a37a82aa1db6f53474e9850cf59cda99e08d6ce63bc888660e131",
       "version": "0.5.2"
     },
     {
       "id": "sf-ragflowctl",
       "package_name": "sf-ragflowctl",
-      "tree_sha256": "69712f55cb4752afee4748c56402af7f13f8f84f038d6060ed4b691ab68a53a6",
+      "tree_sha256": "a634ca21390df2b08c894d283380613c5e80f024d9a50c6788958f66257d1f9b",
       "version": "0.5.1"
     }
   ],
   "schema_version": 1,
-  "source_revision": "69bce8663b91a568c5e538535323c7a1d4dacc56"
+  "source_revision": "0a4db1feaa6bdbabf413430d1fd5f34e9b529347"
 }

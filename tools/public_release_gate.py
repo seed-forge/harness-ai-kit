@@ -208,6 +208,11 @@ def build_package(source_root: Path, output: Path) -> tuple[bool, int]:
     return check.returncode == 0, check.returncode
 
 
+def canonical_file_bytes(path: Path) -> bytes:
+    """Hash text-like release inputs consistently across Windows and Linux."""
+    return path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
 def tree_sha256(repo_root: Path, package: dict[str, Any]) -> str:
     includes = package.get("included_paths") or [package["source_path"]]
     digest = hashlib.sha256()
@@ -221,7 +226,7 @@ def tree_sha256(repo_root: Path, package: dict[str, Any]) -> str:
             files.extend(path for path in iter_files(path) if not is_ignored_path(path, repo_root))
     for path in sorted(set(files), key=lambda value: value.relative_to(repo_root).as_posix()):
         relative = path.relative_to(repo_root).as_posix().encode("utf-8")
-        digest.update(relative + b"\0" + hashlib.sha256(path.read_bytes()).hexdigest().encode("ascii") + b"\n")
+        digest.update(relative + b"\0" + hashlib.sha256(canonical_file_bytes(path)).hexdigest().encode("ascii") + b"\n")
     return digest.hexdigest()
 
 
@@ -252,7 +257,7 @@ def verify_staging_manifest(repo_root: Path, matrix: dict[str, Any], packages: l
     manifest_path = repo_root / manifest_ref
     if not manifest_path.is_file():
         return [*errors, f"staging manifest is missing: {manifest_ref}"]
-    actual_digest = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+    actual_digest = hashlib.sha256(canonical_file_bytes(manifest_path)).hexdigest()
     if isinstance(expected_digest, str) and actual_digest != expected_digest:
         errors.append("staging manifest digest does not match the release matrix")
     try:
@@ -484,8 +489,10 @@ def main(argv: list[str] | None = None) -> int:
                 raise ValueError("--source-revision is required when writing a staging manifest")
             payload = staging_manifest_payload(repo_root, selected_for_manifest, args.source_revision)
             args.write_staging_manifest.parent.mkdir(parents=True, exist_ok=True)
-            args.write_staging_manifest.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-            digest = hashlib.sha256(args.write_staging_manifest.read_bytes()).hexdigest()
+            args.write_staging_manifest.write_text(
+                json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"
+            )
+            digest = hashlib.sha256(canonical_file_bytes(args.write_staging_manifest)).hexdigest()
             if args.update_matrix_snapshot:
                 update_matrix_snapshot(args.matrix.resolve(), args.source_revision, digest)
                 matrix = load_matrix(args.matrix.resolve())

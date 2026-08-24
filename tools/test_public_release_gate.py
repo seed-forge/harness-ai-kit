@@ -200,6 +200,20 @@ class PublicReleaseGateTests(unittest.TestCase):
             (metadata / "PKG-INFO").write_text("generated build metadata\n", encoding="utf-8")
             self.assertEqual(gate.tree_sha256(root, package), baseline)
 
+    def test_package_tree_digest_normalizes_line_endings(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            package = self.make_package(root)
+            baseline = gate.tree_sha256(root, package)
+            source = root / "cli" / "example" / "README.md"
+            source.write_bytes(b"line one\r\nline two\r\n")
+            package["included_paths"] = ["cli/example/README.md"]
+            crlf_digest = gate.tree_sha256(root, package)
+            source.write_bytes(b"line one\nline two\n")
+            lf_digest = gate.tree_sha256(root, package)
+        self.assertNotEqual(baseline, crlf_digest)
+        self.assertEqual(crlf_digest, lf_digest)
+
     def test_update_matrix_snapshot_accepts_digit_prefixed_revision(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             path = Path(temp_dir) / "matrix.yaml"
