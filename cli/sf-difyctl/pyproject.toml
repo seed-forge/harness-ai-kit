@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sf-difyctl"
-version = "0.1.0"
+version = "0.15.0"
 description = "Dify usage-layer ops CLI: dual-track DSL import (Console API + Playwright), per-instance DSL version detect, import-ready DSL authoring/validation, provider config, resource ledger."
 readme = "README.md"
 requires-python = ">=3.10"

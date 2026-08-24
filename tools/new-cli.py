@@ -4,9 +4,10 @@
 Usage:
     python tools/new-cli.py <name> [--summary "one-line summary"]
 
-Creates a ready-to-publish package skeleton (pyproject.toml, README.md, cli.json,
-<name>/cli.py with a `main` entry) that publish-clis.yml auto-discovers. PyPI
-project name is `sf-<name>`; the installed command is `<name>`.
+Creates a package skeleton (pyproject.toml, README.md, cli.json, <name>/cli.py
+with a `main` entry). PyPI project name is `sf-<name>`; the installed command
+is `<name>`. The package remains unpublished until it has a reviewed entry in
+docs/oss-public-release.yaml.
 """
 from __future__ import annotations
 
@@ -149,8 +150,8 @@ if __name__ == "__main__":
 
     print(f"Created {pkg_dir.relative_to(REPO_ROOT)}")
     print(f"  PyPI package: sf-{name}   command: {name}")
-    print("Next: implement cli.py, then `git tag cli-v<version> && git push --tags` to publish.")
-    print(f"Remember to add a Trusted Publisher for sf-{name} on PyPI (workflow publish-clis.yml, env pypi).")
+    print("Next: implement tests, then add a reviewed release-matrix entry before creating a v<version> tag.")
+    print(f"Before the first release, configure a Trusted Publisher for sf-{name} (workflow release.yml, matching pypi/testpypi environment).")
     return 0
 
 

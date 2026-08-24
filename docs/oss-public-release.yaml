@@ -1,0 +1,95 @@
+schema_version: 1
+
+public:
+  repository: seed-forge/harness-ai-kit
+  release_workflow: release.yml
+  trusted_publishing: oidc
+
+# A release is intentionally impossible until these fields identify the
+# reviewed private snapshot and its committed staging manifest.
+source_snapshot:
+  source_revision: null
+  staging_manifest: docs/oss-staging-manifest.json
+  staging_manifest_sha256: null
+
+channels:
+  testpypi:
+    repository_url: https://test.pypi.org
+  pypi:
+    repository_url: https://pypi.org
+
+# This is an allowlist, not a discovery mechanism. New packages require an
+# explicit review of their source path, version sources, tests and dependency
+# order before they can be released.
+packages:
+  - id: harness-ai-kit
+    package_name: harness-ai-kit
+    source_path: .
+    public: true
+    ci: true
+    publish: false
+    release_wave: 0
+    depends_on: []
+    version_sources: [pyproject]
+    test_command: "{python} -c \"import harness_ai_kit; print('harness-ai-kit import OK')\""
+    included_paths:
+      - harness_ai_kit
+      - pyproject.toml
+      - README.md
+      - LICENSE
+
+  - id: sf-difyctl
+    package_name: sf-difyctl
+    source_path: cli/sf-difyctl
+    public: true
+    ci: true
+    publish: false
+    release_wave: 0
+    depends_on: []
+    version_sources: [pyproject, cli_json, init]
+    test_command: "{python} -m pytest -q tests"
+
+  - id: sf-evalctl
+    package_name: sf-evalctl
+    source_path: cli/sf-evalctl
+    public: true
+    ci: false
+    publish: false
+    version_sources: [pyproject, cli_json, init]
+    hold_reason: version metadata and test suite are not release-ready
+
+  - id: sf-loopctl
+    package_name: sf-loopctl
+    source_path: cli/sf-loopctl
+    public: true
+    ci: false
+    publish: false
+    version_sources: [pyproject, cli_json]
+    hold_reason: test suite is not release-ready
+
+  - id: sf-mineructl
+    package_name: sf-mineructl
+    source_path: cli/sf-mineructl
+    public: true
+    ci: false
+    publish: false
+    version_sources: [pyproject, cli_json, init]
+    hold_reason: version metadata and test suite are not release-ready
+
+  - id: sf-nexusctl
+    package_name: sf-nexusctl
+    source_path: cli/sf-nexusctl
+    public: true
+    ci: false
+    publish: false
+    version_sources: [pyproject, cli_json, init]
+    hold_reason: version metadata and test suite are not release-ready
+
+  - id: sf-ragflowctl
+    package_name: sf-ragflowctl
+    source_path: cli/sf-ragflowctl
+    public: true
+    ci: false
+    publish: false
+    version_sources: [pyproject, cli_json, init]
+    hold_reason: test suite is not release-ready

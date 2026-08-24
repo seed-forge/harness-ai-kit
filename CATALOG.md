@@ -118,7 +118,7 @@ Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>`
 | `sf-nexusctl` | `nexusctl` | Nexus repository ops CLI: repo CRUD, blobstore, cleanup-policy, inventory export/diff, presets, user/role management. |
 | `sf-ragflowctl` | `ragflowctl` | RAGFlow ops CLI: doctor, dataset/document/ingest/retrieval, LLM model provider governance (v0.26 HTTP API). Companion of infra-ragflow-ops. |
 
-Each CLI depends on `harness-ai-kit` and is published via `.github/workflows/publish-clis.yml` (auto-discovered).
+Each CLI depends on `harness-ai-kit`. Publication is controlled by the explicit `docs/oss-public-release.yaml` allowlist and `.github/workflows/release.yml`; a directory is never auto-published.
 
 ## Plugins (1)
 

@@ -1,0 +1,207 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Target package index
+        required: true
+        default: testpypi
+        type: choice
+        options: [testpypi, pypi]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pypi-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      channel: ${{ steps.plan.outputs.channel }}
+      wave_0: ${{ steps.plan.outputs.wave_0 }}
+      wave_1: ${{ steps.plan.outputs.wave_1 }}
+      wave_2: ${{ steps.plan.outputs.wave_2 }}
+      wave_3: ${{ steps.plan.outputs.wave_3 }}
+      has_wave_0: ${{ steps.plan.outputs.has_wave_0 }}
+      has_wave_1: ${{ steps.plan.outputs.has_wave_1 }}
+      has_wave_2: ${{ steps.plan.outputs.has_wave_2 }}
+      has_wave_3: ${{ steps.plan.outputs.has_wave_3 }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install release dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -e . build twine pytest
+      - name: Run complete release gate and create explicit plan
+        id: plan
+        run: |
+          echo "channel=${{ inputs.channel || 'pypi' }}" >> "$GITHUB_OUTPUT"
+          python tools/public_release_gate.py \
+            --mode release \
+            --report build/release-gate.json \
+            --write-plan build/release-plan.json \
+            --github-output "$GITHUB_OUTPUT"
+      - name: Upload checked distributions and release evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-build
+          path: build/
+
+  publish_wave_0:
+    needs: prepare
+    if: needs.prepare.outputs.has_wave_0 == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ needs.prepare.outputs.channel }}
+    permissions:
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.wave_0) }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-build
+          path: build
+      - name: Preflight immutable PyPI version
+        id: preflight
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --github-output "$GITHUB_OUTPUT"
+      - name: Publish ${{ matrix.package_name }}
+        if: steps.preflight.outputs.should_publish == 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: build/${{ matrix.dist_path }}/
+      - name: Read back immutable PyPI files
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback
+
+  publish_wave_1:
+    needs: [prepare, publish_wave_0]
+    if: needs.prepare.outputs.has_wave_1 == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ needs.prepare.outputs.channel }}
+    permissions:
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.wave_1) }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-build
+          path: build
+      - name: Preflight immutable PyPI version
+        id: preflight
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --github-output "$GITHUB_OUTPUT"
+      - name: Publish ${{ matrix.package_name }}
+        if: steps.preflight.outputs.should_publish == 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: build/${{ matrix.dist_path }}/
+      - name: Read back immutable PyPI files
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback
+
+  publish_wave_2:
+    needs: [prepare, publish_wave_1]
+    if: needs.prepare.outputs.has_wave_2 == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ needs.prepare.outputs.channel }}
+    permissions:
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.wave_2) }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-build
+          path: build
+      - name: Preflight immutable PyPI version
+        id: preflight
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --github-output "$GITHUB_OUTPUT"
+      - name: Publish ${{ matrix.package_name }}
+        if: steps.preflight.outputs.should_publish == 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: build/${{ matrix.dist_path }}/
+      - name: Read back immutable PyPI files
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback
+
+  publish_wave_3:
+    needs: [prepare, publish_wave_2]
+    if: needs.prepare.outputs.has_wave_3 == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ needs.prepare.outputs.channel }}
+    permissions:
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.wave_3) }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-build
+          path: build
+      - name: Preflight immutable PyPI version
+        id: preflight
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --github-output "$GITHUB_OUTPUT"
+      - name: Publish ${{ matrix.package_name }}
+        if: steps.preflight.outputs.should_publish == 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: build/${{ matrix.dist_path }}/
+      - name: Read back immutable PyPI files
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback
+
+  github_release:
+    needs: [prepare, publish_wave_0, publish_wave_1, publish_wave_2, publish_wave_3]
+    if: >-
+      always() && github.ref_type == 'tag' && needs.prepare.result == 'success' &&
+      (needs.publish_wave_0.result == 'success' || needs.publish_wave_0.result == 'skipped') &&
+      (needs.publish_wave_1.result == 'success' || needs.publish_wave_1.result == 'skipped') &&
+      (needs.publish_wave_2.result == 'success' || needs.publish_wave_2.result == 'skipped') &&
+      (needs.publish_wave_3.result == 'success' || needs.publish_wave_3.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-build
+          path: build
+      - name: Create GitHub Release after PyPI readback
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            build/release-gate.json
+            build/release-plan.json

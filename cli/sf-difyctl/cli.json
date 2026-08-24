@@ -3,7 +3,7 @@
   "id": "difyctl",
   "name": "difyctl",
   "owner": "seedforge",
-  "version": "0.1.0",
+  "version": "0.15.0",
   "status": "trial",
   "package_type": "cli",
   "summary": "Dify usage-layer ops CLI: dual-track DSL import (Console API + Playwright), DSL version detect, DSL authoring/validation, provider config, resource ledger.",

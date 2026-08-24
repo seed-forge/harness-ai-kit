@@ -9,6 +9,7 @@ Companion command-line tools for [harness-ai-kit](https://github.com/seed-forge/
 | `sf-evalctl/` | `sf-evalctl` | `evalctl` | Eval loop for AI/data apps (run / diff / ingest / feedback / report) |
 | `sf-nexusctl/` | `sf-nexusctl` | `nexusctl` | Nexus repository ops (repo CRUD / blobstore / cleanup-policy / inventory / user/role) |
 | `sf-difyctl/` | `sf-difyctl` | `difyctl` | Dify usage-layer ops (DSL import / validate / version detect / provider config) |
+| `sf-ragflowctl/` | `sf-ragflowctl` | `ragflowctl` | RAGFlow operations (doctor / dataset / document / ingest / retrieval) |
 
 ## Install a CLI
 
@@ -18,32 +19,33 @@ pip install sf-mineructl        # -> `mineructl` command
 pip install sf-evalctl          # -> `evalctl` command
 pip install sf-nexusctl         # -> `nexusctl` command
 pip install sf-difyctl          # -> `difyctl` command
+pip install sf-ragflowctl       # -> `ragflowctl` command
 ```
 
 Each CLI declares `harness-ai-kit` as a dependency and reuses its public `domain` / `infrastructure` layers.
 
 ## Publishing
 
-All CLIs are published by [`.github/workflows/publish-clis.yml`](../.github/workflows/publish-clis.yml) via PyPI **Trusted Publishing** (OIDC, no stored tokens). The workflow **auto-discovers** every `cli/*/` directory that has a `pyproject.toml` — nothing in the workflow needs editing when you add a CLI.
+Publication is governed by the explicit [`docs/oss-public-release.yaml`](../docs/oss-public-release.yaml) matrix and [`.github/workflows/release.yml`](../.github/workflows/release.yml). Adding a `cli/*/` directory never makes it publishable by itself. A package needs a reviewed source path, aligned versions, a test command, a staging manifest entry and `publish: true` in the matrix.
 
-Trigger a CLI release (decoupled from the core package):
+After the matrix and staging manifest have passed review, trigger a repository release:
 
 ```bash
-git tag cli-v0.1.0
-git push origin cli-v0.1.0
+git tag v0.15.0
+git push origin v0.15.0
 ```
 
-> **One-time per package:** because PyPI has no namespaces, each `sf-<name>` project needs its own Trusted Publisher on PyPI (Owner `seed-forge`, Repo `harness-ai-kit`, Workflow `publish-clis.yml`, Environment `pypi`).
+> **One-time per package and channel:** because PyPI has no namespaces, each `sf-<name>` project needs its own Trusted Publisher. Use Owner `seed-forge`, Repository `harness-ai-kit`, Workflow `release.yml`, and the matching `pypi` or `testpypi` GitHub environment.
 
 ## Add a new CLI
 
-Use the scaffolder — it creates a ready-to-publish skeleton that the workflow picks up automatically:
+Use the scaffolder, then add an explicit matrix entry and release tests:
 
 ```bash
 python tools/new-cli.py <name>        # e.g. python tools/new-cli.py fooctl
 ```
 
-This generates `cli/sf-<name>/` with `pyproject.toml`, `README.md`, `cli.json`, and a `<name>/cli.py` entry stub. Fill in the command logic, then tag `cli-v*` to publish.
+This generates `cli/sf-<name>/` with `pyproject.toml`, `README.md`, `cli.json`, and a `<name>/cli.py` entry stub. Fill in the command logic, add tests, and update the reviewed release matrix before creating a release tag.
 
 ## Namespace note
 
