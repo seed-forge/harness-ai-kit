@@ -167,6 +167,16 @@ class PublicReleaseGateTests(unittest.TestCase):
         self.assertEqual(payload["packages"][0]["version"], "1.2.3")
         self.assertRegex(payload["packages"][0]["tree_sha256"], r"^[0-9a-f]{64}$")
 
+    def test_package_tree_digest_ignores_generated_egg_info(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            package = self.make_package(root)
+            baseline = gate.tree_sha256(root, package)
+            metadata = root / "cli" / "example" / "example_cli.egg-info"
+            metadata.mkdir()
+            (metadata / "PKG-INFO").write_text("generated build metadata\n", encoding="utf-8")
+            self.assertEqual(gate.tree_sha256(root, package), baseline)
+
     def test_update_matrix_snapshot_accepts_digit_prefixed_revision(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             path = Path(temp_dir) / "matrix.yaml"

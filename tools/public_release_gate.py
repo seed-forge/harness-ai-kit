@@ -215,9 +215,10 @@ def tree_sha256(repo_root: Path, package: dict[str, Any]) -> str:
     for item in includes:
         path = repo_root / str(item)
         if path.is_file():
-            files.append(path)
+            if not is_ignored_path(path, repo_root):
+                files.append(path)
         elif path.is_dir():
-            files.extend(iter_files(path))
+            files.extend(path for path in iter_files(path) if not is_ignored_path(path, repo_root))
     for path in sorted(set(files), key=lambda value: value.relative_to(repo_root).as_posix()):
         relative = path.relative_to(repo_root).as_posix().encode("utf-8")
         digest.update(relative + b"\0" + hashlib.sha256(path.read_bytes()).hexdigest().encode("ascii") + b"\n")
