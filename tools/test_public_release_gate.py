@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import sys
 import tempfile
 import unittest
@@ -59,6 +60,16 @@ class PublicReleaseGateTests(unittest.TestCase):
             findings = gate.scan_release_surface(root)
         self.assertEqual(findings, [{"path": "config.txt", "line": "1", "rule": "private-network"}])
 
+    def test_release_surface_scan_ignores_package_build_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            metadata = root / "example.egg-info"
+            metadata.mkdir()
+            private_address = ".".join(("10", "1", "2", "3"))
+            (metadata / "PKG-INFO").write_text(f"endpoint = '{private_address}'\n", encoding="utf-8")
+            findings = gate.scan_release_surface(root)
+        self.assertEqual(findings, [])
+
     def test_matrix_rejects_duplicate_package_names(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
@@ -78,6 +89,21 @@ class PublicReleaseGateTests(unittest.TestCase):
             errors = gate.validate_matrix(root, matrix)
         self.assertIn("publish dependency must be in an earlier release wave: cli -> base", errors)
 
+    def test_matrix_rejects_non_string_install_command(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            package = self.make_package(root)
+            package["install_command"] = True
+            matrix = {"public": {"repository": "seed-forge/harness-ai-kit"}, "packages": [package]}
+            errors = gate.validate_matrix(root, matrix)
+        self.assertIn("install_command must be a string when set: example-cli", errors)
+
+    def test_run_command_replaces_python_placeholder_without_windows_path_escaping(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            ok, returncode = gate.run_command('{python} -c "print(123)"', Path(temp_dir))
+        self.assertTrue(ok)
+        self.assertEqual(returncode, 0)
+
     def test_staging_manifest_requires_immutable_snapshot(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
@@ -94,6 +120,26 @@ class PublicReleaseGateTests(unittest.TestCase):
             errors = gate.verify_staging_manifest(root, matrix, [package])
         self.assertIn("source_snapshot.source_revision must be an immutable 40-character commit", errors)
         self.assertIn("staging manifest digest does not match the release matrix", errors)
+
+    def test_staging_manifest_requires_revision_available_in_checkout(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            package = self.make_package(root)
+            manifest_path = root / "manifest.json"
+            manifest_path.write_text(
+                json.dumps({"schema_version": 1, "source_revision": "a" * 40, "packages": []}),
+                encoding="utf-8",
+            )
+            digest = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+            matrix = {
+                "source_snapshot": {
+                    "source_revision": "a" * 40,
+                    "staging_manifest": "manifest.json",
+                    "staging_manifest_sha256": digest,
+                }
+            }
+            errors = gate.verify_staging_manifest(root, matrix, [package])
+        self.assertIn("source_snapshot.source_revision is not available in this checkout", errors)
 
     def test_release_plan_groups_explicit_waves(self) -> None:
         matrix = {

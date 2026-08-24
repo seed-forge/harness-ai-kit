@@ -6,7 +6,8 @@ public:
   trusted_publishing: oidc
 
 # A release is intentionally impossible until these fields identify the
-# reviewed private snapshot and its committed staging manifest.
+# reviewed staging baseline and its committed release manifest. The baseline
+# can intentionally skip private-only versions.
 source_snapshot:
   source_revision: null
   staging_manifest: docs/oss-staging-manifest.json
@@ -44,52 +45,68 @@ packages:
     public: true
     ci: true
     publish: false
-    release_wave: 0
-    depends_on: []
+    release_wave: 1
+    depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
+    install_command: "{python} -m pip install ."
     test_command: "{python} -m pytest -q tests"
 
   - id: sf-evalctl
     package_name: sf-evalctl
     source_path: cli/sf-evalctl
     public: true
-    ci: false
+    ci: true
     publish: false
+    release_wave: 1
+    depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
-    hold_reason: version metadata and test suite are not release-ready
+    install_command: "{python} -m pip install ."
+    test_command: "{python} -m pytest -q tests"
 
   - id: sf-loopctl
     package_name: sf-loopctl
     source_path: cli/sf-loopctl
     public: true
-    ci: false
+    ci: true
     publish: false
-    version_sources: [pyproject, cli_json]
-    hold_reason: test suite is not release-ready
+    release_wave: 1
+    depends_on: [harness-ai-kit]
+    version_sources: [pyproject, cli_json, init]
+    install_command: "{python} -m pip install ."
+    test_command: "{python} -m pytest -q tests"
 
   - id: sf-mineructl
     package_name: sf-mineructl
     source_path: cli/sf-mineructl
     public: true
-    ci: false
+    ci: true
     publish: false
+    release_wave: 1
+    depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
-    hold_reason: version metadata and test suite are not release-ready
+    install_command: "{python} -m pip install ."
+    test_command: "{python} -m pytest -q tests"
 
   - id: sf-nexusctl
     package_name: sf-nexusctl
     source_path: cli/sf-nexusctl
     public: true
-    ci: false
+    ci: true
     publish: false
+    release_wave: 1
+    depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
-    hold_reason: version metadata and test suite are not release-ready
+    install_command: "{python} -m pip install ."
+    test_command: "{python} -m pytest -q tests"
 
   - id: sf-ragflowctl
     package_name: sf-ragflowctl
     source_path: cli/sf-ragflowctl
     public: true
-    ci: false
+    ci: true
     publish: false
+    release_wave: 1
+    depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
-    hold_reason: test suite is not release-ready
+    install_command: "{python} -m pip install ."
+    test_command: "{python} -m pytest -q tests"

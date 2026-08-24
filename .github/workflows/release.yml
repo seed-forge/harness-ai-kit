@@ -1,8 +1,6 @@
 name: Release
 
 on:
-  push:
-    tags: ["v*"]
   workflow_dispatch:
     inputs:
       channel:
@@ -34,6 +32,8 @@ jobs:
       has_wave_3: ${{ steps.plan.outputs.has_wave_3 }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
@@ -75,6 +75,9 @@ jobs:
         with:
           name: release-build
           path: build
+      - name: Require TestPyPI release before PyPI
+        if: needs.prepare.outputs.channel == 'pypi'
+        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence
       - name: Preflight immutable PyPI version
         id: preflight
         run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --github-output "$GITHUB_OUTPUT"
@@ -107,6 +110,9 @@ jobs:
         with:
           name: release-build
           path: build
+      - name: Require TestPyPI release before PyPI
+        if: needs.prepare.outputs.channel == 'pypi'
+        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence
       - name: Preflight immutable PyPI version
         id: preflight
         run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --github-output "$GITHUB_OUTPUT"
@@ -139,6 +145,9 @@ jobs:
         with:
           name: release-build
           path: build
+      - name: Require TestPyPI release before PyPI
+        if: needs.prepare.outputs.channel == 'pypi'
+        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence
       - name: Preflight immutable PyPI version
         id: preflight
         run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --github-output "$GITHUB_OUTPUT"
@@ -171,6 +180,9 @@ jobs:
         with:
           name: release-build
           path: build
+      - name: Require TestPyPI release before PyPI
+        if: needs.prepare.outputs.channel == 'pypi'
+        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence
       - name: Preflight immutable PyPI version
         id: preflight
         run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --github-output "$GITHUB_OUTPUT"

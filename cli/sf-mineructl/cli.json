@@ -3,7 +3,7 @@
   "id": "mineructl",
   "name": "mineructl",
   "owner": "seedforge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "status": "trial",
   "package_type": "cli",
   "summary": "MinerU document-parsing service ops CLI: doctor, probe, version, submit, status, result, tasks.",

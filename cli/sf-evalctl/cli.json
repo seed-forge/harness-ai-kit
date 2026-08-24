@@ -3,7 +3,7 @@
   "id": "evalctl",
   "name": "evalctl",
   "owner": "seedforge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "status": "trial",
   "package_type": "cli",
   "summary": "Eval CLI for AI / data apps: run eval sets, diff regressions, ingest real-world samples, collect feedback, generate reports.",

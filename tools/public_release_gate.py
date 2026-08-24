@@ -37,6 +37,11 @@ SCAN_RULES = (
 IGNORED_PARTS = {".git", ".venv", "venv", "build", "dist", "dist3", "__pycache__", ".pytest_cache"}
 
 
+def is_ignored_path(path: Path, root: Path) -> bool:
+    """Exclude transient files which are neither source nor release input."""
+    return any(part in IGNORED_PARTS or part.endswith(".egg-info") for part in path.relative_to(root).parts)
+
+
 def load_matrix(path: Path) -> dict[str, Any]:
     loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(loaded, dict):
@@ -55,7 +60,7 @@ def read_toml(path: Path) -> dict[str, Any]:
 
 def iter_files(root: Path) -> Iterable[Path]:
     for path in root.rglob("*"):
-        if path.is_file() and not any(part in IGNORED_PARTS for part in path.relative_to(root).parts):
+        if path.is_file() and not is_ignored_path(path, root):
             yield path
 
 
@@ -148,6 +153,8 @@ def validate_matrix(repo_root: Path, matrix: dict[str, Any]) -> list[str]:
             errors.append(f"source path is missing for {package_id}: {source_path}")
         if item.get("ci") and not isinstance(item.get("test_command"), str):
             errors.append(f"ci package is missing test_command: {package_id}")
+        if "install_command" in item and not isinstance(item.get("install_command"), str):
+            errors.append(f"install_command must be a string when set: {package_id}")
         if item.get("publish"):
             if not item.get("public"):
                 errors.append(f"publish package is not public: {package_id}")
@@ -182,13 +189,16 @@ def validate_matrix(repo_root: Path, matrix: dict[str, Any]) -> list[str]:
 
 
 def run_command(command: str, cwd: Path) -> tuple[bool, int]:
-    rendered = command.format(python=shlex.quote(sys.executable))
-    completed = subprocess.run(shlex.split(rendered), cwd=cwd, check=False)
+    rendered = command.format(python="{python}")
+    args = [sys.executable if item == "{python}" else item for item in shlex.split(rendered)]
+    completed = subprocess.run(args, cwd=cwd, check=False)
     return completed.returncode == 0, completed.returncode
 
 
 def build_package(source_root: Path, output: Path) -> tuple[bool, int]:
     output.mkdir(parents=True, exist_ok=True)
+    for artifact in (*output.glob("*.whl"), *output.glob("*.tar.gz")):
+        artifact.unlink()
     command = [sys.executable, "-m", "build", "--outdir", str(output), str(source_root)]
     completed = subprocess.run(command, cwd=source_root, check=False)
     if completed.returncode:
@@ -214,6 +224,16 @@ def tree_sha256(repo_root: Path, package: dict[str, Any]) -> str:
     return digest.hexdigest()
 
 
+def git_revision_exists(repo_root: Path, revision: str) -> bool:
+    completed = subprocess.run(
+        ["git", "-C", str(repo_root), "cat-file", "-e", f"{revision}^{{commit}}"],
+        check=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return completed.returncode == 0
+
+
 def verify_staging_manifest(repo_root: Path, matrix: dict[str, Any], packages: list[dict[str, Any]]) -> list[str]:
     errors: list[str] = []
     snapshot = matrix.get("source_snapshot") if isinstance(matrix.get("source_snapshot"), dict) else {}
@@ -222,6 +242,8 @@ def verify_staging_manifest(repo_root: Path, matrix: dict[str, Any], packages: l
     manifest_ref = snapshot.get("staging_manifest")
     if not isinstance(revision, str) or not REVISION_RE.fullmatch(revision):
         errors.append("source_snapshot.source_revision must be an immutable 40-character commit")
+    elif not git_revision_exists(repo_root, revision):
+        errors.append("source_snapshot.source_revision is not available in this checkout")
     if not isinstance(expected_digest, str) or not SHA256_RE.fullmatch(expected_digest):
         errors.append("source_snapshot.staging_manifest_sha256 must be a SHA-256 digest")
     if not isinstance(manifest_ref, str):
@@ -333,6 +355,14 @@ def gate(repo_root: Path, matrix: dict[str, Any], mode: str, build_root: Path) -
             result["status"] = "failed"
             result["errors"] = version_errors
             errors.extend(f"{package['id']}: {error}" for error in version_errors)
+        install_command = package.get("install_command")
+        if isinstance(install_command, str):
+            success, returncode = run_command(install_command, source_root)
+            result["install_returncode"] = returncode
+            if not success:
+                result["status"] = "failed"
+                result.setdefault("errors", []).append("install-command-failed")
+                errors.append(f"{package['id']}: install-command-failed")
         command = package.get("test_command")
         if isinstance(command, str):
             success, returncode = run_command(command, source_root)

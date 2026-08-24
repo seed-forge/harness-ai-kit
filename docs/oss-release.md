@@ -10,14 +10,17 @@ reviewed matrix entry.
    staging checkout, remove private operational details, and review the diff.
 2. Align `pyproject.toml`, `cli.json`, and package `__version__` where the
    package uses them. Add and run a package test command.
-3. Generate a checked staging manifest from the immutable private source
-   revision. The manifest records each selected package's name, version, and
-   source-tree SHA-256.
+3. Commit the reviewed public staging baseline, then generate a checked
+   staging manifest from that immutable commit. The manifest records each
+   selected package's name, version, and source-tree SHA-256. Private-only
+   versions may be intentionally skipped.
 4. Set `publish: true` only for the reviewed packages. It is deliberately
    `false` by default. Assign `release_wave` values so dependencies publish in
    an earlier wave.
-5. Run the release gate locally, then push a reviewed `v*` tag or use the
-   manual workflow for TestPyPI. The workflow builds packages, performs the
+5. Run the release gate locally, then use the manual workflow from the reviewed
+   commit: TestPyPI first, then PyPI. A pushed `v*` tag never publishes by
+   itself; running the production workflow from a tag additionally creates the
+   GitHub Release. The workflow builds packages, performs the
    full gate, verifies existing PyPI hashes, publishes only missing identical
    versions through OIDC, and reads hashes back before creating a GitHub
    Release.
@@ -41,14 +44,15 @@ package, configure a PyPI Trusted Publisher for each target index:
 Create matching protected GitHub environments. The `pypi` environment should
 require a human approval; `testpypi` may be less restrictive. The first real,
 approved release establishes package ownership. Do not publish a placeholder
-package to reserve a name.
+package to reserve a name. The production workflow refuses to publish a
+package version which has not first been read from TestPyPI.
 
 ## Local Commands
 
 ```bash
 python -m pip install -e . build twine pytest
 python tools/public_release_gate.py --mode ci --report build/release-gate.json
-python tools/public_release_gate.py --mode ci --package-id harness-ai-kit --source-revision <private-commit> --write-staging-manifest docs/oss-staging-manifest.json --update-matrix-snapshot
+python tools/public_release_gate.py --mode ci --source-revision <staging-commit> --write-staging-manifest docs/oss-staging-manifest.json --package-id harness-ai-kit --package-id sf-difyctl --package-id sf-evalctl --package-id sf-loopctl --package-id sf-mineructl --package-id sf-nexusctl --package-id sf-ragflowctl --update-matrix-snapshot
 python tools/public_release_gate.py --mode release --report build/release-gate.json
 ```
 

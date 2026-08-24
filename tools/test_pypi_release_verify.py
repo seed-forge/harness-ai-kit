@@ -39,6 +39,17 @@ class PyPIReleaseVerifyTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "immutable version collision"):
                 verify.verify_release("pypi", "example", "1.0.0", local, phase="preflight")
 
+    def test_existing_testpypi_release_can_satisfy_presence_gate(self) -> None:
+        with patch.object(verify, "fetch_release", return_value={"urls": []}):
+            result = verify.verify_release("testpypi", "example", "1.0.0", self.local_artifacts(), phase="presence")
+        self.assertEqual(result["status"], "present")
+        self.assertFalse(result["should_publish"])
+
+    def test_missing_testpypi_release_fails_presence_gate(self) -> None:
+        with patch.object(verify, "fetch_release", return_value=None):
+            with self.assertRaisesRegex(RuntimeError, "absent from testpypi"):
+                verify.verify_release("testpypi", "example", "1.0.0", self.local_artifacts(), phase="presence")
+
 
 if __name__ == "__main__":
     unittest.main()

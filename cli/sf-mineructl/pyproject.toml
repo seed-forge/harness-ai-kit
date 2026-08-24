@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sf-mineructl"
-version = "0.1.0"
+version = "0.1.1"
 description = "MinerU document-parsing service ops CLI: doctor, probe, version, submit, status, result, tasks."
 readme = "README.md"
 requires-python = ">=3.10"

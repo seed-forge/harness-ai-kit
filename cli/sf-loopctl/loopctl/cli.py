@@ -11,9 +11,11 @@ from pathlib import Path
 
 import click
 
+from . import __version__
+
 
 @click.group()
-@click.version_option(version="0.1.0", prog_name="loopctl")
+@click.version_option(version=__version__, prog_name="loopctl")
 def main() -> None:
     """loopctl - Loop lifecycle management CLI."""
 

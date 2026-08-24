@@ -8,6 +8,8 @@ from __future__ import annotations
 import argparse
 import sys
 
+from . import __version__
+
 _DRAFT = "[draft] 该子命令为草案骨架，尚未实现；契约见 devlab-eval-driven-agent。"
 
 
@@ -55,7 +57,7 @@ def _cmd_report(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="evalctl", description="AI/数据应用评测 CLI (draft)")
-    p.add_argument("--version", action="version", version="evalctl 0.1.0")
+    p.add_argument("--version", action="version", version=f"evalctl {__version__}")
     sub = p.add_subparsers(dest="command", required=True)
 
     sub.add_parser("doctor", help="环境自检").set_defaults(func=_cmd_doctor)

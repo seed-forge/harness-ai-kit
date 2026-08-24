@@ -78,11 +78,20 @@ def verify_release(
     """Return a publish decision or raise if an immutable release conflicts."""
     remote = fetch_release(repository, package, version)
     if remote is None:
-        if phase == "readback":
+        if phase in {"readback", "presence"}:
             raise RuntimeError(f"{package} {version} is absent from {repository} after publish")
         return {
             "status": "publish",
             "should_publish": True,
+            "package": package,
+            "version": version,
+            "repository": repository,
+        }
+
+    if phase == "presence":
+        return {
+            "status": "present",
+            "should_publish": False,
             "package": package,
             "version": version,
             "repository": repository,
@@ -131,7 +140,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--package", required=True)
     parser.add_argument("--version", required=True)
     parser.add_argument("--artifacts", type=Path, action="append", required=True)
-    parser.add_argument("--phase", choices=("preflight", "readback"), default="preflight")
+    parser.add_argument("--phase", choices=("preflight", "readback", "presence"), default="preflight")
     parser.add_argument("--github-output", type=Path)
     args = parser.parse_args(argv)
     try:

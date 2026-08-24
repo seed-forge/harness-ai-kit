@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sf-nexusctl"
-version = "0.1.0"
+version = "0.5.2"
 description = "Nexus repository ops CLI: repo CRUD, blobstore, cleanup-policy, inventory export/diff, presets, user/role management."
 readme = "README.md"
 requires-python = ">=3.10"
