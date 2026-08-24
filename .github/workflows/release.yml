@@ -97,6 +97,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: build/${{ matrix.dist_path }}/
+          repository-url: ${{ needs.prepare.outputs.channel == 'testpypi' && 'https://test.pypi.org/legacy/' || 'https://upload.pypi.org/legacy/' }}
       - name: Read back immutable PyPI files
         run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback
 
@@ -132,6 +133,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: build/${{ matrix.dist_path }}/
+          repository-url: ${{ needs.prepare.outputs.channel == 'testpypi' && 'https://test.pypi.org/legacy/' || 'https://upload.pypi.org/legacy/' }}
       - name: Read back immutable PyPI files
         run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback
 
@@ -167,6 +169,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: build/${{ matrix.dist_path }}/
+          repository-url: ${{ needs.prepare.outputs.channel == 'testpypi' && 'https://test.pypi.org/legacy/' || 'https://upload.pypi.org/legacy/' }}
       - name: Read back immutable PyPI files
         run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback
 
@@ -202,6 +205,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: build/${{ matrix.dist_path }}/
+          repository-url: ${{ needs.prepare.outputs.channel == 'testpypi' && 'https://test.pypi.org/legacy/' || 'https://upload.pypi.org/legacy/' }}
       - name: Read back immutable PyPI files
         run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback
 
