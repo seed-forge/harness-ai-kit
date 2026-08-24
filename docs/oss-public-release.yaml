@@ -9,9 +9,9 @@ public:
 # reviewed staging baseline and its committed release manifest. The baseline
 # can intentionally skip private-only versions.
 source_snapshot:
-  source_revision: null
+  source_revision: 69bce8663b91a568c5e538535323c7a1d4dacc56
   staging_manifest: docs/oss-staging-manifest.json
-  staging_manifest_sha256: null
+  staging_manifest_sha256: 0685f1d6c295ac87a93d1f2afec46b6f17a463a940e59bc10bdf43e74443203c
 
 channels:
   testpypi:
@@ -28,7 +28,7 @@ packages:
     source_path: .
     public: true
     ci: true
-    publish: false
+    publish: true
     release_wave: 0
     depends_on: []
     version_sources: [pyproject]
@@ -44,7 +44,7 @@ packages:
     source_path: cli/sf-difyctl
     public: true
     ci: true
-    publish: false
+    publish: true
     release_wave: 1
     depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
@@ -56,7 +56,7 @@ packages:
     source_path: cli/sf-evalctl
     public: true
     ci: true
-    publish: false
+    publish: true
     release_wave: 1
     depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
@@ -68,7 +68,7 @@ packages:
     source_path: cli/sf-loopctl
     public: true
     ci: true
-    publish: false
+    publish: true
     release_wave: 1
     depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
@@ -80,7 +80,7 @@ packages:
     source_path: cli/sf-mineructl
     public: true
     ci: true
-    publish: false
+    publish: true
     release_wave: 1
     depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
@@ -92,7 +92,7 @@ packages:
     source_path: cli/sf-nexusctl
     public: true
     ci: true
-    publish: false
+    publish: true
     release_wave: 1
     depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
@@ -104,7 +104,7 @@ packages:
     source_path: cli/sf-ragflowctl
     public: true
     ci: true
-    publish: false
+    publish: true
     release_wave: 1
     depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
