@@ -88,10 +88,10 @@ jobs:
           path: build
       - name: Require TestPyPI release before PyPI
         if: needs.prepare.outputs.channel == 'pypi'
-        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence
+        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
       - name: Preflight immutable PyPI version
         id: preflight
-        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --github-output "$GITHUB_OUTPUT"
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30 --github-output "$GITHUB_OUTPUT"
       - name: Publish ${{ matrix.package_name }}
         if: steps.preflight.outputs.should_publish == 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -99,7 +99,7 @@ jobs:
           packages-dir: build/${{ matrix.dist_path }}/
           repository-url: ${{ needs.prepare.outputs.channel == 'testpypi' && 'https://test.pypi.org/legacy/' || 'https://upload.pypi.org/legacy/' }}
       - name: Read back immutable PyPI files
-        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
 
   publish_wave_1:
     needs: [prepare, publish_wave_0]
@@ -124,10 +124,10 @@ jobs:
           path: build
       - name: Require TestPyPI release before PyPI
         if: needs.prepare.outputs.channel == 'pypi'
-        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence
+        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
       - name: Preflight immutable PyPI version
         id: preflight
-        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --github-output "$GITHUB_OUTPUT"
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30 --github-output "$GITHUB_OUTPUT"
       - name: Publish ${{ matrix.package_name }}
         if: steps.preflight.outputs.should_publish == 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -135,7 +135,7 @@ jobs:
           packages-dir: build/${{ matrix.dist_path }}/
           repository-url: ${{ needs.prepare.outputs.channel == 'testpypi' && 'https://test.pypi.org/legacy/' || 'https://upload.pypi.org/legacy/' }}
       - name: Read back immutable PyPI files
-        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
 
   publish_wave_2:
     needs: [prepare, publish_wave_1]
@@ -160,10 +160,10 @@ jobs:
           path: build
       - name: Require TestPyPI release before PyPI
         if: needs.prepare.outputs.channel == 'pypi'
-        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence
+        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
       - name: Preflight immutable PyPI version
         id: preflight
-        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --github-output "$GITHUB_OUTPUT"
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30 --github-output "$GITHUB_OUTPUT"
       - name: Publish ${{ matrix.package_name }}
         if: steps.preflight.outputs.should_publish == 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -171,7 +171,7 @@ jobs:
           packages-dir: build/${{ matrix.dist_path }}/
           repository-url: ${{ needs.prepare.outputs.channel == 'testpypi' && 'https://test.pypi.org/legacy/' || 'https://upload.pypi.org/legacy/' }}
       - name: Read back immutable PyPI files
-        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
 
   publish_wave_3:
     needs: [prepare, publish_wave_2]
@@ -196,10 +196,10 @@ jobs:
           path: build
       - name: Require TestPyPI release before PyPI
         if: needs.prepare.outputs.channel == 'pypi'
-        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence
+        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
       - name: Preflight immutable PyPI version
         id: preflight
-        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --github-output "$GITHUB_OUTPUT"
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30 --github-output "$GITHUB_OUTPUT"
       - name: Publish ${{ matrix.package_name }}
         if: steps.preflight.outputs.should_publish == 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -207,7 +207,7 @@ jobs:
           packages-dir: build/${{ matrix.dist_path }}/
           repository-url: ${{ needs.prepare.outputs.channel == 'testpypi' && 'https://test.pypi.org/legacy/' || 'https://upload.pypi.org/legacy/' }}
       - name: Read back immutable PyPI files
-        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback
+        run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
 
   github_release:
     needs: [prepare, publish_wave_0, publish_wave_1, publish_wave_2, publish_wave_3]

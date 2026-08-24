@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import argparse
+import email.utils
 import hashlib
 import json
+import math
 import sys
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -17,6 +21,13 @@ REPOSITORIES = {
     "pypi": "https://pypi.org/pypi",
     "testpypi": "https://test.pypi.org/pypi",
 }
+
+DEFAULT_MAX_ATTEMPTS = 6
+DEFAULT_MAX_TOTAL_SECONDS = 90.0
+DEFAULT_BASE_BACKOFF_SECONDS = 2.0
+DEFAULT_MAX_BACKOFF_SECONDS = 30.0
+REQUEST_TIMEOUT_SECONDS = 20.0
+TRANSIENT_HTTP_STATUS_CODES = frozenset({408, 425, 429, 500, 502, 503, 504})
 
 
 def artifact_hashes(paths: list[Path]) -> dict[str, str]:
@@ -33,21 +44,129 @@ def artifact_hashes(paths: list[Path]) -> dict[str, str]:
     return result
 
 
-def fetch_release(repository: str, package: str, version: str) -> dict[str, Any] | None:
-    """Fetch one exact package version, returning ``None`` when it is absent."""
-    url = f"{REPOSITORIES[repository]}/{quote(package)}/{quote(version)}/json"
+def parse_retry_after(value: str | None, *, now: datetime | None = None) -> float | None:
+    """Parse a Retry-After value as non-negative seconds."""
+    if not value:
+        return None
     try:
-        with urlopen(url, timeout=20) as response:  # nosec B310 - fixed package index URLs
-            payload = json.loads(response.read().decode("utf-8"))
-    except HTTPError as exc:
-        if exc.code == 404:
-            return None
-        raise RuntimeError(f"PyPI returned HTTP {exc.code} for {package} {version}") from exc
-    except (URLError, TimeoutError) as exc:
-        raise RuntimeError(f"could not query {repository} for {package} {version}") from exc
+        seconds = float(value.strip())
+        return max(0.0, seconds) if math.isfinite(seconds) else None
+    except ValueError:
+        pass
+    try:
+        retry_at = email.utils.parsedate_to_datetime(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if retry_at is None:
+        return None
+    if retry_at.tzinfo is None:
+        retry_at = retry_at.replace(tzinfo=timezone.utc)
+    current = now or datetime.now(timezone.utc)
+    if current.tzinfo is None:
+        current = current.replace(tzinfo=timezone.utc)
+    return max(0.0, (retry_at - current).total_seconds())
+
+
+def _pending_payload(payload: object) -> bool:
+    """Return whether a JSON response is not ready for immutable comparison."""
     if not isinstance(payload, dict):
-        raise RuntimeError(f"invalid JSON response for {package} {version}")
-    return payload
+        return True
+    urls = payload.get("urls")
+    if not isinstance(urls, list) or not urls:
+        return True
+    return not all(
+        isinstance(item, dict)
+        and isinstance(item.get("filename"), str)
+        and isinstance(item.get("digests"), dict)
+        and isinstance(item["digests"].get("sha256"), str)
+        for item in urls
+    )
+
+
+def fetch_release(
+    repository: str,
+    package: str,
+    version: str,
+    *,
+    max_attempts: int = DEFAULT_MAX_ATTEMPTS,
+    max_total_seconds: float = DEFAULT_MAX_TOTAL_SECONDS,
+    base_backoff_seconds: float = DEFAULT_BASE_BACKOFF_SECONDS,
+    max_backoff_seconds: float = DEFAULT_MAX_BACKOFF_SECONDS,
+    wait_for_404: bool = True,
+    require_files: bool = True,
+    sleep: Any = time.sleep,
+    clock: Any = time.monotonic,
+) -> dict[str, Any] | None:
+    """Fetch one exact version with bounded retries for absent or pending metadata."""
+    if max_attempts < 1:
+        raise ValueError("max_attempts must be at least 1")
+    if not all(
+        math.isfinite(value)
+        for value in (max_total_seconds, base_backoff_seconds, max_backoff_seconds)
+    ) or max_total_seconds < 0 or base_backoff_seconds < 0 or max_backoff_seconds < 0:
+        raise ValueError("retry timing values must be finite and non-negative")
+    url = f"{REPOSITORIES[repository]}/{quote(package)}/{quote(version)}/json"
+    started = clock()
+    attempts = 0
+    last_state = "unknown"
+    last_error = ""
+    while attempts < max_attempts:
+        remaining = max_total_seconds - (clock() - started)
+        if attempts and remaining <= 0:
+            break
+        attempts += 1
+        retry_after: float | None = None
+        try:
+            request_timeout = min(REQUEST_TIMEOUT_SECONDS, max(0.1, remaining))
+            with urlopen(url, timeout=request_timeout) as response:  # nosec B310 - fixed package index URLs
+                payload = json.loads(response.read().decode("utf-8"))
+                response_headers = getattr(response, "headers", None)
+                retry_after = parse_retry_after(
+                    response_headers.get("Retry-After") if response_headers else None
+                )
+            if not isinstance(payload, dict):
+                last_state = "invalid-json"
+                last_error = "response is not a JSON object"
+            elif require_files and _pending_payload(payload):
+                last_state = "pending"
+                last_error = "metadata has no complete SHA-256 release files"
+            else:
+                return payload
+        except HTTPError as exc:
+            retry_after = parse_retry_after(exc.headers.get("Retry-After") if exc.headers else None)
+            if exc.code == 404:
+                if not wait_for_404:
+                    return None
+                last_state = "404"
+                last_error = "version is not visible yet"
+            elif exc.code in TRANSIENT_HTTP_STATUS_CODES:
+                last_state = f"HTTP {exc.code}"
+                last_error = "transient index response"
+            else:
+                raise RuntimeError(f"PyPI returned HTTP {exc.code} for {package} {version}") from exc
+        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+            last_state = "invalid-json"
+            last_error = str(exc)
+        except (URLError, TimeoutError) as exc:
+            last_state = "request-error"
+            last_error = str(exc)
+
+        remaining = max_total_seconds - (clock() - started)
+        if attempts >= max_attempts or remaining <= 0:
+            break
+        delay = retry_after if retry_after is not None else min(
+            max_backoff_seconds, base_backoff_seconds * (2 ** (attempts - 1))
+        )
+        delay = min(max(0.0, delay), remaining)
+        if delay <= 0:
+            break
+        sleep(delay)
+
+    raise RuntimeError(
+        f"PyPI metadata still {last_state} for {package} {version} on {repository} "
+        f"after {attempts} attempt(s) over {max_total_seconds:g}s; {last_error}. "
+        "Check the package index and GitHub Actions publish logs."
+    )
 
 
 def remote_hashes(payload: dict[str, Any]) -> dict[str, str]:
@@ -74,9 +193,23 @@ def verify_release(
     local: dict[str, str],
     *,
     phase: str,
+    max_attempts: int = DEFAULT_MAX_ATTEMPTS,
+    max_total_seconds: float = DEFAULT_MAX_TOTAL_SECONDS,
+    base_backoff_seconds: float = DEFAULT_BASE_BACKOFF_SECONDS,
+    max_backoff_seconds: float = DEFAULT_MAX_BACKOFF_SECONDS,
 ) -> dict[str, Any]:
     """Return a publish decision or raise if an immutable release conflicts."""
-    remote = fetch_release(repository, package, version)
+    remote = fetch_release(
+        repository,
+        package,
+        version,
+        max_attempts=max_attempts,
+        max_total_seconds=max_total_seconds,
+        base_backoff_seconds=base_backoff_seconds,
+        max_backoff_seconds=max_backoff_seconds,
+        wait_for_404=phase != "preflight",
+        require_files=phase != "presence",
+    )
     if remote is None:
         if phase in {"readback", "presence"}:
             raise RuntimeError(f"{package} {version} is absent from {repository} after publish")
@@ -141,6 +274,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--version", required=True)
     parser.add_argument("--artifacts", type=Path, action="append", required=True)
     parser.add_argument("--phase", choices=("preflight", "readback", "presence"), default="preflight")
+    parser.add_argument("--max-attempts", type=int, default=DEFAULT_MAX_ATTEMPTS)
+    parser.add_argument("--max-total-seconds", type=float, default=DEFAULT_MAX_TOTAL_SECONDS)
+    parser.add_argument("--base-backoff-seconds", type=float, default=DEFAULT_BASE_BACKOFF_SECONDS)
+    parser.add_argument("--max-backoff-seconds", type=float, default=DEFAULT_MAX_BACKOFF_SECONDS)
     parser.add_argument("--github-output", type=Path)
     args = parser.parse_args(argv)
     try:
@@ -150,6 +287,10 @@ def main(argv: list[str] | None = None) -> int:
             args.version,
             artifact_hashes(args.artifacts),
             phase=args.phase,
+            max_attempts=args.max_attempts,
+            max_total_seconds=args.max_total_seconds,
+            base_backoff_seconds=args.base_backoff_seconds,
+            max_backoff_seconds=args.max_backoff_seconds,
         )
     except (OSError, RuntimeError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
