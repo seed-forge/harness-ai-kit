@@ -1,5 +1,10 @@
 # Changelog — devlab-eval-driven-agent
 
+## 0.2.1 - 2026-08-24
+
+- Public-release metadata normalization: remove internal-only execution context
+  and use the public `skill-registry` source name.
+
 ## 0.2.0 - 2026-08-14
 
 - **draft → released**：evalctl CLI 已发布（0.2.x），本技能从"规划"转"已落地"

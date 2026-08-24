@@ -80,13 +80,5 @@
     "根据项目类型选择子技能：前端 → devlab-web-test-e2e，后端 → devlab-srv-test-api，全栈 → devlab-integration-fullstack"
   ],
   "skill_type": "workflow",
-  "updated_at": "2026-08-14",
-  "execution_context": {
-    "ide": true,
-    "server": true,
-    "requires_codebase": false,
-    "requires_browser": false,
-    "requires_interactive": false,
-    "server_runtime": "cli-direct"
-  }
+  "updated_at": "2026-08-14"
 }

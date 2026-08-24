@@ -32,7 +32,7 @@ No default base URL ships with the package — you supply your own.
 |---------|---------|
 | `mineructl doctor` | Check config + service reachability |
 | `mineructl probe` / `version` | Probe the service / show its version |
-| `mineructl submit <file>` | Submit a document for parsing |
+| `mineructl submit --url <document-url>` | Submit a document for parsing |
 | `mineructl status <task>` | Poll a task's status |
 | `mineructl result <task>` | Fetch a finished task's result |
 | `mineructl tasks` | List recent tasks |

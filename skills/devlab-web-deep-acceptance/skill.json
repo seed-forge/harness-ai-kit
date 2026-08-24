@@ -77,13 +77,5 @@
   "contributors": [],
   "skill_type": "workflow",
   "agents_md_inject": "",
-  "updated_at": "2026-08-14",
-  "execution_context": {
-    "ide": true,
-    "server": false,
-    "requires_codebase": false,
-    "requires_browser": true,
-    "requires_interactive": false,
-    "server_runtime": null
-  }
+  "updated_at": "2026-08-14"
 }

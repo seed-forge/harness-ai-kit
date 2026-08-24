@@ -14,13 +14,5 @@
     "prompt",
     "eval"
   ],
-  "summary": "AI Agent / LLM 应用工程化方法论：分层管道、规则优先+LLM兜底、多模型触点路由、Prompt 统一治理、超时/缓存/降级、评测闭环、多厂商 SDK 适配。各领域（NL2SQL/RPA/数字人语音）作为独立 reference。",
-  "execution_context": {
-    "ide": true,
-    "server": true,
-    "requires_codebase": false,
-    "requires_browser": false,
-    "requires_interactive": false,
-    "server_runtime": "cli-direct"
-  }
+  "summary": "AI Agent / LLM 应用工程化方法论：分层管道、规则优先+LLM兜底、多模型触点路由、Prompt 统一治理、超时/缓存/降级、评测闭环、多厂商 SDK 适配。各领域（NL2SQL/RPA/数字人语音）作为独立 reference。"
 }

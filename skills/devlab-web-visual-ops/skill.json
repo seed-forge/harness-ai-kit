@@ -101,13 +101,5 @@
   "agents_md_inject": "",
   "config_schema": "config.defaults.yaml",
   "skill_type": "workflow",
-  "execution_context": {
-    "ide": true,
-    "server": false,
-    "requires_codebase": false,
-    "requires_browser": true,
-    "requires_interactive": false,
-    "server_runtime": null
-  },
   "updated_at": "2026-08-14"
 }

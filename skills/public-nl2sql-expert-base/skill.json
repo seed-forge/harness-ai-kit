@@ -29,7 +29,7 @@
   "dependencies": [],
   "sources": {
     "preferred": [
-      "team-skill-registry",
+      "skill-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -56,13 +56,5 @@
     "Typically hidden from IDE listings and merged into extending skills.",
     "Load reference files per topic area as needed."
   ],
-  "updated_at": "2026-08-14",
-  "execution_context": {
-    "ide": true,
-    "server": false,
-    "requires_codebase": false,
-    "requires_browser": false,
-    "requires_interactive": false,
-    "server_runtime": null
-  }
+  "updated_at": "2026-08-14"
 }

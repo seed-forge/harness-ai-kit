@@ -9,7 +9,7 @@ Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>`
 
 > Build Less, Compose More — the **REMIX** methodology (Reuse · Extend · Mix · Integrate · eXecute): these assets compose open-source tools and community skills rather than reimplement them.
 
-## Skills (56)
+## Skills (57)
 
 ### Database & Middleware Expertise (11)
 

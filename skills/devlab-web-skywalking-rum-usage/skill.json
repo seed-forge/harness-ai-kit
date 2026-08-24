@@ -44,13 +44,5 @@
   ],
   "skill_type": "operational",
   "updated_at": "2026-08-14",
-  "config_schema": "config.defaults.yaml",
-  "execution_context": {
-    "ide": true,
-    "server": false,
-    "requires_codebase": false,
-    "requires_browser": true,
-    "requires_interactive": false,
-    "server_runtime": null
-  }
+  "config_schema": "config.defaults.yaml"
 }

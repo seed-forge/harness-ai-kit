@@ -37,7 +37,7 @@
   ],
   "sources": {
     "preferred": [
-      "team-skill-registry"
+      "skill-registry"
     ],
     "allow_fallback": true
   },
@@ -56,13 +56,5 @@
     "不负责权利要求书撰写"
   ],
   "post_install_hints": [],
-  "updated_at": "2026-08-14",
-  "execution_context": {
-    "ide": true,
-    "server": false,
-    "requires_codebase": false,
-    "requires_browser": false,
-    "requires_interactive": false,
-    "server_runtime": null
-  }
+  "updated_at": "2026-08-14"
 }

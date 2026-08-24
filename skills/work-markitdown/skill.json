@@ -36,7 +36,7 @@
   ],
   "sources": {
     "preferred": [
-      "team-skill-registry",
+      "skill-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -81,13 +81,5 @@
     "Verify python -m markitdown --help runs successfully.",
     "Check that .agents/tools/markitdown.cmd exists in the target workspace."
   ],
-  "updated_at": "2026-08-14",
-  "execution_context": {
-    "ide": true,
-    "server": false,
-    "requires_codebase": false,
-    "requires_browser": false,
-    "requires_interactive": false,
-    "server_runtime": null
-  }
+  "updated_at": "2026-08-14"
 }

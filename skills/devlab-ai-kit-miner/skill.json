@@ -63,13 +63,5 @@
     "复盘输出草案后，可用 harness-ai-kit-forge 接手创建资产"
   ],
   "skill_type": "operational",
-  "updated_at": "2026-08-14",
-  "execution_context": {
-    "ide": true,
-    "server": true,
-    "requires_codebase": false,
-    "requires_browser": false,
-    "requires_interactive": false,
-    "server_runtime": "cli-direct"
-  }
+  "updated_at": "2026-08-14"
 }

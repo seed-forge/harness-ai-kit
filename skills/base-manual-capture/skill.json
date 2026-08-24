@@ -42,13 +42,5 @@
     "Never write real credentials into the ledger or trace; follow references/REFERENCE-REDACTION-RULES.md.",
     "Beware of common pitfalls: polling SPA timeouts, headless layout collapse, route guard redirects, Windows GBK printing crashes, toast capture timing."
   ],
-  "updated_at": "2026-08-14",
-  "execution_context": {
-    "ide": true,
-    "server": true,
-    "requires_codebase": false,
-    "requires_browser": true,
-    "requires_interactive": true,
-    "server_runtime": "cli-direct"
-  }
+  "updated_at": "2026-08-14"
 }

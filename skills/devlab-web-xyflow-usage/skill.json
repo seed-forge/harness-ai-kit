@@ -54,13 +54,5 @@
     "See SKILL.md for core concepts and custom node patterns",
     "See references/REFERENCE-PITFALLS.md for troubleshooting"
   ],
-  "updated_at": "2026-08-14",
-  "execution_context": {
-    "ide": true,
-    "server": false,
-    "requires_codebase": false,
-    "requires_browser": true,
-    "requires_interactive": false,
-    "server_runtime": null
-  }
+  "updated_at": "2026-08-14"
 }

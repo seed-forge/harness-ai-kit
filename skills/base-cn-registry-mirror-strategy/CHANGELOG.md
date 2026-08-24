@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.7 - 2026-08-24
+
+- Public-release metadata normalization: remove internal-only execution context
+  and use the public `skill-registry` source name.
+
 ## 0.1.6 - 2026-08-14
 
 - frontmatter 规范化：SKILL.md 统一 LF / 无 BOM / 单一 YAML frontmatter 块，修复 AI IDE 加载告警（missing YAML frontmatter delimited by ---）。

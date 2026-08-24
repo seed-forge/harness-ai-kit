@@ -47,13 +47,5 @@
     "data-safety",
     "rollback"
   ],
-  "entry": "SKILL.md",
-  "execution_context": {
-    "ide": true,
-    "server": true,
-    "requires_codebase": false,
-    "requires_browser": false,
-    "requires_interactive": false,
-    "server_runtime": "cli-direct"
-  }
+  "entry": "SKILL.md"
 }

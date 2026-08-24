@@ -65,7 +65,87 @@ LOCKFILE_NAME = active_product_profile().lockfile_name
 SELF_CLI_PACKAGE_NAME = active_product_profile().self_cli_package_name
 
 
+def _exact_repo_file(repo_root: Path, name: str) -> Path | None:
+    """Return a root file only when its on-disk spelling matches exactly.
+
+    Public repositories use ``CATALOG.md`` while internal checkouts use
+    ``catalog.md``. Windows resolves both spellings to the same path, so
+    ``Path.exists()`` alone cannot distinguish the two repository contracts.
+    """
+    try:
+        return next(
+            (path for path in repo_root.iterdir() if path.is_file() and path.name == name),
+            None,
+        )
+    except OSError:
+        return None
+
+
+def public_catalog_path(repo_root: Path) -> Path | None:
+    """Return the public catalog when this checkout uses the public layout."""
+    public_catalog = _exact_repo_file(repo_root, "CATALOG.md")
+    private_catalog = _exact_repo_file(repo_root, "catalog.md")
+    return public_catalog if public_catalog is not None and private_catalog is None else None
+
+
+def public_catalog_asset_ids(catalog_path: Path) -> set[str]:
+    """Read asset IDs from the public, description-only catalog table."""
+    asset_ids: set[str] = set()
+    for raw_line in catalog_path.read_text(encoding="utf-8").splitlines():
+        match = re.match(r"^\|\s*`([^`]+)`\s*\|", raw_line)
+        if match:
+            asset_ids.add(match.group(1))
+    return asset_ids
+
+
+def public_doctor_versions_results(repo_root: Path, catalog_path: Path) -> list[dict[str, str]]:
+    """Validate version records for the intentionally smaller public layout."""
+    results: list[dict[str, str]] = []
+    catalog_ids = public_catalog_asset_ids(catalog_path)
+
+    for record in load_skill_inventory(repo_root).values():
+        changelog_version = read_top_changelog_version(record.path / "CHANGELOG.md") if record.path else None
+        if changelog_version == record.version:
+            changelog_status = "success"
+            changelog_message = f"skill.json={record.version}; CHANGELOG.md={changelog_version}"
+        else:
+            changelog_status = "error"
+            changelog_message = f"skill.json={record.version}; CHANGELOG.md={changelog_version or '<missing>'}"
+        results.append(
+            {
+                "subject": f"skill:{record.skill_id}:changelog",
+                "status": changelog_status,
+                "message": changelog_message,
+            }
+        )
+
+        listed = record.skill_id in catalog_ids
+        results.append(
+            {
+                "subject": f"skill:{record.skill_id}:catalog",
+                "status": "success" if listed else "error",
+                "message": (
+                    f"skill.json={record.version}; CATALOG.md={'listed' if listed else '<missing>'}"
+                ),
+            }
+        )
+
+    project_version = read_project_version(pyproject_path(repo_root))
+    results.append(
+        {
+            "subject": "package:harness-ai-kit:pyproject",
+            "status": "success" if project_version else "error",
+            "message": f"pyproject.toml={project_version or '<missing>'}; public package layout",
+        }
+    )
+    return results
+
+
 def doctor_versions_results(repo_root: Path) -> list[dict[str, str]]:
+    public_catalog = public_catalog_path(repo_root)
+    if public_catalog is not None:
+        return public_doctor_versions_results(repo_root, public_catalog)
+
     results: list[dict[str, str]] = []
     catalog_map = catalog_versions(repo_root / "catalog.md")
 

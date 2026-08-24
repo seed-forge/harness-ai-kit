@@ -46,13 +46,5 @@
   "post_install_hints": [
     "Use this skill as the drafting layer; pair it with `patent-disclosure-workflow` for intake, polishing, and export orchestration."
   ],
-  "updated_at": "2026-05-14",
-  "execution_context": {
-    "ide": true,
-    "server": false,
-    "requires_codebase": false,
-    "requires_browser": false,
-    "requires_interactive": false,
-    "server_runtime": null
-  }
+  "updated_at": "2026-05-14"
 }

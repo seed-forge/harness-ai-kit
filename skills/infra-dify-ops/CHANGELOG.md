@@ -1,5 +1,10 @@
 # 变更记录
 
+## 0.6.2 - 2026-08-24
+
+- 公共发布元数据规范化：移除内部执行上下文，registry 来源改为公开
+  `skill-registry` 名称。
+
 ## 0.6.1 - 2026-08-14
 
 - frontmatter 规范化：SKILL.md 统一 LF / 无 BOM / 单一 YAML frontmatter 块，修复 AI IDE 加载告警（missing YAML frontmatter delimited by ---）。

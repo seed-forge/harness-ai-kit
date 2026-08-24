@@ -59,13 +59,5 @@
       "direction": "outbound",
       "contract": "发布/废弃/同步、bump 版本、lock 刷新"
     }
-  ],
-  "execution_context": {
-    "ide": true,
-    "server": true,
-    "requires_codebase": false,
-    "requires_browser": false,
-    "requires_interactive": false,
-    "server_runtime": "cli-direct"
-  }
+  ]
 }
