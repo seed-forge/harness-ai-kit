@@ -11,7 +11,10 @@
 ```js
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production' ? '/sub-app/' : '/',
-  devServer: { port: 21011, host: '0.0.0.0' },
+  devServer: {
+    port: Number(process.env.PORT || 21011),
+    host: process.env.HOST || '127.0.0.1',
+  },
   transpileDependencies: true,
   chainWebpack: (config) => {
     config.optimization.splitChunks({ chunks: 'all' })

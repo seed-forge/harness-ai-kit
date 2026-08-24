@@ -15,7 +15,7 @@
 ## Prerequisites
 - Node ≥ 18 + `npx playwright install chromium`。
 - 项目侧配置 `assets.devlab-web-visual-ops`（preview_base_url / preview_start_command / stagehand_enabled 等），详见 config.defaults.yaml。
-- Stagehand 本地模式（可选）：Node ≥ 22.18.0 + `newapi_base_url` / `newapi_api_key`(secret) / `stagehand_model` 配置；零 Browserbase 依赖（localBrowser + generate callback，spike 2026-08-14 验证）。
+- Stagehand 本地模式（可选）：Node ≥ 22.18.0 + `newapi_base_url` / `newapi_api_key`(secret) / `stagehand_model` 配置；零 Browserbase 依赖（localBrowser + generate callback，spike 2026-08-14 验证）。LLM 选型与 key 引用 infra-aimodel-ops。
 - Vision/CUA 视觉兜底（可选）：`vision_model`（默认 mimo-v2.5-pro）复用同一 newapi 消费配置；截图 + 视觉模型 + forced tool call 实现元素定位/坐标点击/视觉审查（spike 2026-08-14 验证，误差 <1px）。
 
 ## 可直接复制的中文 Prompt

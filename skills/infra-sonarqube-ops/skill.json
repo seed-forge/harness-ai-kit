@@ -3,7 +3,7 @@
   "id": "infra-sonarqube-ops",
   "name": "infra-sonarqube-ops",
   "owner": "seedforge",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -48,7 +48,7 @@
     "配套 CLI sonarqubectl 可简化日常操作"
   ],
   "skill_type": "operational",
-  "updated_at": "2026-08-14",
+  "updated_at": "2026-08-20",
   "config_schema": "config.defaults.yaml",
   "companion_cli": "sonarqubectl"
 }

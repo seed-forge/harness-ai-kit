@@ -628,3 +628,9 @@ difyctl app run --app-id <id> --mode workflow --inputs '{"query":"..."}'
 - **依赖 dify-sandbox**：Code 与 Template-Transform 节点都在 `dify-sandbox` 里执行；曾遇 `-500 fork/exec /usr/local/bin/python3`（sandbox 缺 python3，拖垮所有含 Code/Template 的 workflow），修复 sandbox 后恢复。
 - **超时**：全链 50-65s；difyctl 默认超时已调到 **120s**（0.12.2+），或 `app run --timeout` 单次覆盖。真机 GREEN：56-73s、带来源 URL。
 - 规避：单段 `SearXNG→LLM`（json 已含 content 摘要）无需 sandbox、更快，适合多数问答；两段式用于需要读全文的深研。
+
+
+## 参考文档
+
+- [REFERENCE-DSL-AUTHORING.md](references/REFERENCE-DSL-AUTHORING.md)
+- [REFERENCE-DSL-GOTCHAS.md](references/REFERENCE-DSL-GOTCHAS.md)

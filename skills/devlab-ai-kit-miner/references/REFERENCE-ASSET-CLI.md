@@ -24,19 +24,19 @@ cli/{id}/
 
 | 字段 | 说明 | 示例 |
 |------|------|------|
-| `id` | 唯一标识 | `"nexusctl"` |
+| `id` | 唯一标识 | `"devlab-tool-codegen"` |
 | `name` | 人类可读名称 | `"代码生成器"` |
 | `version` | 语义化版本 | `"0.1.0"` |
 | `status` | `draft` / `trial` / `stable` | `"trial"` |
 | `package_type` | 固定 `"cli"` | `"cli"` |
 | `install_type` | `python-package` / `binary-release` | `"python-package"` |
-| `package_name` | PyPI 包名 | `"sf-nexusctl"` |
+| `package_name` | PyPI 包名 | `"devlab-codegen"` |
 | `summary` | 一句话说明 | — |
 
 ## CLI 命名规范
 
-- ID：`devlab-tool-{function}`（如 `nexusctl`）
-- PyPI 包名：`{function-short-name}`（如 `sf-nexusctl`）
+- ID：`devlab-tool-{function}`（如 `devlab-tool-codegen`）
+- PyPI 包名：`{function-short-name}`（如 `devlab-codegen`）
 - 命令名：短小精悍，可用缩写（如 `codegen`）
 
 ## 配套 Skill 要求

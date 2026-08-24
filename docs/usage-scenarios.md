@@ -37,7 +37,7 @@ You: "重构这个模块的数据访问层，消除 god-class"
         │  decompose → match skills
         ▼
    ┌─────────────────────────────────────────────┐
-   │ requirements.md   → devlab-spec-driven-dev   │
+   │ requirements.md   → SDD framework            │
    │ design.md         → devlab-tech-debt-ops     │
    │ tasks.md (DB)     → public-mysql-expert-base │
    │ verify            → devlab-eval-driven-agent │
@@ -48,12 +48,11 @@ You: "重构这个模块的数据访问层，消除 god-class"
 
 **Flow 1 — Feature/refactor with spec discipline**
 ```bash
-harness-ai-kit add skill devlab-spec-driven-dev
 harness-ai-kit add skill devlab-tech-debt-ops
 harness-ai-kit sync
 ```
 Then in your SDD framework: *"按 spec 驱动方式做这个重构：先出 requirements/design/tasks，我确认后再执行。"*
-The framework loads `devlab-spec-driven-dev` for the workflow discipline and
+Use your SDD framework for the requirements/design/tasks discipline, then use
 `devlab-tech-debt-ops` for the refactor method.
 
 **Flow 2 — Production incident**
@@ -121,7 +120,7 @@ pipeline, invoke the relevant `diag-*` skill, generate a fix, run verification, 
 |--------------|-----|
 | Give your AI domain expertise (DB, Git, NL2SQL) | a `public-*-expert-base` skill |
 | Troubleshoot a specific production failure | a `diag-*` skill |
-| Run a disciplined feature/refactor workflow | `devlab-spec-driven-dev` + an SDD framework |
+| Run a disciplined feature/refactor workflow | an SDD framework + `devlab-tech-debt-ops` |
 | Draft a patent / copyright / SOP document | a `patent-*` / `work-sc-*` / `document-*` skill |
 | Automate a repeat-until-converged workflow | a **loop** (v0.2) bound to your runtime |
 

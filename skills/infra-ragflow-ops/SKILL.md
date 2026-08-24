@@ -20,15 +20,15 @@ description: RAGFlow 平台运维技能。凡是用户提到 RAGFlow、ragflowct
 
 | 配置项 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
-| `ragflow_url` | string | ✅ | RAGFlow 服务 URL（默认 `http://<service-url>:11281`） |
+| `ragflow_url` | string | ✅ | RAGFlow 服务 URL（默认 `http://ragflow.{base_domain}:11281`） |
 
 配套 CLI：`ragflowctl`（配置来源：`~/.harness-ai-kit/config.yaml` → `assets.ragflowctl`）
 
 ## 边界
 
 - 本 skill 负责：RAGFlow 服务健康、dataset/知识库 API 探活、模型/向量库/对象存储依赖检查、运行台账。
-- 模型消费统一走任一 OpenAI 兼容网关（provider=`OpenAI-API-Compatible`）。
-- 数据库/向量库/对象存储连接由你自有的数据源与对象存储（MinIO/S3）提供。
+- 模型消费规则交给 `infra-aimodel-ops`。
+- 数据库/向量库/对象存储连接规则交给 `infra-datasource-ops` 和 `infra-minio-ops`。
 
 
 ## 推荐输出格式
@@ -36,7 +36,7 @@ description: RAGFlow 平台运维技能。凡是用户提到 RAGFlow、ragflowct
 执行完毕后输出极简回执：**状态**（✅ 成功 / ⚠️ 部分成功 / ❌ 失败）+ **关键结果**（1-2 行，如操作对象、产出位置、下一步）。无需强制套用大表格。
 ## 操作顺序
 
-1. 运行 `ragflowctl doctor --profile default --json`。
+1. 运行 `ragflowctl doctor --profile 组织内部集群 --json`。
 2. 检查依赖：模型 endpoint、数据库、向量库、对象存储。
 3. 只读列 dataset/知识库，再评估是否需要变更。
 4. 变更前输出 dry-run 计划。
@@ -52,7 +52,7 @@ v0.26 起 RAGFlow 模型管理重构为 provider/instance/model 三级（`tenant
 - `llm remove-provider`：连实例/模型整体删除
 - `dataset set-embedding`：存量库 embedding 引用重绑（同模型换服务后端向量兼容，无需重建索引）
 
-模型选型与消费统一走任一 OpenAI 兼容网关（provider=`OpenAI-API-Compatible`）。
+模型选型与消费 token 遵循 `infra-aimodel-ops` 场景矩阵；组织内部集群 默认统一走 newapi 入口（provider=`OpenAI-API-Compatible`）。
 
 ## 能力地图（v0.26：不止是知识库 RAG）
 
@@ -62,3 +62,30 @@ v0.26 的 RAGFlow 是 **RAG-native 智能体平台**：知识库底座 + agent �
 - references/REFERENCE-RAGFLOW-AGENT-AND-ALGORITHMS.md（能力地图：agent 组件/模板、RAG 算法速查、召回与入库纪律、Dify/自研 agent 分工、扩展 backlog）
 - references/REFERENCE-PARSER-CONFIG.md（parser_config 全参数 + chunk method×场景矩阵 + 场景推荐配置）
 - references/REFERENCE-RAGFLOWCTL-CLI.md
+
+
+## 用途
+
+<!-- TODO: 描述本技能解决的重复性工作和触发场景 -->
+
+## 工作流
+
+<!-- TODO: 列出执行步骤 -->
+
+1. ...
+2. ...
+3. ...
+
+## 约束与边界
+
+<!-- TODO: 说明前提假设和能力边界 -->
+
+- ...
+- **环境适配**：主机名 <host>/<host> 为逻辑名示例；IP/域名使用占位符（`{hs_host}`/`{base_domain}`/`{root_domain}` 等），解析自 `~/.harness-ai-kit/config.yaml` 顶层字段，规范见 docs/config-governance.md。
+
+
+## 参考文档
+
+- [REFERENCE-PARSER-CONFIG.md](references/REFERENCE-PARSER-CONFIG.md)
+- [REFERENCE-RAGFLOW-AGENT-AND-ALGORITHMS.md](references/REFERENCE-RAGFLOW-AGENT-AND-ALGORITHMS.md)
+- [REFERENCE-RAGFLOWCTL-CLI.md](references/REFERENCE-RAGFLOWCTL-CLI.md)

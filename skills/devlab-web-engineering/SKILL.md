@@ -16,6 +16,8 @@ Web / 前端工程化能力层。从工程化六域入手，覆盖项目初始�
 
 ## 触发条件
 
+需要输出 Web 技术、集成或安全架构图时，消费 `base-diagram-ops` 的 `web`、`integration`、`security` profile；本技能提供 Web 工程事实，不实现图布局或导出器。
+
 - 用户说"初始化前端项目工程""配构建配置""帮我打包前端""工程化规范"
 - 新项目需要工程化引导（识别语言×框架后路由到对应 profile）
 - 现有项目构建/打包/容器化/微前端排障（构建失败、产物异常、镜像路径等）
@@ -131,7 +133,7 @@ Phase 3: 验证闭环（内建）→ verification_report（脚本验证 + 构建
   B. 仅官方源
   → 你的选择: ____
 
-**D5. API 地址**（默认从 基础设施配置源(registry/API 地址) 读推荐值，非必问）
+**D5. API 地址**（默认从 devlab-infra-usage 读推荐值，非必问）
   → 确认: ____
 
 **D6. 环境变量规范**
@@ -175,18 +177,32 @@ decisions:
 | QA 验收、质量门禁、上线前检查 | `devlab-qa-ops` |
 | 测试体系搭建 / E2E 用例 | `devlab-test-onboard` / `devlab-web-test-e2e` |
 | Web↔Server 契约（接口/序列化一致性） | `devlab-contract-web-server` |
-| CI/CD 管线编排 | `你的 CI/CD 接入流程` |
+| CI/CD 管线编排 | `devlab-cicd-onboard` |
 | 浏览器扩展（WebExtension/MV3） | `devlab-web-extension-bootstrap` |
 | State Management 方案选型（业务架构决策） | 业务架构/领域设计（暂无专有资产，不建实体） |
-| 基础设施信息查询（Nexus/registry/API 地址） | `基础设施配置源(registry/API 地址)` |
+| 基础设施信息查询（Nexus/registry/API 地址） | `devlab-infra-usage` |
+
+## 可观测性接入基线
+
+本技能不直接部署监控后端或把业务 telemetry 发往任意硬编码地址。Web 项目统一由 `devlab-observability-onboard` 编排：基础设施 profile 由 `devlab-infra-usage` 提供，后端 OTLP 由 `infra-otlp-ops` 执行，前端错误/RUM/性能按项目路由到 `infra-glitchtip-ops` 或 `devlab-web-skywalking-rum-usage`。
+
+前端交付前必须明确以下信号：
+
+- **浏览器性能**：记录 Web Vitals、资源/导航耗时和前端路由变化；标签和事件属性使用页面/路由模板等低基数值，不上传完整 query、用户输入或隐私字段。
+- **前端错误**：统一错误边界、未处理 Promise rejection 和资源加载错误；错误事件带 release、environment、route 和可关联 trace/request id，源码映射只由受控构建流程上传。
+- **日志**：生产不依赖 `console.log` 作为日志管道；调试日志默认关闭或受运行时开关控制，禁止在浏览器端输出 token、Cookie、Authorization 和完整 API 响应。
+- **告警**：前端错误率、关键交互失败和 Web Vitals 阈值由错误追踪/中心告警平台管理，业务代码只上报事件，不直接调用通知渠道。
+- **Trace/RUM**：浏览器不得直连内部 OTLP Collector；通过批准的同源 tunnel、后端代理或 RUM 专用入口发送，并在 `.platform/observability.yml` 声明数据域和采样策略。
+
+验收至少覆盖：生产构建不泄露 secret、一次真实页面访问产生性能/错误证据、敏感字段未进入事件、release 与 source map 可关联，以及后端 Trace（如启用）能通过 request/trace id 关联。
 
 ## Integration Points
 
 | 目标资产 | 类型 | 方向 | 契约（输入→输出） |
 |---------|------|------|-----------------|
-| `基础设施配置源(registry/API 地址)` | skill | outbound | 查询 registry 地址/凭据/API 推荐值 → 仓库与环境配置 |
+| `devlab-infra-usage` | skill | outbound | 查询 registry 地址/凭据/API 推荐值 → 仓库与环境配置 |
 | `devlab-web-context` | skill | inbound/outbound | 模式A：被委托按 profiles/ 规则扫描 → 画像；工程化改动前消费 context 画像 |
-| `你的 CI/CD 接入流程` | skill | outbound | 构建配置完成后 → CI/CD 管线接入 |
+| `devlab-cicd-onboard` | skill | outbound | 构建配置完成后 → CI/CD 管线接入 |
 | `devlab-project-bootstrap` | skill | inbound | Phase 4 编排路由 → 本技能执行前端工程化初始化 |
 | `devlab-qa-ops` | skill | outbound | 工程化交付后 QA 验收（横向 web/srv） |
 | `devlab-ui-taste-ops` | skill | outbound | UI 精修/设计边界（组件工程结构归本技能，视觉/交互归 ui-taste-ops） |
@@ -202,7 +218,7 @@ decisions:
 - **不自动修改业务代码**：只生成/修改工程配置文件与脚本，不改 src/ 目录业务代码。
 - **不覆盖已有脚本**：检测到同名文件时提示用户选择。
 - **不包含私有信息**：生成的 .env.local.example 只有占位符；registry/API 地址从
-  基础设施配置源(registry/API 地址) 获取，不硬编码。
+  devlab-infra-usage 获取，不硬编码。
 - **增量生成**：已有部分脚本时只补充缺失的。
 - **Bash 兼容性**：要求 Bash 4.0+，兼容 Linux/macOS。
 - **交互限制**：最多 8 个决策点（D0-D7），不确定时用合理默认值。
@@ -211,12 +227,12 @@ decisions:
 
 ## 配置上下文
 
-本技能运行时配置通过 `基础设施配置源(registry/API 地址)` 技能获取，包括：
+本技能运行时配置通过 `devlab-infra-usage` 技能获取，包括：
 - 私有 npm registry 地址与凭据（.npmrc 配置模板）
-- 推荐 API 地址（基础设施配置源(registry/API 地址) 查询）
+- 推荐 API 地址（devlab-infra-usage 查询）
 - 部署目标信息
 
-配置优先级：`基础设施配置源(registry/API 地址)` 查询结果 > 项目已有配置 > 本技能默认值。
+配置优先级：`devlab-infra-usage` 查询结果 > 项目已有配置 > 本技能默认值。
 
 ## 专题引用
 

@@ -282,7 +282,7 @@ console.log(import.meta.env.VITE_APP_TITLE);
 ```bash
 # 开发服务器
 vite
-vite --host 0.0.0.0 --port 3000
+HOST="${HOST:-127.0.0.1}" PORT="${PORT:-3000}" vite --host "$HOST" --port "$PORT" --strictPort
 
 # 生产构建
 vite build

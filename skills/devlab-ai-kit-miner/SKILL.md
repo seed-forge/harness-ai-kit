@@ -30,6 +30,8 @@ description: Review completed dev sessions to decide whether work should be dist
 - 建议的沉淀位置：项目级 / 团队共享
 - 候选资产的最小规格草案
 - 与现有 `devlab-*` 资产的关系（新增 / 补充 / 桥接 / 重复）
+- 演进处置分类：`patch-existing` / `create-new` / `reject-local-only`；其中前两类才生成 `candidate/v1`，`reject-local-only` 只保留本地记录
+- 已脱敏的 evidence 引用、基线 Skill 版本、最小变更摘要和建议评测 case
 
 ## 工作流
 
@@ -41,7 +43,7 @@ description: Review completed dev sessions to decide whether work should be dist
 6. 与现有 `devlab-*` 资产对照（新增 / 补充 / 桥接 / 重复 / 不沉淀）。
 7. 判断资产类型 → 查阅对应 reference 获取详细规范。
 8. 判断沉淀位置（项目级 vs 团队共享）。
-9. 输出结论和最小规格草案。
+9. 输出结论、最小规格草案和 evidence-backed candidate manifest 草案。
 
 ## 资产类型决策矩阵
 
@@ -73,9 +75,9 @@ description: Review completed dev sessions to decide whether work should be dist
 
 | 前缀 | 领域 | 示例 |
 |------|------|------|
-| `devlab-srv-*` | 后端 / 服务（API、业务逻辑、中间件集成） | `devlab-srv-test-api` |
-| `devlab-web-*` | 网站 / Web 应用（页面、组件、前端框架） | `devlab-web-test-e2e` |
-| `devlab-tool-*` | 开发工具（脚手架、代码生成、工程化脚本） | `nexusctl` |
+| `devlab-srv-*` | 后端 / 服务（API、业务逻辑、中间件集成） | `devlab-srv-spring-boot-sop` |
+| `devlab-web-*` | 网站 / Web 应用（页面、组件、前端框架） | `devlab-web-react-sop` |
+| `devlab-tool-*` | 开发工具（脚手架、代码生成、工程化脚本） | `devlab-tool-codegen-sop` |
 | `devlab-cicd-*` | CI/CD 编排（构建、部署、流水线配置） | `devlab-cicd-onboard` |
 | `devlab-*`（省略二级） | 不归属特定技术栈 | `devlab-srv-reliability-ops` |
 
@@ -96,13 +98,17 @@ description: Review completed dev sessions to decide whether work should be dist
 
 ## 与 harness-ai-kit-forge 的接力
 
-本技能负责**复盘提炼**阶段，输出资产草案。如需实际创建资产（骨架生成 → validate → publish），由 `harness-ai-kit-forge` 接手。
+本技能负责**复盘提炼**阶段，输出脱敏证据和 candidate 草案，不直接修改正式 Skill。
+`patch-existing` 交给 `harness-ai-kit-maintainer`，`create-new` 经用户确认后交给
+`harness-ai-kit-forge`，`reject-local-only` 只保留项目级记录。
 
 ```
-devlab-ai-kit-miner 复盘输出草案
+devlab-ai-kit-miner 复盘输出 evidence + candidate/v1 草案
         │
-        ▼ (用户确认后衔接)
-harness-ai-kit-forge 接收草案 → 生成骨架 → validate → publish
+        ▼ (harness-ai-kit-evolution-ops 编排评测与 review)
+patch-existing → harness-ai-kit-maintainer
+create-new    → harness-ai-kit-forge
+reject-local-only → 不进入共享资产
 ```
 
 ## 团队共享资产必要条件
@@ -112,6 +118,7 @@ harness-ai-kit-forge 接收草案 → 生成骨架 → validate → publish
 3. `CHANGELOG.md` 记录版本历史
 4. 不含私有路径、凭证、个人习惯
 5. 输入输出可被其他团队成员理解
+6. 来源脱敏：正文 / CHANGELOG / 元数据不得深度包含具体项目名、产品名、会话 ID、内部域名或路径；来源用匿名化表述（如"某上游产品二开项目（已脱敏）"），量化锚点可保留
 
 ## 约束
 
@@ -119,7 +126,10 @@ harness-ai-kit-forge 接收草案 → 生成骨架 → validate → publish
 - 先检查 `harness-ai-kit/skills/` 和 `.claude/skills/` 是否已有可复用资产。
 - 沉淀到团队仓库必须有对应的 metadata 文件 + `USAGE.md` + `CHANGELOG.md`。
 - 涉及私有路径、凭证、个人习惯的内容不得进入团队共享。
+- 涉及具体项目/产品的反哺内容必须先脱敏再沉淀：项目名、产品名、会话 ID、内部域名与路径一律匿名化（如"某上游产品二开项目（已脱敏）"），量化证据可保留。
 - 不要只根据最后一轮消息做复盘；默认结合 session 连续历史。
+- 不得把未脱敏 trace/session、凭据、内部路径或一次性项目偏好写入 candidate 或共享资产。
+- candidate 开始评测后视为不可变；后续修订必须生成新的 candidate id。
 
 ## 专题引用
 
@@ -156,8 +166,20 @@ harness-ai-kit-forge 接收草案 → 生成骨架 → validate → publish
 
 ## 八、与审查流水线的关系
 
-本技能产出的沉淀候选建议作为草稿进入 Draft → Review → Merge 流水线（`historyminerctl push`），
-由 [`harness-ai-kit-review-ops`](../harness-ai-kit-review-ops/SKILL.md) 统一五维审查后融合，不直提交。
+本技能产出的沉淀候选建议作为草稿进入 Draft → Eval → Review → Merge 流水线（`historyminerctl push`），
+由 [`harness-ai-kit-evolution-ops`](../harness-ai-kit-evolution-ops/SKILL.md) 编排
+`evalctl candidate/skill-eval/diff`，再由 [`harness-ai-kit-review-ops`](../harness-ai-kit-review-ops/SKILL.md)
+审查后交给 maintainer，不直提交。
+
+## 参数化演进（pilot）
+
+本 Skill 的行为参数 pilot 声明在
+`evals/parameters/devlab-ai-kit-miner.parameters.yaml`：
+
+- `evidence_threshold`：证据充分性阈值，允许在声明范围内调参。
+- `duplicate_similarity_threshold`：与既有资产相似度判定阈值，允许在声明范围内调参。
+
+参数优化只生成 `profile` candidate 和可审查的 trial 记录；不得修改本文件的安全边界、脱敏要求、人工审查点或生产配置。
 
 ## Human Decisions
 

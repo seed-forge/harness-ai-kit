@@ -1,4 +1,4 @@
-# devlab-tech-debt-ops — Usage
+# devlab-tech-debt-refactor — Usage
 
 ## Overview
 技术债清理/重构编排方法论（非业务债）：现状梳理固化 → 建安全网 → 拆分设计 → 引用清零安全移除 → 回归验证，全程小步可回退、行为不变。
@@ -14,7 +14,7 @@
 ## 可直接复制的中文 Prompt
 
 ```text
-用 devlab-tech-debt-ops 处理这个技术债：
+用 devlab-tech-debt-refactor 处理这个技术债：
 1) 先梳理 <目标类/模块> 现状并固化成 md（架构/流程/职责/问题分层 P0-P3），不改代码；
 2) 确认将改动行为的测试安全网是否够；
 3) 给拆分设计（模块划分+职责边界+迁移映射），按需选设计模式但不过度；

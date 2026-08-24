@@ -3,7 +3,7 @@
   "id": "devlab-web-extension-bootstrap",
   "name": "DevLab Web Extension Bootstrap",
   "owner": "seedforge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -76,5 +76,5 @@
   "contributors": [],
   "skill_type": "workflow",
   "agents_md_inject": "",
-  "updated_at": "2026-08-11"
+  "updated_at": "2026-08-20"
 }

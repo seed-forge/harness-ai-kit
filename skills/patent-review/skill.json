@@ -3,7 +3,7 @@
   "id": "patent-review",
   "name": "patent-review",
   "owner": "seedforge",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -15,7 +15,7 @@
     "disclosure",
     "drawio"
   ],
-  "summary": "专利技术交底书多轮循环严格审查。支持多维审查（数据流闭合、术语一致、状态迁移、公式完整、错误代码分流、图文一致性（集成drawio-skill））、逐轮收敛、可选自动修复（默认关闭需人工确认）。",
+  "summary": "专利技术交底书多轮循环严格审查。支持多维审查（数据流闭合、术语一致、状态迁移、公式完整、错误代码分流、图文一致性（消费drawioctl inspect JSON））、逐轮收敛、可选自动修复（默认关闭需人工确认）。",
   "compatible_clients": [
     "claude-code"
   ],
@@ -25,19 +25,26 @@
   "dependencies": [
     {
       "type": "skill",
-      "namespace": "team",
+      "namespace": "community",
       "id": "patent-disclosure-workflow",
       "version": ">=0.1.0",
       "scope": "optional",
       "feature": "workflow-integration"
     },
     {
-      "type": "skill",
-      "namespace": "team",
-      "id": "drawio-skill",
-      "version": ">=0.1.0",
+      "type": "cli",
+      "id": "drawioctl",
+      "version": ">=0.1.3",
       "scope": "optional",
       "feature": "diagram-consistency"
+    }
+  ],
+  "integrations": [
+    {
+      "target": "drawioctl",
+      "type": "cli",
+      "direction": "outbound",
+      "contract": "patent .drawio/.xml → inspect JSON → D7 text-diagram consistency verdict"
     }
   ],
   "sources": {
@@ -57,7 +64,7 @@
     "Invoke with /patent-review or via Skill tool. Pass patent disclosure markdown file paths as input.",
     "Use --fix to enable auto-repair mode, but severe issues will still require human confirmation.",
     "For cross-document interface checks, pass all related disclosures together.",
-    "For text-diagram consistency (D7), pass .drawio files alongside the patent .md files. The drawio-skill will auto-parse them."
+    "For text-diagram consistency (D7), pass .drawio files alongside the patent .md files and use drawioctl inspect --json as the semantic evidence input."
   ],
   "updated_at": "2026-08-14"
 }

@@ -4,10 +4,9 @@
 > 知识库解析/检索是原生底座，`agent` 模块提供完整 DAG 编排引擎（画布 + 组件 + 沙箱 + 内置模板）。
 > 本文是 infra-ragflow-ops 的能力参考底账，源码实证于 <host> v0.26.4 容器（`/ragflow/agent/`）。
 >
-> 借鉴致谢（practice-first 研读，未整体引入）：
-> - [LunarCache/ragflow-skill](https://github.com/LunarCache/ragflow-skill)（v0.26.4 命令面全景 + AGENT_GUIDE）→ §1.4 DSL 要点、§4 backlog
-> - [cclyfblink/ragflow_skill-zhlx](https://github.com/cclyfblink/ragflow_skill-zhlx)（知识库查询/入库纪律）→ §2.1 三级召回、§2.2 入库纪律
-> - [LiuChenyangSHU/ragflow-kb-skill](https://github.com/LiuChenyangSHU/ragflow-kb-skill)（极简 chat 查询，评估后无增量，未采纳）
+> 借鉴致谢（practice-first 研读，部分采纳）：
+> - [LunarCache/ragflow-skill](https://github.com/LunarCache/ragflow-skill)（v0.26.4 命令面全景 + AGENT_GUIDE）→ 采纳：§1.4 DSL 要点、§4 backlog
+> - [cclyfblink/ragflow_skill-zhlx](https://github.com/cclyfblink/ragflow_skill-zhlx)（知识库查询/入库纪律）→ 采纳：§2.1 三级召回、§2.2 入库纪律
 
 ## 1. Agent 编排引擎（内嵌智能体 pipeline）
 
@@ -94,7 +93,7 @@
 | 通用业务编排（内容工厂/外部集成/发布渠道） | **Dify workflow** | 现有 DSL 资产全部沉淀在 Dify（craft-share/gate/工厂） |
 | **自研代码 agent（LangGraph/自研框架）** | **RAGFlow retrieval API 作检索后端** | `POST /api/v1/retrieval` 一站式 hybrid+rerank，免自建向量库/解析运维；`ragflowctl retrieval` 即该 API 的 CLI 封装，可作接入冒烟与回归工具 |
 | 联网核查 | Dify craft-gate（已有） | 不重复建设；RAGFlow 侧仅做「面向知识库内容的核实/深研」 |
-| 模型治理/消费 | 统一 newapi | 各平台/自研代码均经 `OpenAI-API-Compatible` 入口消费，模型经任一 OpenAI 兼容网关消费 |
+| 模型治理/消费 | 统一 newapi | 各平台/自研代码均经 `OpenAI-API-Compatible` 入口消费，模型台账归 infra-aimodel-ops |
 
 **自研 agent 选型判断**：画布类（RAGFlow Agent / Dify）表达力覆盖不了的状态机——如 LangGraph 的 checkpoint 续跑、精细人机协同、复杂工具链与自研中间件——就走自研代码；此时 RAGFlow 退位为「检索后端」一类基础设施（与 ES/MinIO 同层），通过 retrieval API 消费，不要为用它而硬套画布。
 

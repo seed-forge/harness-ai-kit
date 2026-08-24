@@ -38,6 +38,12 @@
 ```
 最多5轮审查。
 
+### 图文一致性（D7）
+```bash
+drawioctl inspect "C:\path\to\figure.drawio" --json
+```
+将 `.drawio`/`.xml` 附图与交底书一起提供给审查。先处理 inspect 的结构错误，再根据全页节点/连线 JSON 判断图文是否一致。
+
 ## 输出解读
 
 - **阻塞问题**：必须修复才能提交

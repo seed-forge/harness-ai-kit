@@ -3,7 +3,7 @@
   "id": "devlab-web-visual-ops",
   "name": "DevLab Web Visual Ops",
   "owner": "seedforge",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -86,8 +86,8 @@
     "@browserbasehq/stagehand==4.0.0（可选：AI 增强适配器，缺失时降级为 Playwright 确定性路径）",
     "Node >= 22.18.0（仅 Stagehand 本地模式需要）",
     "Chromium 浏览器（Playwright 自带或系统安装）",
-    "OpenAI 兼容网关 API key + chat 模型（Stagehand 本地模式）",
-    "OpenAI 兼容网关的多模态模型（Vision/CUA 视觉兜底，vision_model，默认 mimo-v2.5-pro）"
+    "newapi 消费 key + chat_default 模型（Stagehand 本地模式，见 infra-aimodel-ops）",
+    "newapi 多模态模型（Vision/CUA 视觉兜底，vision_model，默认 mimo-v2.5-pro，见 infra-aimodel-ops）"
   ],
   "post_install_hints": [
     "在项目侧配置 preview_base_url / preview_start_command（~/.harness-ai-kit/config.yaml 的 assets.devlab-web-visual-ops 段）",
@@ -101,5 +101,5 @@
   "agents_md_inject": "",
   "config_schema": "config.defaults.yaml",
   "skill_type": "workflow",
-  "updated_at": "2026-08-14"
+  "updated_at": "2026-08-20"
 }

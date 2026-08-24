@@ -3,7 +3,7 @@
   "id": "work-sc-document-sop-builder",
   "name": "work-sc-document-sop-builder",
   "owner": "seedforge",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -62,5 +62,5 @@
   },
   "runtime_requirements": [],
   "post_install_hints": [],
-  "updated_at": "2026-08-14"
+  "updated_at": "2026-08-20"
 }

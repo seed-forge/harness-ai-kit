@@ -3,7 +3,7 @@
   "id": "devlab-integration-fullstack",
   "name": "DevLab Integration Fullstack Test",
   "owner": "seedforge",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -53,7 +53,7 @@
     "确保 Docker 运行（testcontainers 依赖 Docker）"
   ],
   "skill_type": "workflow",
-  "updated_at": "2026-08-14",
+  "updated_at": "2026-08-20",
   "integrations": [
     {
       "target": "harness-ai-kit-maintainer",

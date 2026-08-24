@@ -1,9 +1,10 @@
 # 变更记录
 
-## 0.6.2 - 2026-08-24
+## 0.6.3 - 2026-08-23
+- 将 difyctl 资源工作区默认值改为成员侧 `~/.harness-ai-kit/state/difyctl/resources`，移除维护者 checkout 依赖。
 
-- 公共发布元数据规范化：移除内部执行上下文，registry 来源改为公开
-  `skill-registry` 名称。
+## 0.6.2 - 2026-08-20
+- OSS notice/环境适配声明注入。
 
 ## 0.6.1 - 2026-08-14
 

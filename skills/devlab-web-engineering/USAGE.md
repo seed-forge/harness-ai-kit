@@ -13,7 +13,7 @@ Dependency / Packaging / Runtime-Environment / Engineering Convention。
 
 - Node.js ≥ 18（项目版本由 .nvmrc / engines 决定）
 - Bash 4.0+（生成脚本）；shellcheck 可选
-- 可选：`基础设施配置源`（registry/API 地址查询）、`devlab-web-context`（画像输入）
+- 可选：`devlab-infra-usage`（registry/API 地址查询）、`devlab-web-context`（画像输入）
 
 ## 触发场景
 
@@ -45,5 +45,17 @@ Dependency / Packaging / Runtime-Environment / Engineering Convention。
 - 子应用挂载期错误被吞：用例 reset 勿放在导航后
 - 私有 registry 不可达时自动降级官方源（setup_registry）
 - 端口冲突先确认进程归属再清理（自己的旧进程直接杀，他人进程需确认）
+- 对外人工验收才绑定 `0.0.0.0`；端口与 API 代理地址必须可配置，Vite 必须启用严格端口模式
 
 详细陷阱见 `profiles/vue/REFERENCE-PITFALLS.md`。
+
+## External manual acceptance
+
+Vue full-stack projects can copy `profiles/vue/scripts/run-acceptance.sh.template` into
+their own `scripts/` directory. Configure the command arrays and project-specific health
+URLs in the copy; keep the shared launcher responsible for process cleanup, IPv4/IPv6
+port checks, readiness probes, and printing FQDN / overlay / loopback addresses.
+
+For Python services, let the backend command load the project env file explicitly, for
+example `uv run --env-file "$ENV_FILE" uvicorn my_app.main:app`. The template does not
+hard-code an application name, port, FQDN, overlay IP, proxy target, or credential.

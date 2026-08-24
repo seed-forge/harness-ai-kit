@@ -4,10 +4,13 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
+HOST="${HOST:-127.0.0.1}"
 PORT="${PORT:-21010}"
+STRICT_PORT="${STRICT_PORT:-true}"
 NAME="${NAME:-$(basename "$PWD")}"
 PID_DIR="${PID_DIR:-$SCRIPT_DIR/.pid}"
-DEV_CMD=("${DEV_CMD[@]:-vite --port $PORT --host}")
+DEV_CMD=(vite --port "$PORT" --host "$HOST")
+[[ "$STRICT_PORT" == "true" ]] && DEV_CMD+=(--strictPort)
 
 start() {
   read_pid "$NAME" && { warn "已在运行 (PID: $(read_pid "$NAME"))"; return 1; }
@@ -18,7 +21,7 @@ start() {
   nohup "${DEV_CMD[@]}" > "$SCRIPT_DIR/.dev.log" 2>&1 &
   write_pid "$NAME" $!
   wait_for_port "$PORT" 30 || { error "启动超时，查看 $SCRIPT_DIR/.dev.log"; return 1; }
-  success "访问: http://localhost:$PORT （局域网: http://$(hostname -I 2>/dev/null | awk '{print $1}'):$PORT）"
+  success "访问: http://${HOST}:$PORT"
 }
 
 stop() {

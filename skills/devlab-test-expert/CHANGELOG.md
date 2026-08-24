@@ -1,5 +1,15 @@
 # 变更记录
 
+## 0.3.1 - 2026-08-18
+
+- `references/REFERENCE-AI-SERVICE-TEST-TIERING.md` 末尾新增「延伸：Agent 测试的 L0-L4 分层（指针）」：
+  明确本模式 = L0 确定性单测落地形态，L1-L4 由 `devlab-eval-driven-agent` 承载、路由见 `devlab-test-onboard`。
+
+## 0.3.0 - 2026-08-17
+
+- 新增 `references/REFERENCE-AI-SERVICE-TEST-TIERING.md`：AI 服务测试分级隔离模式（9 级 marker + opt-in 开关 + fake key 注入 + mock_env + 全局超时 + 目录镜像 + 落地清单）。来源 devlab-spec-miner 对某 NL2DSL 服务（已脱敏）的 measure-first 挖掘（40 条规范，2026-08-17）
+- SKILL.md 索引表/尾部 references 列表与 references/REFERENCE-README.md 同步加行。
+
 ## 0.2.0 - 2026-08-15
 
 - 新增 `references/REFERENCE-PROPERTY-BASED-TESTING.md`：属性测试模式索引（roundtrip / inverse / idempotence / stateful / shrink / precondition），映射 fast-check / Hypothesis / jqwik / FsCheck 与官方文档。

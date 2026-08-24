@@ -3,7 +3,7 @@
   "id": "devlab-tech-debt-ops",
   "name": "devlab-tech-debt-ops",
   "owner": "seedforge",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "status": "trial",
   "tags": [
     "refactor",

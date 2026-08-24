@@ -30,6 +30,7 @@
 | `lint.sh` | ESLint/Prettier/Stylelint |
 | `doctor.sh` | 10 项环境诊断（Node 版本/依赖完整性/端口/磁盘/构建产物/registry 连通性等） |
 | `orchestrator.sh` | （monorepo 可选）批量启停/健康检查/日志聚合 |
+| `run-acceptance.sh` | 外部人工验收启动器：双栈端口检查、前后端启动、健康探测和三类入口输出 |
 | `.env.local.example` | 环境变量模板（占位符） |
 
 ### 域 2：Build（构建）
@@ -61,7 +62,8 @@
 
 - Node 版本管理：nvm / fnm / volta（`references/REFERENCE-NODE-VERSION-MGT.md`）
 - 环境变量：VUE_APP_ / VITE_ 前缀规范；.env.local（个人）+ .env.development（团队共享）
-- 端口策略：固定 / 动态分配 / 用户名哈希
+- 端口策略：固定 / 动态分配 / 用户名哈希；外部人工验收时端口、`--host` 和 API
+  proxy target 均须可配置，Vite 使用 `--strictPort`，并分别验证回环与目标网络入口
 - 制品源：私有 registry + 官方源降级（`references/REFERENCE-REGISTRY-STRATEGY.md`）
 - API 地址：从 `devlab-infra-usage` 查询推荐值，不硬编码
 

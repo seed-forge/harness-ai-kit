@@ -3,13 +3,13 @@
 One-line descriptions of every skill, CLI, and plugin bundled in this repo.
 Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>` / `harness-ai-kit add cli <id>` (CLIs).
 
-- **Skills: 57** across 8 categories
+- **Skills: 55** across 8 categories
 - **CLIs: 6** (pip-installable, published to PyPI as `sf-*`)
 - **Plugins: 1** (AI-harness plugins)
 
 > Build Less, Compose More — the **REMIX** methodology (Reuse · Extend · Mix · Integrate · eXecute): these assets compose open-source tools and community skills rather than reimplement them.
 
-## Skills (57)
+## Skills (55)
 
 ### Database & Middleware Expertise (11)
 
@@ -47,19 +47,18 @@ Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>`
 | `devlab-ai-kit-miner` | 研发会话后复盘提炼：分析已完成的研发会话，判断哪些经验值得沉淀为 Skill/CLI/MCP/Loop/Subagent/知识卡片，输出最小规格草案。基于 base-session-ai-kit-miner 二次定制，覆盖全资产类型决策和 devlab-* 命名规范。 |
 | `devlab-eval-driven-agent` | eval 自评测体系驱动的 AI Agent 生产体系：评测集组织、Mock 隔离、标准化比对、自动评测脚本与回归；L3 数据后端接 Langfuse（dataset/scores/LLM-as-judge），配套 evalctl CLI（0.2.x 已发布）承接 run/diff/ingest/feedback/report。 |
 
-### Software Engineering Methodology (7)
+### Software Engineering Methodology (6)
 
 | Skill | Description |
 |-------|-------------|
 | `devlab-contract-web-server` | 前后端契约规范技能（contract 技能簇首个，介于 srv 与 web 之间）：接口/序列化契约、字段类型一致性、配置分层与不过度设计，配契约校验与联调防错清单。 |
 | `devlab-integration-fullstack` | 全栈集成测试专家技能。支持多服务 Docker Compose 部署场景，基于 Testcontainers + Mock Server 实现端到端集成测试。 |
-| `devlab-spec-driven-dev` | 通用 spec 驱动的 AI 协作开发方法论：以 requirements/design/tasks 提案为事实源，提案审查→细化→分任务执行→回归；含提案质量约束与 human-on-the-loop 决策门禁。Kiro spec 作为一个具体 example。 |
 | `devlab-srv-test-api` | 后端 API 测试专家技能。支持 Java（JUnit）/ Python（pytest）/ Node.js（supertest + jest）后端项目的接口测试、Mock 服务、测试数据管理。 |
 | `devlab-tech-debt-ops` | 技术债清理/重构编排方法论（非业务债，侧重技术债）：现状梳理→拆分设计→引用清零安全移除→回归验证；附设计模式清单与典型模式示意性伪代码（点到即止，实操由 AI 给选项）。 |
 | `devlab-test-expert` | 测试专家知识库。包含测试最佳实践、故障排查指南、测试策略设计、性能优化建议、属性测试（property-based testing）模式等专家级知识，供其他测试技能引用。 |
 | `devlab-test-onboard` | AI 驱动的分层测试体系顶层路由编排。根据项目特征（前端/后端/全栈/微服务）智能识别测试需求，路由到对应子技能（devlab-web-test-e2e / devlab-srv-test-api / devlab-integration-fullstack）。 |
 
-### Web & Frontend (10)
+### Web & Frontend (9)
 
 | Skill | Description |
 |-------|-------------|
@@ -68,7 +67,6 @@ Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>`
 | `devlab-web-echarts-usage` | ECharts 在 Astro/前端项目中的完整集成指南，包含 tree-shaking、IntersectionObserver 按需加载、自定义系列集成、拓扑图实现、雷达图配置、Astro Islands 数据传递、调试经验。 |
 | `devlab-web-engineering` | Web / 前端工程化能力层。语言无关覆盖六域：Project Bootstrap、Build、Dependency、Packaging、Runtime/Environment、Engineering Convention。路由键 = 语言 × 框架 双维：TS 主线 / JS 兼容 / 语言维度扩展位 → 框架路由 profiles/vue（实战级：Vite 主线/Webpack 兼容 + 微前端场景层）、profiles/react（模板级），其余框架走 references 引用层。Capability Layer：原则沉淀 + 能力编排 + Profile + 工程质量要求；由 devlab-web-bootstrap 吸收升级而来。 |
 | `devlab-web-extension-bootstrap` | 浏览器扩展（WebExtension/MV3）从零构建的团队工作流：可行性→逆向目标站点数据通道→WXT+Vue+MV3 选型→content/background/popup 三面架构→单测+Chrome-for-Testing 真实浏览器 e2e。尤其适用于从已有 Web 应用提取/下载/增强内容的扩展。 |
-| `devlab-web-glitchtip-usage` | 前端 GlitchTip 错误追踪接入指南（框架无关）：Sentry SDK 初始化、Source Map 上传、Release 管理、Issue 跟踪。 |
 | `devlab-web-skywalking-rum-usage` | 前端 SkyWalking RUM 接入指南（框架无关）：skywalking-client-js 初始化、全局错误捕获、Web Vitals 采集、SPA 路由感知、前后端 trace 关联。 |
 | `devlab-web-test-e2e` | Web E2E 测试专家技能。专注 Vue/React 前端项目的浏览器端到端测试能力，基于 Playwright + AI Agent 实现测试计划生成 → 代码生成 → 失败修复的完整闭环。 |
 | `devlab-web-visual-ops` | Web 视觉化操作手册：Core（Observe/Navigate/Interact/Inspect/Validate/Capture）+ Router（Playwright/Stagehand/DevTools/Vision-CUA）+ Workflows（Debug/UI Review/Visual Regression/E2E/Browser Automation）。Stagehand 作为 Router 的 AI Adapter 而非底座，避免绑定单一框架。 |

@@ -23,7 +23,7 @@ skills/{id}/
 | 字段 | 说明 | 示例 |
 |------|------|------|
 | `namespace` | 资产命名空间 | `"team"` |
-| `id` | 唯一标识 | `"devlab-web-test-e2e"` |
+| `id` | 唯一标识 | `"devlab-web-react-sop"` |
 | `name` | 人类可读名称 | `"React 研发 SOP"` |
 | `version` | 语义化版本 | `"0.1.0"` |
 | `status` | `draft` / `trial` / `stable` | `"trial"` |

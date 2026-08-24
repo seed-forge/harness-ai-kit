@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.5 - 2026-08-20
+- 环境值占位符抽取：组织内部集群 IP/域名改为 {<host>_host}/{<host>_host}/{<host>_host}/{base_domain}/{service_domain}/{root_domain} config 占位符（docs/config-governance.md §12）
+
 ## 0.2.4 - 2026-08-17
 
 - 配套 ragflowctl 0.5.0（依赖升至 >=0.5.0）：新增 chat（dataset-backed 问答助手）/ agent（画布智能体 create+ask）/ graph（GraphRAG/RAPTOR run-trace）/ chunk（含 expand 邻块上下文）四命令组与 HD 确认门（delete 类默认交互确认，--yes 跳过，EOF fail-closed）。
@@ -13,6 +16,7 @@
 
 - 新增 references/REFERENCE-RAGFLOW-AGENT-AND-ALGORITHMS.md（能力地图）：v0.26 agent 编排引擎（21 组件/25 内置模板含 deep_research）、Agent DSL 编写要点、RAG 算法速查（GraphRAG/RAPTOR/hybrid/VLM/parent_child）、三级召回方法论与入库纪律、与 Dify 分工选型、ragflowctl 扩展 backlog（RAPTOR-GraphRAG run-trace / chat sessions / agent CRUD / connector / embed / system）。SKILL.md 补「能力地图」指引段。
 - 借鉴致谢（practice-first 研读未整体引入）：LunarCache/ragflow-skill（DSL 要点与命令全景）、cclyfblink/ragflow_skill-zhlx（召回方法论与入库纪律）。
+- 评估未采纳：LiuChenyangSHU/ragflow-kb-skill — 极简 chat 查询，对已有 ragflowctl chat/retrieval 能力无增量。
 
 ## 0.2.1 - 2026-08-14
 

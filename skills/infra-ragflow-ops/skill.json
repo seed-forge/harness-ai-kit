@@ -3,7 +3,7 @@
   "id": "infra-ragflow-ops",
   "name": "infra-ragflow-ops",
   "owner": "seedforge",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -38,12 +38,12 @@
     "allow_fallback": true
   },
   "runtime_requirements": [
-    "Consume models via any OpenAI-compatible gateway and use your own database/vector store for external dependencies."
+    "Use infra-aimodel-ops for model consumption and infra-datasource-ops for external database/vector dependencies."
   ],
   "post_install_hints": [
-    "Run `ragflowctl doctor --profile default --json` before dataset or knowledge-base operations."
+    "Run `ragflowctl doctor --profile 组织内部集群 --json` before dataset or knowledge-base operations."
   ],
-  "updated_at": "2026-08-16",
+  "updated_at": "2026-08-20",
   "integrations": [
     {
       "target": "harness-ai-kit-maintainer",

@@ -3,7 +3,7 @@
   "id": "devlab-web-engineering",
   "name": "DevLab Web Engineering",
   "owner": "seedforge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -32,10 +32,34 @@
     {
       "type": "skill",
       "namespace": "community",
+      "id": "devlab-infra-usage",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "infra-query"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
       "id": "devlab-web-context",
       "version": ">=0.1.0",
       "scope": "optional",
       "feature": "context-profile"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "devlab-cicd-onboard",
+      "version": ">=0.2.0",
+      "scope": "optional",
+      "feature": "cicd"
+    },
+    {
+      "type": "skill",
+      "namespace": "community",
+      "id": "base-diagram-ops",
+      "version": ">=0.1.0",
+      "scope": "optional",
+      "feature": "web-architecture-views"
     }
   ],
   "integrations": [
@@ -64,7 +88,7 @@
       "contract": "Phase 4 编排路由 → 本技能执行前端工程化初始化"
     },
     {
-      "target": "devlab-web-qa-ops",
+      "target": "devlab-qa-ops",
       "type": "skill",
       "direction": "outbound",
       "contract": "工程化交付后 QA 验收（Quality Gate）"
@@ -80,6 +104,12 @@
       "type": "skill",
       "direction": "outbound",
       "contract": "浏览器扩展场景路由"
+    },
+    {
+      "target": "base-diagram-ops",
+      "type": "skill",
+      "direction": "outbound",
+      "contract": "web context → web/integration/security profile diagram"
     }
   ],
   "sources": {
@@ -132,5 +162,5 @@
   "contributors": [],
   "skill_type": "workflow",
   "agents_md_inject": "",
-  "updated_at": "2026-08-14"
+  "updated_at": "2026-08-22"
 }

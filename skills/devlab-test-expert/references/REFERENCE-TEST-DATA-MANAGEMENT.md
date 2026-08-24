@@ -452,7 +452,7 @@ version: '3.8'
 
 services:
   test-data-service:
-    image: your-registry/test-data-service:latest
+    image: team/test-data-service:latest
     ports:
       - "8081:8080"
     environment:

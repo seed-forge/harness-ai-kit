@@ -122,7 +122,7 @@ start_dev_server() {
       vue-cli-service serve --port "$port" --mode development
       ;;
     vite)
-      vite --port "$port" --host 0.0.0.0
+      HOST="${HOST:-127.0.0.1}" vite --port "$port" --host "$HOST" --strictPort
       ;;
     *)
       error "未知构建工具: $build_tool"
@@ -281,7 +281,7 @@ const envConfig = require('./config/dev.env')
 module.exports = {
   devServer: {
     port: process.env.VUE_APP_PORT || 3000,
-    host: '0.0.0.0',
+    host: process.env.HOST || '127.0.0.1',
     hot: true,
     open: false,
     compress: true,

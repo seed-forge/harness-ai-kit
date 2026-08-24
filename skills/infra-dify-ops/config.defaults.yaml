@@ -2,7 +2,8 @@ $schema: harness-ai-kit-config/v1
 
 # difyctl config schema (skill mirror). Values live in
 # ~/.harness-ai-kit/config.yaml under assets.difyctl (source of truth,
-# priority over env vars). See 工程规范/harness-ai-kit/docs/config-governance.md.
+# priority over env vars). The package config contract is defined here and
+# exposed by `difyctl config`/`doctor`.
 config:
   - key: base_url
     type: string
@@ -34,7 +35,7 @@ config:
     required: false
     sensitivity: public
     description: "本地 Dify 资源工作区目录（resource capture / DSL 归档根）。"
-    default: "C:\\Users\\Working\\Documents\\02-工程工作空间\\fleet-platform\\resources\\dify"
+    default: "~/.harness-ai-kit/state/difyctl/resources"
 
   - key: timeout_seconds
     type: string

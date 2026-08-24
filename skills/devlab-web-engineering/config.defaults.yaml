@@ -1,0 +1,37 @@
+$schema: harness-ai-kit-config/v1
+# Runtime configuration for devlab-web-engineering.
+# Priority: user input > ~/.harness-ai-kit/config.yaml assets.dev... > this file.
+config:
+- key: host
+  type: string
+  required: false
+  sensitivity: normal
+  default: "127.0.0.1"
+  env_var: HOST
+  description: Development server bind address. Use 0.0.0.0 only for explicit external acceptance.
+- key: port
+  type: number
+  required: false
+  sensitivity: normal
+  default: 21010
+  env_var: PORT
+  description: Development server port; check IPv4 and IPv6 occupancy before starting.
+- key: strict_port
+  type: bool
+  required: false
+  sensitivity: normal
+  default: true
+  env_var: STRICT_PORT
+  description: Fail when the requested port is occupied instead of silently selecting another port.
+- key: api_proxy_target
+  type: string
+  required: false
+  sensitivity: normal
+  env_var: API_PROXY_TARGET
+  description: API proxy target supplied by the target project or devlab-infra-usage.
+- key: private_registry
+  type: string
+  required: false
+  sensitivity: normal
+  env_var: PRIVATE_REGISTRY
+  description: Optional private package registry supplied by devlab-infra-usage.

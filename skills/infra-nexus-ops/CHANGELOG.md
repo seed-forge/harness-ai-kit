@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.6 - 2026-08-22
+
+- 新增 raw hosted 资产退役/清理 reference，覆盖 archive、metadata、checksum、index 与回读验收。
+
+## 0.3.5 - 2026-08-20
+- 环境值占位符抽取：组织内部集群 IP/域名改为 {<host>_host}/{<host>_host}/{<host>_host}/{base_domain}/{service_domain}/{root_domain} config 占位符（docs/config-governance.md §12）
+
 ## 0.3.4 - 2026-08-14
 
 - frontmatter 规范化：SKILL.md 统一 LF / 无 BOM / 单一 YAML frontmatter 块，修复 AI IDE 加载告警（missing YAML frontmatter delimited by ---）。

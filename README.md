@@ -52,7 +52,7 @@ The manifest is where harness-ai-kit pays off most. The intended team flow:
 
 ```
 Member A (sets up)
-  harness-ai-kit add skill devlab-spec-driven-dev
+  harness-ai-kit add skill devlab-tech-debt-ops
   harness-ai-kit add skill diag-mysql-deadlock
   git add harness-ai-kit.yml harness-ai-kit.lock        # commit ONLY the manifest
   git commit -m "chore: pin team AI skills"
@@ -163,11 +163,10 @@ Requires Python >= 3.10 and `git`.
 </details>
 
 <details>
-<summary><strong>AI Engineering Methodology</strong> (5 skills — spec-driven dev, agent architecture, eval, tech debt)</summary>
+<summary><strong>AI Engineering Methodology</strong> (4 skills — agent architecture, eval, tech debt)</summary>
 
 | Skill | Purpose |
 |-------|---------|
-| `devlab-spec-driven-dev` | Spec-driven AI collaboration (requirements → design → tasks) |
 | `devlab-ai-agent-engineering` | AI agent app architecture methodology |
 | `devlab-eval-driven-agent` | Eval-driven agent quality system |
 | `devlab-ai-kit-miner` | Post-session retrospective → asset extraction |

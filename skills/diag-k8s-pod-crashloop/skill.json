@@ -1,10 +1,10 @@
 {
-  "namespace": "diag",
+  "namespace": "community",
   "id": "diag-k8s-pod-crashloop",
   "name": "diag-k8s-pod-crashloop",
-  "owner": "team",
-  "version": "0.1.1",
-  "status": "draft",
+  "owner": "seedforge",
+  "version": "0.1.2",
+  "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
   "tags": [
@@ -52,5 +52,5 @@
   ],
   "contributors": [],
   "skill_type": "diagnostic",
-  "updated_at": "2026-08-14"
+  "updated_at": "2026-08-20"
 }

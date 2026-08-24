@@ -3,7 +3,7 @@
   "id": "devlab-test-onboard",
   "name": "DevLab Test Onboard",
   "owner": "seedforge",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -14,7 +14,7 @@
     "router",
     "orchestration"
   ],
-  "summary": "AI 驱动的分层测试体系顶层路由编排。根据项目特征（前端/后端/全栈/微服务）智能识别测试需求，路由到对应子技能（devlab-web-test-e2e / devlab-srv-test-api / devlab-integration-fullstack）。",
+  "summary": "AI 驱动的分层测试体系顶层路由编排。根据项目特征（前端/后端/全栈/微服务/AI Agent）智能识别测试需求，路由到对应子技能（devlab-web-test-e2e / devlab-srv-test-api / devlab-integration-fullstack / devlab-eval-driven-agent）。",
   "compatible_clients": [
     "codex",
     "claude-code",

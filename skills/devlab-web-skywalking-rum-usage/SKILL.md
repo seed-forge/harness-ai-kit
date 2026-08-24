@@ -7,6 +7,8 @@ description: 前端 SkyWalking RUM 接入技能。凡是用户提到前端监控
 
 为前端应用接入 SkyWalking RUM（Real User Monitoring），实现 JS 错误监控、API 调用监控、Core Web Vitals 采集、SPA 路由感知和前后端分布式链路追踪。
 
+> 本 Skill 负责浏览器性能/RUM 和浏览器链路；前端错误聚合、Source Map 与 Issue 管理统一走 `infra-glitchtip-ops`。完整支柱路由可选参考 `devlab-observability-onboard` 的 `REFERENCE-ROUTE-TABLE.md`。
+
 ## 适用场景
 
 - 为前端应用安装并配置 `skywalking-client-js`
@@ -18,9 +20,9 @@ description: 前端 SkyWalking RUM 接入技能。凡是用户提到前端监控
 
 ## 不适用场景
 
-- SkyWalking OAP 部署/升级/运维 → 使用 `SkyWalking 官方部署文档 https://skywalking.apache.org`
-- 后端 Java Agent 接入 → 使用 `你的后端 APM / Java Agent 接入方案`
-- 前端错误聚合平台（Source Map / Issue 管理） → 使用 `devlab-web-glitchtip-usage`
+- SkyWalking OAP 部署/升级/运维 → 使用 `infra-skywalking-ops`
+- 后端 Java Agent 接入 → 使用 `devlab-srv-skywalking-usage`
+- 前端错误聚合平台（Source Map / Issue 管理） → 使用 `infra-glitchtip-ops`
 - OAP REST 端口反代配置 → 使用 `infra-ingress-ops`
 
 ## 前置条件
@@ -46,7 +48,7 @@ npm install skywalking-client-js --save
 import ClientMonitor from 'skywalking-client-js';
 
 export function initRum(options: {
-  collector: string;   // OpenResty HTTPS 反代地址，如 https://<service-url>
+  collector: string;   // OpenResty HTTPS 反代地址，如 https://rum.{base_domain}
   service: string;     // 应用标识，如 'my-app-web'
   version: string;     // 应用版本号，如 'v1.0.0'
 }) {
@@ -70,7 +72,7 @@ export function initRum(options: {
 
 | 框架 | 环境变量前缀 | 示例 |
 |------|-------------|------|
-| Vite | `VITE_` | `VITE_SW_COLLECTOR=https://<service-url>` |
+| Vite | `VITE_` | `VITE_SW_COLLECTOR=https://rum.{base_domain}` |
 | Next.js | `NEXT_PUBLIC_` | `NEXT_PUBLIC_SW_COLLECTOR=...` |
 | Create React App | `REACT_APP_` | `REACT_APP_SW_COLLECTOR=...` |
 | Vue CLI | `VUE_APP_` | `VUE_APP_SW_COLLECTOR=...` |
@@ -242,6 +244,7 @@ location /browser/perfData/ {
 ## 约束
 
 - `skywalking-client-js` ≥ 1.0.0 要求 OAP ≥ 10.2.0
+- **环境适配**：主机名 <host>/<host> 为逻辑名示例；IP/域名使用占位符（`{hs_host}`/`{base_domain}`/`{root_domain}` 等），解析自 `~/.harness-ai-kit/config.yaml` 顶层字段，规范见 docs/config-governance.md。
 - `collector` 地址通过环境变量注入，禁止硬编码到源码中
 - OAP 不应直接暴露到公网，必须通过 HTTPS 反代
 - `noTraceOrigins` 排除 localhost，避免开发环境产生无效 trace

@@ -1,7 +1,7 @@
 # infra-system-env-ops Usage
 
 ## When To Use
-- Use this skill when you need to 面向 Team / Team 场景的 Linux 端口转发运维 Skill，覆盖 iptables、DNAT、SNAT、MASQUERADE、firewalld rich rule、回滚与持久化方案.
+- Use this skill when you need to 面向 组织内部集群 场景的 Linux 端口转发运维 Skill，覆盖 iptables、DNAT、SNAT、MASQUERADE、firewalld rich rule、回滚与持久化方案.
 - Use it when the task matches the asset's documented workflow and should stay within the skill boundary.
 
 ## Inputs

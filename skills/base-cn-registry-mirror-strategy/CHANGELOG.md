@@ -1,9 +1,14 @@
 # Changelog
 
-## 0.1.7 - 2026-08-24
+## 0.1.9 - 2026-08-22
 
-- Public-release metadata normalization: remove internal-only execution context
-  and use the public `skill-registry` source name.
+- 新增 Docker daemon 代理验收清单：大小写变量冲突、重复 systemd drop-in、NO_PROXY 覆盖范围，以及 daemon/容器代理层级区分。
+
+## 0.1.8 - 2026-08-20
+- 环境值占位符抽取：组织内部集群 IP/域名改为 {<host>_host}/{<host>_host}/{<host>_host}/{base_domain}/{service_domain}/{root_domain} config 占位符（docs/config-governance.md §12）
+
+## 0.1.7 - 2026-08-20
+- OSS notice/环境适配声明注入。
 
 ## 0.1.6 - 2026-08-14
 
@@ -23,10 +28,10 @@
 
 ## 0.1.2 - 2026-05-22
 
-- L1 proxy: cross-link Team node1/node2 default Clash endpoints (`REFERENCE-HOMELAB-OUTBOUND-HTTP-PROXY.md`)
+- L1 proxy: cross-link 组织内部集群 <host>/<host> default Clash endpoints (`REFERENCE-组织内部集群-OUTBOUND-HTTP-PROXY.md`)
 - `REFERENCE-MIRROR-RECIPES.md` §11: per-host HTTP_PROXY table
 
 ## 0.1.1 - 2026-05-15
 
-- rename `references/mirror-recipes.md` to `references/REFERENCE-MIRROR-RECIPES.md` to satisfy team-ai-kit reference naming rules
+- rename `references/mirror-recipes.md` to `references/REFERENCE-MIRROR-RECIPES.md` to satisfy harness-ai-kit reference naming rules
 - add this changelog so `skill.json` and `CHANGELOG.md` top versions stay aligned

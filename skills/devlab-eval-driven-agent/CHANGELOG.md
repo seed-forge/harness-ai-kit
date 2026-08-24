@@ -1,9 +1,20 @@
 # Changelog — devlab-eval-driven-agent
 
-## 0.2.1 - 2026-08-24
+## 0.3.0 - 2026-08-18
 
-- Public-release metadata normalization: remove internal-only execution context
-  and use the public `skill-registry` source name.
+- **L0-L4 分层评测矩阵**：新增 Agent 全景测试分层（L0 确定性单测 / L1 轨迹评测 / L2 输出评测 /
+  L3 生产回归 / L4 安全+成本护栏），含分层选用规则与工具/基座映射（Langfuse 平台基座 + Promptfoo 本地
+  CLI + 代码级 golden session；不新增 组织内部集群 服务基座）
+- **L1 轨迹评测（golden session）**：新增轨迹断言方法论——`golden-sessions/<scenario>/session.yaml`
+  资产格式（expected_trace / recovery / stop_conditions / expected_terminal 断言语义表）+ replay runner
+  （ToolSimulator 模式，零凭据零真实后端）+ 生产轨迹回流（Langfuse session → 人工确认 → golden session，
+  经 evalctl ingest 管线）
+- **L3 生产回归闭环**：新增章节，把 evalctl ingest/feedback/run/diff 串成"生产 trace → 评测集 → 回归门禁"
+  闭环（复用既有命令，未新增 CLI 面）
+- **章节对齐**：原「L3 数据后端（Langfuse）」更名为「L2 输出评测后端（Langfuse）」，与 L0-L4 矩阵编号一致
+- **版本对齐**：SKILL.md 内容此前已含 skill-eval 0.3.0+ 与 evalctl 0.3.x 描述但 skill.json 停留在 0.2.1，
+  本次抬升至 0.3.0 对齐
+- frontmatter 补轨迹评测/golden session/agent 测试触发词；适用场景补多步 Agent；工作流 Phase 1 补轨迹判据
 
 ## 0.2.0 - 2026-08-14
 

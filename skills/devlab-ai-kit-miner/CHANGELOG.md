@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.5 - 2026-08-17
+
+- 来源脱敏纪律：复盘产出草案（SKILL.md/CHANGELOG/元数据）不得深度包含具体项目名、产品名、会话 ID、内部域名或路径；来源统一匿名化（如"某上游产品二开项目（已脱敏）"），量化锚点可保留。沉淀自 2026-08-17 首跑反哺批次审查（来源项目已脱敏）。
+
 ## 0.4.4 - 2026-08-14
 
 - frontmatter 规范化：SKILL.md 统一 LF / 无 BOM / 单一 YAML frontmatter 块，修复 AI IDE 加载告警（missing YAML frontmatter delimited by ---）。

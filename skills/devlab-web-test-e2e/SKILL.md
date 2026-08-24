@@ -432,8 +432,8 @@ devlab-test-onboard 检测到项目特征：Vue + Vite
 <!-- 在测试代码中添加引用注释 -->
 /**
  * Fixture Library Reference
- * Source: vendored Playwright base fixture (adapted from an internal fixture library)
- * (Fixture pattern adapted from an internal test-fixture library.)
+ * Source: devlab-test-fixture-lib/fixtures/playwright-base.ts
+ * See also: https://github.com/team/test-fixture-lib
  */
 import { baseTest, expect } from './fixtures';
 ```
@@ -461,6 +461,10 @@ import { baseTest, expect } from './fixtures';
 每步截图留证；遇阻塞记录障碍+尝试过的绕行手法后继续下一项，不卡死在单点。
 输出：通过项/失败项/阻塞项三段清单。
 ```
+
+## 外层 SDD 框架衔接（能力级，见 `devlab-harness-ops` Step 7）
+
+本技能是 Web E2E 用例生成/修复的 **domain floor**。功能开发接缝处的 red-green-refactor TDD 纪律由外层 SDD 框架的 tdd skill（如 mattpocock `tdd` / comet Classic build）驱动（命中则在测试接缝调用）；trellis 类轻量框架或无框架时，本技能独立完成 E2E 层，能力不落空（floor 不可裁）。
 
 ## 已知限制
 

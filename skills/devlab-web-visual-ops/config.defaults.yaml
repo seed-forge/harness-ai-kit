@@ -24,17 +24,17 @@ config:
   type: string
   required: false
   sensitivity: normal
-  description: Stagehand 本地模式的 LLM 端点（OpenAI 兼容，带 /v1，如 http://localhost:1234/v1）。
+  description: Stagehand 本地模式的 LLM 端点（OpenAI 兼容，带 /v1，如 http://<service-url>:13033/v1）。引用 infra-aimodel-ops 消费侧基线。
 - key: newapi_api_key
   type: string
   required: false
   sensitivity: secret
-  description: Stagehand 本地模式所需 LLM 端点的 API key（OpenAI 兼容网关的 sk- token）。禁止写入正式文档。
+  description: newapi 消费侧 sk- token（见 infra-aimodel-ops REFERENCE-CONSUMER-CREDENTIALS）。禁止写入正式文档。
 - key: stagehand_model
   type: string
   required: false
   sensitivity: normal
-  description: Stagehand 本地模式使用的模型（chat_default，默认 mimo-v2.5-pro）。
+  description: Stagehand 本地模式使用的模型（chat_default，默认 mimo-v2.5-pro，见 infra-aimodel-ops 选型矩阵）。
 - key: vision_fallback_enabled
   type: bool
   required: false
@@ -44,7 +44,7 @@ config:
   type: string
   required: false
   sensitivity: normal
-  description: Vision/CUA 使用的多模态模型（chat_default / vision 场景，默认 mimo-v2.5-pro，备选 grok-chat-fast）。缺失时使用 stagehand_model。
+  description: Vision/CUA 使用的多模态模型（chat_default / vision 场景，默认 mimo-v2.5-pro，备选 grok-chat-fast；见 infra-aimodel-ops）。缺失时使用 stagehand_model。
 - key: artifact_dir
   type: string
   required: false

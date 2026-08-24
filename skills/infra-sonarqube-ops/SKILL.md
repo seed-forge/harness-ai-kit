@@ -9,7 +9,16 @@ SonarQube Community Edition 代码质量平台的 day-2 运维操作手册。覆
 
 ## 平台信息
 
-平台地址通过配置注入（`~/.harness-ai-kit/config.yaml` 的 `assets.sonarqubectl` 段），不在本技能硬编码。版本以实际部署为准（Community Edition 与 Developer Edition 功能差异见下文）。
+| 项 | 值 |
+|----|-----|
+| 主机 | <host> (<host>) |
+| 版本 | 10.7.0 Community Edition |
+| 域名 | sonarqube.{base_domain} |
+| 端口 | 19000 |
+| 直连 URL | http://sonarqube.{base_domain}:19000 |
+| 镜像 | sonarqube:10.7.0-community |
+| 部署路径 | 1panel/apps/sonarqube/sonarqube/ |
+| 数据存储 | data→/opt/sonarqube/data, extensions→/opt/sonarqube/extensions, logs→/opt/sonarqube/logs |
 
 ## 用途
 
@@ -153,8 +162,9 @@ Woodpecker config-extension 的 `sonar.py` 提供完整的多层配置合并 + e
 ## 约束
 
 - **社区版限制**: 不支持分支分析（Branch Analysis）、PR Decoration
+- **环境适配**：主机名 <host>/<host> 为逻辑名示例；IP/域名使用占位符（`{hs_host}`/`{base_domain}`/`{root_domain}` 等），解析自 `~/.harness-ai-kit/config.yaml` 顶层字段，规范见 docs/config-governance.md。
 - **主干扫描模式**: 所有扫描结果合并到 main 分支视图
-- **网络模式**: 由部署环境决定（如 Docker host network 或 bridge）；端口/入口变更需同步更新对应的部署编排与反向代理
+- **网络模式**: Docker host network，端口变更需同步改 compose + DDNS + OpenResty
 - **认证**: 使用 User Token（非密码），Token 生成后仅显示一次
 - 配套 CLI `sonarqubectl` 提供命令行操作入口
 - Jenkins 集成通过 `sonarScan.groovy` Shared Library 实现

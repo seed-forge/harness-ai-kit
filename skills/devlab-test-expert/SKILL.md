@@ -33,6 +33,7 @@ description: 测试专家知识库。包含测试最佳实践、故障排查指�
 | [test-data-management-best-practices](references/test-data-management.md) | 测试数据管理 | 数据准备 |
 | [test-automation-pyramid](references/automation-pyramid.md) | 自动化测试金字塔 | 架构设计 |
 | [property-based-testing](references/REFERENCE-PROPERTY-BASED-TESTING.md) | 属性测试模式（fast-check / Hypothesis / jqwik） | 随机数据、性质验证、最小反例 |
+| [ai-service-test-tiering](references/REFERENCE-AI-SERVICE-TEST-TIERING.md) | AI 服务测试分级隔离 | marker 分级 + opt-in 开关 + 环境隔离 |
 
 ### 🎯 前端专项
 
@@ -336,7 +337,7 @@ test.describe('Performance Benchmarks', () => {
 ```typescript
 /**
  * Source: devlab-test-expert/reference/ui-selection-stability.md
- * See also: https://github.com/seed-forge/harness-ai-kit/tree/main/skills/devlab-test-expert
+ * See also: https://github.com/team/devlab-test-expert
  */
 import { semanticSelectors } from '@playwright/test/utils';
 ```
@@ -382,3 +383,4 @@ Author: AI-assisted knowledge curation based on enterprise best practices.
 - references/REFERENCE-README.md
 - references/REFERENCE-TEST-DATA-MANAGEMENT.md
 - references/REFERENCE-PROPERTY-BASED-TESTING.md
+- references/REFERENCE-AI-SERVICE-TEST-TIERING.md

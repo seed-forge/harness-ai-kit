@@ -9,7 +9,7 @@ description: "技术债全生命周期运维：审计分析\u2192建议报告\u2
 
 技术债**全生命周期运维**：从审计发现、分级建议，到确认后的安全重构（微观/宏观），再到回归验证。不只是"怎么拆"，还回答"该不该拆、先拆哪里、拆到什么程度"。
 
-**边界**：只处理技术债（可维护性/结构/复杂度），**不改变业务语义**；业务需求变更走 `devlab-spec-driven-dev`。
+**边界**：只处理技术债（可维护性/结构/复杂度），**不改变业务语义**；业务需求变更走**外层 SDD 框架**（trellis/comet/mattpocock，见 `devlab-harness-ops` Step 7）。
 
 ## 适用场景
 
@@ -20,7 +20,7 @@ description: "技术债全生命周期运维：审计分析\u2192建议报告\u2
 
 ## 不适用场景
 
-- 加新功能（用 `devlab-spec-driven-dev`）。
+- 加新功能（走外层 SDD 框架，见 `devlab-harness-ops` Step 7）。
 - 业务逻辑本身要变（那是业务债，不是技术债）。
 - 一次性小改动（直接改即可，不必起编排）。
 
@@ -43,7 +43,7 @@ description: "技术债全生命周期运维：审计分析\u2192建议报告\u2
 ```
 Phase 0: 审计（Audit）
   [微观] 扫描代码坏味道（长方法/重复/复杂条件/过深嵌套）
-  [宏观] 扫描架构债（循环依赖/god-class/分层违规/耦合度）
+  [宏观] 扫描架构债（循环依赖/god-class/分层违规/耦合度）+ 深化机会（浅模块/抽象泄漏，见 references/REFERENCE-DEEP-MODULE-DESIGN.md）
   -> 产出审计报告：债务清单 + P0-P3 分级 + 建议优先序 + ROI 估算
   -> ⛔ Gate G0：审计报告确认，用户决定处理范围
 
@@ -83,23 +83,25 @@ Phase 5: 回归验证
 - **引用清零再删除**：删旧代码前先搜索确认零引用（含 tests/tools），清零->删除->跑测试三步走。
 - **按需用模式，不过度**：设计模式是手段不是目的；具体选型让 AI 结合场景给选项。
 - **审计先行**：不确定该不该拆时，先跑 Phase 0 审计，用数据说话。
+- **深模块优先**：拆分不只“把大的拆小”，更要“把浅的做深”——大量行为藏在小接口之后、落在可测接缝（见 references/REFERENCE-DEEP-MODULE-DESIGN.md）。
 
 ## reference
 
 - `references/REFERENCE-DESIGN-PATTERNS.md` -- 设计模式清单 + 典型模式示意性伪代码（点到即止；何时用/不用）。
+- `references/REFERENCE-DEEP-MODULE-DESIGN.md` -- 深模块设计与架构深化审计（取精华自 mattpocock/skills codebase-design/improve-codebase-architecture + Ousterhout APOSD）。
 
 ## 与其他 devlab-* Skill 的关系
 
 | Skill | 关系 | 说明 |
 |-------|------|------|
-| `devlab-spec-driven-dev` | **上游** | 重构以 spec 三件套承载（现状=requirements，拆分=design，步骤=tasks） |
+| 外层 SDD 框架（trellis/comet/mattpocock，见 `devlab-harness-ops` Step 7） | **上游** | 重构以 spec 三件套承载（现状=requirements，拆分=design，步骤=tasks） |
 | `devlab-ai-agent-engineering` | **邻接** | 重构 AI 应用时参照其分层管道目标形态 |
 | `devlab-eval-driven-agent` | **下游** | 重构后用评测集证明行为不变 |
-| `devlab-troubleshooting` | **并行** | 重构中出现运行期问题时只读诊断 |
+| `devlab-srv-reliability-ops` / `infra-reliability-ops` | **并行** | 重构中出现运行期问题时只读诊断（研发服务/基础设施） |
 
 ## 约束
 
-- 不改业务语义；发现"其实是业务需求变更"时，转 `devlab-spec-driven-dev`。
+- 不改业务语义；发现"其实是业务需求变更"时，转**外层 SDD 框架**（见 `devlab-harness-ops` Step 7）。
 - 无安全网不动高风险路径 -- 先补表征测试。
 - 每步可回退；禁止一次性大范围不可回退改动。
 - 设计模式伪代码仅示意，不硬编码具体实现/框架。

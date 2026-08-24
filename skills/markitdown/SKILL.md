@@ -1,4 +1,4 @@
-﻿---
+---
 name: markitdown
 description: 使用当前环境已安装的 MarkItDown，把 DOCX、PDF、PPTX、XLSX、图片、HTML、CSV 等文件稳定转换为 Markdown。用户提到“转成 md”“markitdown”“文档转 markdown”“把 docx/pdf/pptx/xlsx 变成 markdown”时使用。
 ---
@@ -74,4 +74,3 @@ python -m pip install azure-ai-documentintelligence azure-identity openpyxl pand
 - DOCX 已在当前环境验证通过
 - PDF、PPTX、XLSX、音频、YouTube 转写依赖已补齐
 - Azure Document Intelligence 和 OpenAI 增强能力仍需各自凭证
-

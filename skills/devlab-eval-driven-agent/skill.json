@@ -3,7 +3,7 @@
   "id": "devlab-eval-driven-agent",
   "name": "devlab-eval-driven-agent",
   "owner": "seedforge",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "status": "trial",
   "tags": [
     "eval",
@@ -12,7 +12,9 @@
     "regression",
     "dataset",
     "methodology",
-    "production"
+    "production",
+    "trajectory",
+    "golden-session"
   ],
-  "summary": "eval 自评测体系驱动的 AI Agent 生产体系：评测集组织、Mock 隔离、标准化比对、自动评测脚本与回归；L3 数据后端接 Langfuse（dataset/scores/LLM-as-judge），配套 evalctl CLI（0.2.x 已发布）承接 run/diff/ingest/feedback/report。"
+  "summary": "eval 自评测体系驱动的 AI Agent 生产体系：评测集组织、Mock 隔离、标准化比对、自动评测脚本与回归；L0-L4 分层评测（确定性单测/轨迹评测/输出评测/生产回归/安全成本护栏），L1 golden session 轨迹断言，L2/L3 数据后端接 Langfuse（dataset/scores/LLM-as-judge），配套 evalctl CLI（0.3.x）承接 run/diff/ingest/feedback/report。"
 }

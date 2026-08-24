@@ -19,7 +19,7 @@ description: Nexus 平台运维技能。凡是用户提到 Nexus 仓库、raw/Py
 
 | 配置项 | 环境变量 | Profile 字段 | 默认值 | 敏感度 |
 |--------|---------|-------------|--------|--------|
-| base_url | NEXUS_BASE_URL | base_url |  | public |
+| base_url | NEXUS_BASE_URL | base_url | http://nexus.{base_domain}:19010 | public |
 | user | NEXUS_USER | user | - | sensitive |
 | password | NEXUS_PASSWORD | password | - | sensitive |
 
@@ -140,3 +140,31 @@ nexusctl inventory diff --against <fleet-platform>/infra/artifact-registry.yaml
 参考文档：
 - references/REFERENCE-NEXUSCTL-CLI.md
 - references/REFERENCE-README.md
+
+
+## 用途
+
+<!-- TODO: 描述本技能解决的重复性工作和触发场景 -->
+
+## 工作流
+
+<!-- TODO: 列出执行步骤 -->
+
+1. ...
+2. ...
+3. ...
+
+## 约束与边界
+
+<!-- TODO: 说明前提假设和能力边界 -->
+
+- ...
+- **环境适配**：主机名 <host>/<host> 为逻辑名示例；IP/域名使用占位符（`{hs_host}`/`{base_domain}`/`{root_domain}` 等），解析自 `~/.harness-ai-kit/config.yaml` 顶层字段，规范见 docs/config-governance.md。
+
+
+## 参考文档
+
+- [REFERENCE-NAMING-CONVENTIONS.md](references/REFERENCE-NAMING-CONVENTIONS.md)
+- [REFERENCE-NEXUSCTL-CLI.md](references/REFERENCE-NEXUSCTL-CLI.md)
+- [REFERENCE-RAW-ASSET-RETIREMENT.md](references/REFERENCE-RAW-ASSET-RETIREMENT.md)
+- [REFERENCE-README.md](references/REFERENCE-README.md)

@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+# Shared external manual-acceptance launcher template.
+# Copy this file into a project and configure the command arrays below.
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly ROOT_DIR
+readonly BACKEND_DIR="${ACCEPTANCE_BACKEND_DIR:-$ROOT_DIR}"
+readonly FRONTEND_DIR="${ACCEPTANCE_FRONTEND_DIR:-$ROOT_DIR/frontend}"
+readonly BACKEND_PORT="${ACCEPTANCE_BACKEND_PORT:-48000}"
+readonly FRONTEND_PORT="${ACCEPTANCE_FRONTEND_PORT:-45000}"
+readonly BIND_HOST="${ACCEPTANCE_BIND_HOST:-0.0.0.0}"
+readonly ENV_FILE="${ACCEPTANCE_ENV_FILE:-$ROOT_DIR/.env}"
+readonly BACKEND_HEALTH_URL="${ACCEPTANCE_BACKEND_HEALTH_URL:-http://127.0.0.1:${BACKEND_PORT}/health}"
+readonly FRONTEND_HEALTH_URL="${ACCEPTANCE_FRONTEND_HEALTH_URL:-http://127.0.0.1:${FRONTEND_PORT}/}"
+readonly FQDN="${ACCEPTANCE_FQDN:-<fqdn>}"
+readonly OVERLAY_IP="${ACCEPTANCE_OVERLAY_IP:-<overlay-ip>}"
+
+# Keep commands as arrays so arguments are not re-parsed by eval.
+# Examples:
+#   BACKEND_CMD=(uv run --env-file "$ENV_FILE" uvicorn my_app.main:app)
+#   BACKEND_ARGS=(--host "$BIND_HOST" --port "$BACKEND_PORT")
+#   FRONTEND_CMD=(npm run dev)
+#   FRONTEND_ARGS=()
+BACKEND_CMD=()
+BACKEND_ARGS=()
+BACKEND_ENV=()
+FRONTEND_CMD=()
+FRONTEND_ARGS=()
+FRONTEND_ENV=()
+
+require_configured_command() {
+  local name="$1"
+  shift
+  if (($# == 0)); then
+    echo "${name} command is not configured in ${BASH_SOURCE[0]}" >&2
+    exit 1
+  fi
+}
+
+require_port() {
+  local port="$1"
+  if [[ ! "$port" =~ ^[0-9]{4,5}$ ]] || ((10#$port < 1024 || 10#$port > 65535)); then
+    echo "Port ${port} must be a numeric user-space port (1024-65535)." >&2
+    exit 1
+  fi
+}
+
+port_in_use() {
+  local port="$1"
+  if command -v ss >/dev/null 2>&1; then
+    ss -4 -ltnH "sport = :${port}" | grep -q . && return 0
+    ss -6 -ltnH "sport = :${port}" | grep -q . && return 0
+    return 1
+  fi
+  if command -v lsof >/dev/null 2>&1; then
+    if lsof -nP -iTCP:"$port" -sTCP:LISTEN -t >/dev/null 2>&1; then
+      return 0
+    fi
+    return 1
+  fi
+  echo "Neither ss nor lsof is available for port checks." >&2
+  exit 1
+}
+
+wait_for_http() {
+  local pid="$1"
+  local url="$2"
+  local label="$3"
+  local attempt
+
+  for ((attempt = 0; attempt < 40; attempt++)); do
+    if ! kill -0 "$pid" 2>/dev/null; then
+      echo "${label} exited before becoming ready." >&2
+      return 1
+    fi
+    if curl --noproxy '*' -fsS --max-time 2 "$url" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.25
+  done
+
+  echo "${label} did not become ready: ${url}" >&2
+  return 1
+}
+
+cleanup() {
+  for pid in "${BACKEND_PID:-}" "${FRONTEND_PID:-}"; do
+    if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+      kill "$pid" 2>/dev/null || true
+    fi
+  done
+}
+trap cleanup EXIT
+trap 'exit 130' INT TERM
+
+require_configured_command BACKEND_CMD "${BACKEND_CMD[@]}"
+require_configured_command FRONTEND_CMD "${FRONTEND_CMD[@]}"
+require_port "$BACKEND_PORT"
+require_port "$FRONTEND_PORT"
+if port_in_use "$BACKEND_PORT"; then
+  echo "Backend port ${BACKEND_PORT} is already listening on IPv4 or IPv6." >&2
+  exit 1
+fi
+if port_in_use "$FRONTEND_PORT"; then
+  echo "Frontend port ${FRONTEND_PORT} is already listening on IPv4 or IPv6." >&2
+  exit 1
+fi
+if [[ "${ACCEPTANCE_REQUIRE_ENV_FILE:-0}" == "1" && ! -f "$ENV_FILE" ]]; then
+  echo "Environment file not found: ${ENV_FILE}" >&2
+  exit 1
+fi
+
+cd "$ROOT_DIR"
+(
+  cd "$BACKEND_DIR"
+  env "${BACKEND_ENV[@]}" "${BACKEND_CMD[@]}" "${BACKEND_ARGS[@]}"
+) &
+BACKEND_PID=$!
+
+(
+  cd "$FRONTEND_DIR"
+  env "${FRONTEND_ENV[@]}" "${FRONTEND_CMD[@]}" "${FRONTEND_ARGS[@]}"
+) &
+FRONTEND_PID=$!
+
+wait_for_http "$BACKEND_PID" "$BACKEND_HEALTH_URL" "Backend"
+wait_for_http "$FRONTEND_PID" "$FRONTEND_HEALTH_URL" "Frontend"
+
+echo "External manual-acceptance environment"
+echo "  Bind host:             ${BIND_HOST}"
+echo "  FQDN UI:               http://${FQDN}:${FRONTEND_PORT}/"
+echo "  Overlay UI:            http://${OVERLAY_IP}:${FRONTEND_PORT}/"
+echo "  Local UI:              http://127.0.0.1:${FRONTEND_PORT}/"
+echo "  FQDN API health:       http://${FQDN}:${BACKEND_PORT}/health"
+echo "  Overlay API health:    http://${OVERLAY_IP}:${BACKEND_PORT}/health"
+echo "  Local API health:      http://127.0.0.1:${BACKEND_PORT}/health"
+wait "$BACKEND_PID" "$FRONTEND_PID"

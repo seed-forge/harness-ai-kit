@@ -1,4 +1,4 @@
-﻿---
+---
 name: patent-specification-writer
 description: Draft Chinese patent specification sections for invention, utility model, or design submissions, especially background technology and technical solution writeups, with intake guidance, prior-art-oriented analysis, terminology consistency, and document-ready output. Excludes claims drafting. Use when the user wants 专利说明书、背景技术描述、技术方案撰写、交底书整理或发明点梳理。
 argument-hint: "<technical scheme / invention disclosure / patent topic>"
@@ -210,4 +210,3 @@ Before delivering, verify:
 - the innovation points are specific rather than slogan-like
 - the technical effects correspond to the identified defects
 - the document does not drift into claim drafting
-

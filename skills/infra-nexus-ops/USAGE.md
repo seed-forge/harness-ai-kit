@@ -65,7 +65,7 @@ nexusctl repo list --verbose --json
 ## 可直接复制的中文 Prompt
 
 ```text
-请使用 infra-nexus-ops 巡检 Nexus：先运行 nexusctl doctor，再导出 repo list，核对各 format group 入口，最后运行 inventory summary。构建预热交给 infra-artifact-readiness-ops。
+请使用 infra-nexus-ops 巡检 <host> Nexus：先运行 nexusctl doctor，再导出 repo list，核对各 format group 入口，最后运行 inventory summary。构建预热交给 infra-artifact-readiness-ops。
 ```
 
 ```text

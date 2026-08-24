@@ -39,8 +39,10 @@ description: AI 驱动的分层测试体系顶层路由编排。根据项目特�
 | **单体后端** | `pom.xml`(java), `requirements.txt`(python) | `devlab-srv-test-api` | `pytest`, `jest` |
 | **微服务集群** | `docker-compose.yml`(多服务) | `devlab-integration-fullstack` | `testcontainers`, `mock-server` |
 | **性能/容量需求** | 用户提“压测/性能测试/容量验证/性能门禁”；仓库有 `tests/perf/` 或 `.jmx` | `devlab-app-test-perf` | `grafana/k6`（代码化）/ MeterSphere（平台化）|
+| **AI Agent / LLM 应用** | 仓库含 `agent`/`llm` 目录、LLM SDK 依赖（`openai`/`langchain`/`llamaindex`/`dify`）、`golden-sessions/` 或评测集目录 | `devlab-eval-driven-agent` | `evalctl` + Langfuse |
 
-注：性能测试与上方四类**正交**——功能测试答“对不对”，性能测试答“够不够快/撑不撑得住”，可与任一功能档并行接入。
+注 1：性能测试与上方功能档**正交**——功能测试答“对不对”，性能测试答“够不够快/撑不撑得住”，可与任一功能档并行接入。
+注 2：**AI Agent / LLM 应用走 agent 评测域**（`devlab-eval-driven-agent`，L0-L4 分层：确定性单测/轨迹评测/输出评测/生产回归/安全成本护栏），与上方传统测试正交——Agent 测试测轨迹/输出/安全，传统测试测接口/UI/集成，两者可并行接入。
 
 ---
 
@@ -130,7 +132,7 @@ npm install -D @playwright/test testcontainers supertest
 **功能范围**：
 - k6（代码化）vs MeterSphere（平台化）选型决策
 - 阈值即代码的压测脚本编写（thresholds 驱动 CI 红/绿）
-- 指标经 Prometheus Remote Write 入 远程时序库，Grafana 看板按 testid 过滤
+- 指标经 Prometheus Remote Write 入 <metrics>，Grafana 看板按 testid 过滤
 - CI 性能门禁接入（编排归 `devlab-cicd-onboard` 的 quality-gate 环节）
 - 集群服务容量基线巡检
 
@@ -143,6 +145,22 @@ docker pull grafana/k6:0.54.0   # 固定版本，禁用 latest
 **参考资产**：
 - `server-apps/perf-tests/`（run-k6.sh 包装器 + 巡检场景 + CI step 模板）
 - 委派：`infra-observability-ops`（看板/平台）、`infra-metersphere-ops`（平台化压测）
+
+---
+
+### 5. `devlab-eval-driven-agent` (AI Agent 评测)
+
+**职责**：AI Agent / LLM 应用的质量评测（L0-L4 分层）。
+
+**功能范围**：
+- L0 确定性单测（分层管道每层喂输入断言输出）
+- L1 轨迹评测（golden session：工具调用序列/参数/恢复/停止/终态断言）
+- L2 输出评测（LLM-as-judge 评分，Langfuse dataset + scores）
+- L3 生产回归（Langfuse traces → 评测集 → evalctl diff 门禁）
+- L4 安全+成本护栏（injection/PII + token/延迟/成本上限）
+
+**路由场景**：项目含 agent/LLM 代码（NL2SQL、RAG 问答、工具调用 Agent、数字人、Dify 应用）。
+**推荐 CLI**：`evalctl`（评测运维：run/diff/ingest/feedback/report）。
 
 ---
 

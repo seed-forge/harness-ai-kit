@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.5 - 2026-08-18
+
+- 场景识别矩阵新增「AI Agent / LLM 应用」档，路由到 `devlab-eval-driven-agent`（agent 评测域，L0-L4 分层）；
+  与上方传统测试正交，可并行接入。
+- 子技能说明新增第 5 节（AI Agent 评测）：L0 确定性单测 / L1 轨迹评测（golden session）/
+  L2 输出评测 / L3 生产回归 / L4 安全+成本护栏 + evalctl CLI。
+- 仅路由与内容增补，**未改动 dependencies**（agent 评测按需安装，不强制 required）。
+
 ## 0.1.4 - 2026-08-14
 
 - frontmatter 规范化：SKILL.md 统一 LF / 无 BOM / 单一 YAML frontmatter 块，修复 AI IDE 加载告警（missing YAML frontmatter delimited by ---）。

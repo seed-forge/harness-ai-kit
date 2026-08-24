@@ -1,9 +1,9 @@
 {
-  "namespace": "work-sc",
+  "namespace": "community",
   "id": "work-sc-software-copyright-writer",
   "name": "work-sc-software-copyright-writer",
   "owner": "seedforge",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -57,5 +57,5 @@
     "不负责软著登记流程办理，仅产出申请材料"
   ],
   "post_install_hints": [],
-  "updated_at": "2026-08-14"
+  "updated_at": "2026-08-20"
 }

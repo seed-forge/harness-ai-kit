@@ -1,15 +1,14 @@
 {
-  "namespace": "team",
+  "namespace": "community",
   "id": "infra-system-env-ops",
   "name": "infra-system-env-ops",
-  "owner": "team",
-  "version": "0.2.2",
+  "owner": "seedforge",
+  "version": "0.2.3",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
   "tags": [
     "infra",
-    "team",
     "linux",
     "port-forward",
     "iptables",
@@ -38,5 +37,5 @@
   },
   "runtime_requirements": [],
   "post_install_hints": [],
-  "updated_at": "2026-08-14"
+  "updated_at": "2026-08-20"
 }

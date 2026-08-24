@@ -4,7 +4,7 @@
 
 ## 适用场景
 
-- 远程开发服务器（如 HS02）需要防止 NetworkManager/SSH/ZeroTier 等基础设施服务意外挂掉
+- 远程开发服务器（如 <host>）需要防止 NetworkManager/SSH/ZeroTier 等基础设施服务意外挂掉
 - 需要将服务崩溃告警推送到 Mattermost #alerts 频道
 - 需要统一替代 systemd-only 的 Restart=always（Monit 提供更丰富的资源阈值检测）
 

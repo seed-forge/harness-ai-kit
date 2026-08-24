@@ -3,7 +3,7 @@
   "id": "work-markitdown",
   "name": "work-markitdown",
   "owner": "seedforge",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -28,7 +28,7 @@
   "dependencies": [
     {
       "type": "skill",
-      "namespace": "team",
+      "namespace": "community",
       "id": "markitdown",
       "version": ">=0.1.0",
       "scope": "required"
@@ -81,5 +81,5 @@
     "Verify python -m markitdown --help runs successfully.",
     "Check that .agents/tools/markitdown.cmd exists in the target workspace."
   ],
-  "updated_at": "2026-08-14"
+  "updated_at": "2026-08-20"
 }

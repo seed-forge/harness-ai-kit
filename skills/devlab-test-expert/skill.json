@@ -3,7 +3,7 @@
   "id": "devlab-test-expert",
   "name": "DevLab Test Expert Knowledge",
   "owner": "seedforge",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",

@@ -23,7 +23,7 @@
 
 ```ini
 # 主 registry（私有源）
-registry=http://localhost:4873
+registry=${PRIVATE_REGISTRY}
 
 # 二进制包镜像（node-sass, electron, puppeteer 等）
 sass_binary_site=https://npmmirror.com/mirrors/node-sass
@@ -43,7 +43,7 @@ fetch-retry-maxtimeout=60000
 **`.yarnrc`（Yarn 1.x）**
 
 ```ini
-registry "http://localhost:4873"
+registry "${PRIVATE_REGISTRY}"
 sass_binary_site "https://npmmirror.com/mirrors/node-sass"
 electron_mirror "https://npmmirror.com/mirrors/electron/"
 puppeteer_download_host "https://npmmirror.com/mirrors"
@@ -52,11 +52,11 @@ puppeteer_download_host "https://npmmirror.com/mirrors"
 **`.yarnrc.yml`（Yarn 2+）**
 
 ```yaml
-npmRegistryServer: "http://localhost:4873"
+npmRegistryServer: "${PRIVATE_REGISTRY}"
 
 npmScopes:
   company:
-    npmRegistryServer: "http://localhost:4873"
+    npmRegistryServer: "${PRIVATE_REGISTRY}"
 
 supportedArchitectures:
   os: ["linux", "darwin", "win32"]
@@ -146,7 +146,7 @@ measure_registry_latency() {
 ```bash
 # Registry 降级列表
 REGISTRY_FALLBACK_LIST=(
-  "http://localhost:4873"  # 私有源
+  "${PRIVATE_REGISTRY}"                    # 私有源
   "https://registry.npmmirror.com"           # 国内镜像（淘宝）
   "https://registry.npmjs.org"               # 官方源
 )
@@ -219,7 +219,7 @@ setup_registry_with_fallback() {
 ```bash
 # 检测私有源，不可用时使用公共镜像
 setup_registry_safe() {
-  local private_registry="${1:-http://localhost:4873}"
+  local private_registry="${1:-${PRIVATE_REGISTRY:-}}"
   local fallback_registry="${2:-https://registry.npmmirror.com}"
   local pkg_manager="${3:-yarn}"
   
@@ -426,7 +426,7 @@ patch_vue_native_websocket() {
 # 检查私有包是否可访问
 check_private_package() {
   local package_name="$1"
-  local registry="${2:-http://localhost:4873}"
+  local registry="${2:-${PRIVATE_REGISTRY:-}}"
   
   local package_url="${registry}/${package_name}"
   
@@ -538,7 +538,7 @@ install_dependencies_full() {
 # 生成 .npmrc 文件
 generate_npmrc() {
   local project_root="$1"
-  local registry="${2:-http://localhost:4873}"
+  local registry="${2:-${PRIVATE_REGISTRY:-}}"
   local npmrc="$project_root/.npmrc"
   
   info "生成 .npmrc: $npmrc"
@@ -565,7 +565,7 @@ EOF
 # 生成 .yarnrc 文件（Yarn 1.x）
 generate_yarnrc() {
   local project_root="$1"
-  local registry="${2:-http://localhost:4873}"
+  local registry="${2:-${PRIVATE_REGISTRY:-}}"
   local yarnrc="$project_root/.yarnrc"
   
   info "生成 .yarnrc: $yarnrc"
