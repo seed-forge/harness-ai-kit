@@ -1,0 +1,54 @@
+{
+  "namespace": "community",
+  "id": "base-manual-capture",
+  "name": "base-manual-capture",
+  "owner": "seedforge",
+  "version": "0.1.4",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "manual",
+    "capture",
+    "screenshot",
+    "browser-automation",
+    "base"
+  ],
+  "summary": "域中立的操作手册截图采集基座 Skill：AI 按功能描述自主操作可访问系统，逐步截图并与用户交互确认，产出截图台账与操作路径记录，供 pg-manual-builder 等写作层成稿。",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "kiro",
+    "cursor",
+    "qoder"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "skill-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [
+    "Requires one usable browser automation tool at runtime: Playwright MCP, browser-use MCP, or a local playwright CLI (any one is sufficient).",
+    "The capture ledger and trace are the source-of-truth contract; keep screenshots and ledger in sync before handing off to a manual-writing skill."
+  ],
+  "post_install_hints": [
+    "This skill only captures screenshots and records the operation path; manual prose is written by pg-manual-builder (or another writing-layer skill).",
+    "Never write real credentials into the ledger or trace; follow references/REFERENCE-REDACTION-RULES.md.",
+    "Beware of common pitfalls: polling SPA timeouts, headless layout collapse, route guard redirects, Windows GBK printing crashes, toast capture timing."
+  ],
+  "updated_at": "2026-08-14",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": true,
+    "requires_interactive": true,
+    "server_runtime": "cli-direct"
+  }
+}

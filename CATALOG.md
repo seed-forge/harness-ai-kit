@@ -3,7 +3,7 @@
 One-line descriptions of every skill, CLI, and plugin bundled in this repo.
 Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>` / `harness-ai-kit add cli <id>` (CLIs).
 
-- **Skills: 56** across 8 categories
+- **Skills: 57** across 8 categories
 - **CLIs: 6** (pip-installable, published to PyPI as `sf-*`)
 - **Plugins: 1** (AI-harness plugins)
 
@@ -101,11 +101,12 @@ Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>`
 | `work-sc-patent-specification-writer` | 专利说明书撰写：起草发明/实用新型/外观专利说明书主体章节。 |
 | `work-sc-software-copyright-writer` | 软件著作权申请材料撰写：软件说明书（≥5000字）+ 源程序示例（≥2000行），含软著审查专家自查。与 work-sc-patent-specification-writer 同簇。 |
 
-### General & Base (1)
+### General & Base (2)
 
 | Skill | Description |
 |-------|-------------|
 | `base-cn-registry-mirror-strategy` | 国内镜像源与代理分层策略：覆盖 Docker 拉取、Debian/Alpine 包管理、Node/npm、Python/pip、Maven/Gradle 与 Go 模块，便于 Dockerfile 与 CI 统一维护。 |
+| `base-manual-capture` | Domain-neutral capture base for operation manuals: browser-driven flow capture, screenshots, user confirmation, and structured operation traces. |
 
 ## Companion CLIs (6)
 
