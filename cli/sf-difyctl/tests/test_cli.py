@@ -362,6 +362,7 @@ def test_plugin_auth_info_masks_credentials(monkeypatch, capsys) -> None:
 
 
 def test_plugin_auth_set_add_calls_add(monkeypatch, capsys) -> None:
+    monkeypatch.setenv("HARNESS_AI_KIT_ROLE", "contributor")
     client = _FakePluginClient({"result": "success"})
     monkeypatch.setattr("difyctl.cli._console_client", lambda a, c: client)
     creds = {"servers_config": "{\"groksearch\":{\"url\":\"http://x/mcp\"}}"}
@@ -372,6 +373,7 @@ def test_plugin_auth_set_add_calls_add(monkeypatch, capsys) -> None:
 
 
 def test_plugin_auth_set_with_credential_id_calls_update(monkeypatch, capsys) -> None:
+    monkeypatch.setenv("HARNESS_AI_KIT_ROLE", "contributor")
     client = _FakePluginClient({"result": "success"})
     monkeypatch.setattr("difyctl.cli._console_client", lambda a, c: client)
     creds = {"servers_config": "{}"}
@@ -393,6 +395,7 @@ def test_plugin_auth_set_dry_run_masks_and_skips_api(monkeypatch, capsys) -> Non
 
 
 def test_plugin_auth_remove_calls_delete(monkeypatch, capsys) -> None:
+    monkeypatch.setenv("HARNESS_AI_KIT_ROLE", "maintainer")
     client = _FakePluginClient({"result": "success"})
     monkeypatch.setattr("difyctl.cli._console_client", lambda a, c: client)
     rc = _cmd_plugin(_plugin_args(plugin_command="auth-remove", credential_id="cid-9"), None)
