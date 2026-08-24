@@ -156,7 +156,17 @@ class PublicReleaseGateTests(unittest.TestCase):
         }
         plan = gate.release_plan(matrix, report)
         self.assertEqual(plan["waves"]["0"][0]["id"], "base")
-        self.assertEqual(plan["waves"]["1"][0]["dist_path"], "dist/cli")
+        self.assertEqual(plan["waves"]["1"][0]["dist_path"], "public-release/cli")
+
+    def test_write_github_outputs_preserves_existing_values(self) -> None:
+        plan = {"waves": {str(index): [] for index in range(4)}}
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = Path(temp_dir) / "github-output"
+            output.write_text("channel=testpypi\n", encoding="utf-8")
+            gate.write_github_outputs(output, plan)
+            content = output.read_text(encoding="utf-8")
+        self.assertIn("channel=testpypi\n", content)
+        self.assertIn("has_wave_0=false\n", content)
 
     def test_release_plan_honors_selected_package_ids(self) -> None:
         matrix = {

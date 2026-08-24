@@ -445,7 +445,7 @@ def release_plan(matrix: dict[str, Any], report: dict[str, Any]) -> dict[str, An
                 "id": package["id"],
                 "package_name": package["package_name"],
                 "version": next(iter(values)),
-                "dist_path": f"dist/{package['id']}",
+                "dist_path": f"public-release/{package['id']}",
             }
         )
     return {"waves": {str(index): waves.get(index, []) for index in range(4)}}
@@ -457,7 +457,8 @@ def write_github_outputs(path: Path, plan: dict[str, Any]) -> None:
         wave = plan["waves"][str(index)]
         lines.append(f"wave_{index}={json.dumps(wave, separators=(',', ':'))}")
         lines.append(f"has_wave_{index}={'true' if wave else 'false'}")
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    with path.open("a", encoding="utf-8", newline="\n") as handle:
+        handle.write("\n".join(lines) + "\n")
 
 
 def main(argv: list[str] | None = None) -> int:
