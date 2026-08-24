@@ -3,8 +3,8 @@
     {
       "id": "harness-ai-kit",
       "package_name": "harness-ai-kit",
-      "tree_sha256": "570a7ceb9fb5994b332c079c5e4bdb514fc275e22860d3db63cd5783a80b263b",
-      "version": "0.2.1"
+      "tree_sha256": "042a2230d60d9a96284604d94fd89e140a16d526c67b192067889fc1377ba7f1",
+      "version": "0.2.2"
     },
     {
       "id": "sf-difyctl",
@@ -15,19 +15,19 @@
     {
       "id": "sf-evalctl",
       "package_name": "sf-evalctl",
-      "tree_sha256": "eaabff9fc81908b5d9741af38c169a8f0fe72403d065f46a0c5976a39cfdface",
+      "tree_sha256": "17ca2c23532aa0ac53a5edf2bb38768a28f86e3d9a591868119c0ac45eaeb17a",
       "version": "0.1.1"
     },
     {
       "id": "sf-loopctl",
       "package_name": "sf-loopctl",
-      "tree_sha256": "b04ad01d99c4e9b289bbe462cd25cc55c9104bfcf3323f0b1a11b60f630dfe33",
+      "tree_sha256": "abd5047a8be82f5edcf23a96d6dbad733e4b5134be44d5a6140aa9c59be2d383",
       "version": "0.1.0"
     },
     {
       "id": "sf-mineructl",
       "package_name": "sf-mineructl",
-      "tree_sha256": "c1d4afd6f7221885e77c837682e2609afff758f5a643e0f2d4b5508e31f6a175",
+      "tree_sha256": "fc20f20b7f77b020dd40c735ee3c603db901828756d5f036706b8570895725f6",
       "version": "0.1.1"
     },
     {
@@ -44,5 +44,5 @@
     }
   ],
   "schema_version": 1,
-  "source_revision": "0a4db1feaa6bdbabf413430d1fd5f34e9b529347"
+  "source_revision": "a0433fef78558fda166fd5d6b8778780878b6f54"
 }
