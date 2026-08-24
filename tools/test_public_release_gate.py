@@ -158,6 +158,29 @@ class PublicReleaseGateTests(unittest.TestCase):
         self.assertEqual(plan["waves"]["0"][0]["id"], "base")
         self.assertEqual(plan["waves"]["1"][0]["dist_path"], "dist/cli")
 
+    def test_release_plan_honors_selected_package_ids(self) -> None:
+        matrix = {
+            "packages": [
+                {"id": "base", "package_name": "base", "publish": True, "release_wave": 0},
+                {"id": "cli", "package_name": "cli", "publish": True, "release_wave": 1},
+            ]
+        }
+        report = {
+            "selected_package_ids": ["base"],
+            "packages": [{"versions": {"pyproject": ["1.0.0"]}}],
+        }
+        plan = gate.release_plan(matrix, report)
+        self.assertEqual(plan["waves"]["0"][0]["id"], "base")
+        self.assertEqual(plan["waves"]["1"], [])
+
+    def test_select_packages_can_limit_release_to_wave(self) -> None:
+        packages = [
+            {"id": "base", "publish": True, "ci": True, "release_wave": 0},
+            {"id": "cli", "publish": True, "ci": True, "release_wave": 1},
+        ]
+        selected = gate.select_packages(packages, "release", max_release_wave=0)
+        self.assertEqual([item["id"] for item in selected], ["base"])
+
     def test_staging_manifest_payload_uses_package_tree_digest(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

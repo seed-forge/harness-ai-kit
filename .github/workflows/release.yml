@@ -9,6 +9,12 @@ on:
         default: testpypi
         type: choice
         options: [testpypi, pypi]
+      release_wave:
+        description: Highest release wave to publish (use 0 for harness-ai-kit only)
+        required: true
+        default: all
+        type: choice
+        options: [all, 0, 1, 2, 3]
 
 permissions:
   contents: read
@@ -43,11 +49,16 @@ jobs:
         id: plan
         run: |
           echo "channel=${{ inputs.channel || 'pypi' }}" >> "$GITHUB_OUTPUT"
+          release_args=()
+          if [[ "${{ inputs.release_wave || 'all' }}" != "all" ]]; then
+            release_args+=(--max-release-wave "${{ inputs.release_wave }}")
+          fi
           python tools/public_release_gate.py \
             --mode release \
             --report build/release-gate.json \
             --write-plan build/release-plan.json \
-            --github-output "$GITHUB_OUTPUT"
+            --github-output "$GITHUB_OUTPUT" \
+            "${release_args[@]}"
       - name: Upload checked distributions and release evidence
         uses: actions/upload-artifact@v4
         with:

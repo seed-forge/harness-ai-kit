@@ -336,10 +336,29 @@ def update_matrix_snapshot(path: Path, source_revision: str, manifest_digest: st
     path.write_text(content, encoding="utf-8", newline="\n")
 
 
-def gate(repo_root: Path, matrix: dict[str, Any], mode: str, build_root: Path) -> dict[str, Any]:
+def select_packages(
+    packages: list[dict[str, Any]], mode: str, max_release_wave: int | None = None
+) -> list[dict[str, Any]]:
+    selected = [item for item in packages if item.get("publish")] if mode == "release" else [item for item in packages if item.get("ci")]
+    if mode == "release" and max_release_wave is not None:
+        selected = [
+            item
+            for item in selected
+            if isinstance(item.get("release_wave"), int) and item["release_wave"] <= max_release_wave
+        ]
+    return selected
+
+
+def gate(
+    repo_root: Path,
+    matrix: dict[str, Any],
+    mode: str,
+    build_root: Path,
+    max_release_wave: int | None = None,
+) -> dict[str, Any]:
     matrix_errors = validate_matrix(repo_root, matrix)
     packages = [item for item in matrix["packages"] if isinstance(item, dict)]
-    selected = [item for item in packages if item.get("publish")] if mode == "release" else [item for item in packages if item.get("ci")]
+    selected = select_packages(packages, mode, max_release_wave)
     errors = list(matrix_errors)
     if not selected:
         errors.append("no packages selected by the release matrix")
@@ -394,6 +413,7 @@ def gate(repo_root: Path, matrix: dict[str, Any], mode: str, build_root: Path) -
         "scan_findings": scan_findings,
         "inventory": inventory(repo_root, packages),
         "packages": results,
+        "selected_package_ids": [item["id"] for item in selected],
         "held_packages": [
             {"id": item["id"], "reason": item.get("hold_reason", "publish=false")}
             for item in packages
@@ -403,7 +423,14 @@ def gate(repo_root: Path, matrix: dict[str, Any], mode: str, build_root: Path) -
 
 
 def release_plan(matrix: dict[str, Any], report: dict[str, Any]) -> dict[str, Any]:
-    packages = [item for item in matrix["packages"] if isinstance(item, dict) and item.get("publish")]
+    selected_ids = report.get("selected_package_ids")
+    packages = [
+        item
+        for item in matrix["packages"]
+        if isinstance(item, dict)
+        and item.get("publish")
+        and (not isinstance(selected_ids, list) or item["id"] in selected_ids)
+    ]
     versions = {item["id"]: result.get("versions", {}) for item, result in zip(packages, report["packages"])}
     waves: dict[int, list[dict[str, Any]]] = defaultdict(list)
     for package in packages:
@@ -439,6 +466,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--github-output", type=Path)
     parser.add_argument("--write-staging-manifest", type=Path)
     parser.add_argument("--source-revision")
+    parser.add_argument("--max-release-wave", type=int, choices=range(4))
     parser.add_argument("--package-id", action="append", dest="package_ids")
     parser.add_argument("--update-matrix-snapshot", action="store_true")
     args = parser.parse_args(argv)
@@ -461,7 +489,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.update_matrix_snapshot:
                 update_matrix_snapshot(args.matrix.resolve(), args.source_revision, digest)
                 matrix = load_matrix(args.matrix.resolve())
-        report = gate(repo_root, matrix, args.mode, args.build_root.resolve())
+        report = gate(repo_root, matrix, args.mode, args.build_root.resolve(), args.max_release_wave)
     except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
         report = {"schema_version": 1, "mode": args.mode, "ok": False, "errors": [str(exc)], "packages": []}
     content = json.dumps(report, indent=2, sort_keys=True) + "\n"
