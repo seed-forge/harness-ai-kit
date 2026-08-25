@@ -2,7 +2,7 @@ $schema: harness-ai-kit-config/v1
 
 # difyctl config schema. Values live in ~/.harness-ai-kit/config.yaml under
 # assets.difyctl (source of truth, priority over env vars). See
-# 工程规范/harness-ai-kit/docs/config-governance.md.
+# {checkout_dir}/docs/config-governance.md.
 config:
   - key: base_url
     type: string
