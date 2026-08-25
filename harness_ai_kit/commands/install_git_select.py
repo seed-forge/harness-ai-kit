@@ -108,5 +108,3 @@ def choose_git_skill_interactively(discovered: list[Any]) -> Any | None:
         if 1 <= selected_index <= len(discovered):
             return discovered[selected_index - 1]
         print("Selection out of range.")
-
-

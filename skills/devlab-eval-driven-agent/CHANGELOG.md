@@ -1,5 +1,9 @@
 # Changelog — devlab-eval-driven-agent
 
+## 0.3.1 - 2026-08-25
+
+- Public release metadata now uses the `public` namespace and `seedforge` owner; private registry labels and source references are removed from the OSS bundle.
+
 ## 0.3.0 - 2026-08-18
 
 - **L0-L4 分层评测矩阵**：新增 Agent 全景测试分层（L0 确定性单测 / L1 轨迹评测 / L2 输出评测 /

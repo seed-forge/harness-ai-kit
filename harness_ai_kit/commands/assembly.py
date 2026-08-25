@@ -284,4 +284,3 @@ def build_health_handler_map(core: ModuleType) -> Mapping[str, Callable]:
             doctor_extends_results=core.doctor_extends_results,
         )
     )
-

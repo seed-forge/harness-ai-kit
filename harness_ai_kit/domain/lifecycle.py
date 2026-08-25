@@ -137,7 +137,3 @@ def apply_managed_asset_lifecycle_status(
     )
     append_note_to_top_changelog(asset_dir / "CHANGELOG.md", changelog_note)
     ensure_catalog_entry(repo_root, load_skill_record(asset_dir))
-
-
-
-

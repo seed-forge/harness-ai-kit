@@ -21,20 +21,58 @@ def select_cli_record_for_spec(inventory: Mapping[str, Any], spec: Any) -> Any:
         raise ValueError(
             f"CLI namespaces are not supported yet for project declarations: {canonical_package_id(spec.id, spec.namespace)}"
         )
-    from packaging.specifiers import SpecifierSet
-    from packaging.version import Version
+    from packaging.specifiers import InvalidSpecifier, SpecifierSet
+    from packaging.version import InvalidVersion, Version
     try:
-        if Version(record.version) not in SpecifierSet(spec.version):
-            raise ValueError(
-                f"CLI {spec.id} requires {spec.version} but the available version is {record.version}. Publish or select a matching version first."
-            )
-    except Exception as exc:
-        if "available version" in str(exc):
-            raise
+        satisfied = Version(record.version) in SpecifierSet(spec.version)
+    except (InvalidSpecifier, InvalidVersion) as exc:
         raise ValueError(
             f"CLI {spec.id} has invalid version specifier {spec.version}: {exc}"
         ) from exc
+    if not satisfied:
+        raise ValueError(_cli_version_mismatch_message(spec.id, spec.version, record.version))
     return record
+
+
+def _cli_version_mismatch_message(cli_id: str, pinned: str, available: str) -> str:
+    """Consumer-actionable message for a CLI pin the registry can't satisfy.
+
+    The usual cause is a stale exact pin (``==x.y.z``) left in the project's
+    ``harness-ai-kit.yml`` / ``.lock`` from when that version was current — not a
+    missing publish. Lead with the consumer fix; keep the maintainer path last so
+    a consumer isn't told to "publish" something they only need to repoint.
+    """
+    if pinned.strip().startswith("=="):
+        fix = (
+            f"多为本地 harness-ai-kit.yml / .lock 的陈旧精确 pin："
+            f"`harness-ai-kit add cli {cli_id}` 重指为 latest，"
+            f"或把 {cli_id} 的 version 改成 >= 兼容区间后 `harness-ai-kit sync`。"
+        )
+    else:
+        fix = f"请把 {cli_id} 的版本约束调为与可用版本兼容（推荐 >=）后 `harness-ai-kit sync`。"
+    return (
+        f"CLI {cli_id} 声明版本 {pinned}，但可用版本是 {available}（不满足）。{fix}"
+        f"（维护者若确需 {pinned}：先发布该版本到 registry。）"
+    )
+
+
+def _cli_dependency_mismatch_message(cli_id: str, dep_id: str, spec: str, available: str) -> str:
+    """CLI→CLI 依赖 pin 无法被 registry 满足（元数据层）。口径与单体 pin 一致。"""
+    return (
+        f"CLI {cli_id} 依赖 {dep_id} {spec}，但可用版本是 {available}（不满足）。"
+        f"requires `{dep_id}` {spec}; "
+        f"多为 {cli_id} 元数据里的陈旧依赖 pin：`harness-ai-kit upgrade --all` 升级到已放宽依赖的新版；"
+        f"维护者：把 {cli_id} 的 {dep_id} 依赖改为 >= 兼容区间并重发，或发布满足 {spec} 的 {dep_id}。"
+    )
+
+
+def _cli_lockfile_mismatch_message(cli_id: str, locked: str, available: str) -> str:
+    """Lockfile 钉死的精确版本 registry 不再供应。口径与单体 pin 一致。"""
+    return (
+        f"lock 文件钉住 {cli_id}@{locked}，但可用版本是 {available}（registry 已更新）。"
+        f"刷新 lock：`harness-ai-kit sync`（或 `harness-ai-kit upgrade --all`）重解；"
+        f"仍不符再 `harness-ai-kit install --refresh-lock`。"
+    )
 
 
 def required_cli_dependency_entries(metadata: Mapping[str, object]) -> list[dict[str, str]]:
@@ -96,8 +134,9 @@ def expand_cli_records_with_dependencies(
                 )
             if not spec_matches_version(dependency["version"], dependency_record.version):
                 raise ValueError(
-                    f"CLI `{cli_id}` requires `{dependency_id}` {dependency['version']}, "
-                    f"but the available version is {dependency_record.version}."
+                    _cli_dependency_mismatch_message(
+                        cli_id, dependency_id, dependency["version"], dependency_record.version
+                    )
                 )
             visit(dependency_record)
 
@@ -136,7 +175,7 @@ def select_cli_records_for_lock(lockfile: Lockfile, inventory: Mapping[str, Any]
             raise KeyError(f"CLI required by lockfile is not available: {node.id}")
         if record.version != node.version:
             raise ValueError(
-                f"CLI lockfile requires {node.id}@{node.version}, but the available version is {record.version}."
+                _cli_lockfile_mismatch_message(node.id, node.version, record.version)
             )
         records.append(record)
         seen.add(node.id)

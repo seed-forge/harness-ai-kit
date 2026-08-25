@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import argparse
+import filecmp
 import json
 import os
 import re
 import shutil
+import stat
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -31,7 +33,10 @@ from harness_ai_kit.domain.inventory import (
     load_skill_metadata_for_record,
 )
 from harness_ai_kit.infrastructure.config_io import resolve_repo_root_if_available
-from harness_ai_kit.infrastructure.cli_installer import install_cli_packages
+from harness_ai_kit.infrastructure.cli_installer import (
+    install_cli_packages,
+    is_self_cli_package,
+)
 from harness_ai_kit.infrastructure.git_ops_extra import maybe_sync_repo
 from harness_ai_kit.domain.manifest_ops import (
     declared_skill_specs, declared_plugin_specs, declared_hook_specs,
@@ -45,6 +50,7 @@ from harness_ai_kit.domain.manifest_ops import (
 from harness_ai_kit.domain.install_state import (
     current_materialized_checksum_for_node,
     current_source_checksum_for_node,
+    effective_materialized_checksum,
     evaluate_installed_asset_drift,
     install_skill_directory,
     installed_managed_asset_materialized_checksum,
@@ -88,6 +94,13 @@ def warn_same_version_drift(
     installed_version: str,
     actual_materialized_checksum: str,
 ) -> bool:
+    expected_materialized = effective_materialized_checksum(node, runtime_id)
+    if (
+        expected_materialized
+        and actual_materialized_checksum
+        and actual_materialized_checksum == expected_materialized
+    ):
+        return False
     drift_status, drift_message = evaluate_installed_asset_drift(
         node=node,
         runtime_id=runtime_id,
@@ -197,7 +210,17 @@ def apply_skill_lockfile(
     target_dir: Path,
     runtime_id: str,
     offline: bool,
+    refresh_cache: bool = False,
 ) -> list[Path]:
+    def _same_version_drift_fast_path(node: pm.LockNode) -> bool:
+        if node.source not in {pm.SOURCE_REPO, pm.SOURCE_GIT_REPO} or not node.source_ref:
+            return False
+        source_dir = Path(node.source_ref)
+        payload_dir = installed_skill_payload_dir(target_dir, node.id, runtime_id)
+        if not source_dir.is_dir() or not payload_dir.is_dir():
+            return False
+        return _directories_quick_equivalent(source_dir, payload_dir)
+
     def install_registry_skill(node: pm.LockNode) -> Path:
         registry_index_url = (
             config.public_skill_registry_index_url
@@ -209,6 +232,7 @@ def apply_skill_lockfile(
             node.id,
             version=node.version,
             offline=offline,
+            force_refresh=refresh_cache,
         )
         expected_checksum = (node.checksum or "").strip()
         actual_checksum = pm.hash_bytes(payload)
@@ -231,6 +255,7 @@ def apply_skill_lockfile(
         install_skill_directory=install_skill_directory,
         install_registry_skill=install_registry_skill,
         warn_same_version_drift=warn_same_version_drift,
+        same_version_drift_fast_path=_same_version_drift_fast_path,
     )
 
 
@@ -329,6 +354,7 @@ def resolve_asset_plan(
     install_scope: str,
     features: list[str],
     offline: bool,
+    refresh_cache: bool = False,
     source_selector: str | None = None,
     preferred_sources: list[str] | None = None,
     root_sources: dict[str, tuple[str, str | None, str | None]] | None = None,
@@ -361,7 +387,11 @@ def resolve_asset_plan(
     _cli_versions_override: dict[str, str] | None = None
     while True:
         try:
-            effective_cli_versions = _cli_versions_override if _cli_versions_override is not None else current_cli_versions(repo_root, config)
+            effective_cli_versions = (
+                _cli_versions_override
+                if _cli_versions_override is not None
+                else current_cli_versions(repo_root, config, offline=offline)
+            )
             plan = pm.build_resolution_plan(
                 repo_root,
                 registry_index_url,
@@ -371,6 +401,7 @@ def resolve_asset_plan(
                 install_scope=install_scope,
                 selected_features=features,
                 offline=offline,
+                refresh_cache=refresh_cache,
                 cli_versions=effective_cli_versions,
                 preferred_sources=preferred_sources or pm.source_order_for_selector(selected_source) or role_default_sources,
                 public_registry_index_url=config.public_skill_registry_index_url.strip(),
@@ -456,6 +487,7 @@ def resolve_skill_plan(
     install_scope: str,
     features: list[str],
     offline: bool,
+    refresh_cache: bool = False,
     asset_kind: str = "skill",
     source_selector: str | None = None,
     preferred_sources: list[str] | None = None,
@@ -471,6 +503,7 @@ def resolve_skill_plan(
         install_scope=install_scope,
         features=features,
         offline=offline,
+        refresh_cache=refresh_cache,
         source_selector=source_selector,
         preferred_sources=preferred_sources,
         root_sources=root_sources,
@@ -533,6 +566,7 @@ def project_lockfile_from_manifest(
     install_scope: str,
     *,
     offline: bool,
+    refresh_cache: bool = False,
 ) -> pm.Lockfile:
     skill_root_ids = project_root_ids(manifest)
     loop_root_ids = [pm.canonical_package_id(item.id, item.namespace) for item in declared_loop_specs(manifest)]
@@ -540,6 +574,7 @@ def project_lockfile_from_manifest(
     skill_source_policy = manifest_skill_source_policy(manifest)
     skill_root_sources = manifest_skill_root_sources(manifest)
     skill_root_specifiers = manifest_skill_version_specifiers(manifest)
+    manifest_root_requests = project_manifest_root_requests(manifest)
     if skill_root_ids:
         plan = resolve_skill_plan(
             repo_root,
@@ -549,13 +584,16 @@ def project_lockfile_from_manifest(
             install_scope=install_scope,
             features=features,
             offline=offline,
+            refresh_cache=refresh_cache,
             preferred_sources=skill_source_policy,
             root_sources=skill_root_sources,
             root_specifiers=skill_root_specifiers,
         )
         lockfile = plan.to_lockfile()
         nodes = list(lockfile.nodes)
-        root_requests = list(lockfile.root_requests)
+        # Resolution records the selected source on nodes. The project manifest owns
+        # the root request, including an explicit source policy and version intent.
+        root_requests = [request for request in manifest_root_requests if request.type == "skill"]
         roots = list(lockfile.roots)
     else:
         nodes = []
@@ -575,6 +613,7 @@ def project_lockfile_from_manifest(
             install_scope=install_scope,
             features=features,
             offline=offline,
+            refresh_cache=refresh_cache,
             root_specifiers=loop_specifiers,
         )
         lockfile = plan.to_lockfile()
@@ -591,7 +630,7 @@ def project_lockfile_from_manifest(
     cli_entries: list[project_locking.CliLockEntry] = []
     cli_specs = declared_cli_specs(manifest)
     if cli_specs:
-        inventory = load_combined_cli_inventory(repo_root, config)
+        inventory = load_combined_cli_inventory(repo_root, config, offline=offline)
         for spec in cli_specs:
             record = select_cli_record_for_spec(inventory, spec)
             cli_entries.append(project_locking.CliLockEntry(spec=spec, record=record))
@@ -617,6 +656,10 @@ def project_lockfile_from_manifest(
                     post_install_hints=list(manifest_payload.post_install_hints),
                     recommended_tools=list(manifest_payload.recommended_tools),
                     contributors=list(manifest_payload.contributors),
+                    provenance=manifest_payload.provenance.model_dump(mode="json") if manifest_payload.provenance else None,
+                    structure_profile=manifest_payload.structure_profile,
+                    responsibility_keys=list(manifest_payload.responsibility_keys),
+                    load_plan=manifest_payload.load_plan.model_dump(mode="json") if manifest_payload.load_plan else None,
                     skill_type=manifest_payload.skill_type,
                     agents_md_inject=manifest_payload.agents_md_inject,
                     config_schema=manifest_payload.config_schema,
@@ -628,7 +671,7 @@ def project_lockfile_from_manifest(
         install_scope=install_scope,
         roots=roots,
         features=features,
-        root_requests=root_requests or project_manifest_root_requests(manifest),
+        root_requests=root_requests or manifest_root_requests,
         base_nodes=nodes,
         cli_entries=cli_entries,
         managed_entries=managed_entries,
@@ -734,10 +777,16 @@ def cli_nodes_from_lock(lockfile: pm.Lockfile) -> list[pm.LockNode]:
 
 
 
-def select_cli_records_for_lock(lockfile: pm.Lockfile, repo_root: Path | None, config: CliConfig) -> list[CliAssetRecord]:
+def select_cli_records_for_lock(
+    lockfile: pm.Lockfile,
+    repo_root: Path | None,
+    config: CliConfig,
+    *,
+    offline: bool = False,
+) -> list[CliAssetRecord]:
     if not cli_nodes_from_lock(lockfile):
         return []
-    inventory = load_combined_cli_inventory(repo_root, config)
+    inventory = load_combined_cli_inventory(repo_root, config, offline=offline)
     records = cli_assets.select_cli_records_for_lock(lockfile, inventory)
     return cli_assets.expand_cli_records_with_dependencies(records, inventory, load_cli_metadata_for_record)
 
@@ -823,6 +872,9 @@ def fanout_canonical_to_runtime(
         if not src.exists():
             continue
         dst = target_dir / skill_id
+        if dst.exists() and _directories_equivalent(src, dst):
+            installed.append(dst)
+            continue
         if dst.exists():
             shutil.rmtree(dst)
         shutil.copytree(src, dst)
@@ -840,6 +892,130 @@ def fanout_canonical_to_runtime(
     return installed
 
 
+def _directories_equivalent(left: Path, right: Path) -> bool:
+    """Return True when two directories are recursively identical on disk."""
+    left_signature = _directory_quick_signature(left)
+    right_signature = _directory_quick_signature(right)
+    if left_signature is not None and right_signature is not None:
+        if left_signature == right_signature:
+            return True
+    return _directories_equivalent_deep(left, right)
+
+
+def _directories_quick_equivalent(left: Path, right: Path) -> bool:
+    """Return True only when the stat-based tree signatures match exactly."""
+    left_signature = _directory_quick_signature(left)
+    right_signature = _directory_quick_signature(right)
+    return (
+        left_signature is not None
+        and right_signature is not None
+        and left_signature == right_signature
+    )
+
+
+def _directory_quick_signature(root: Path) -> tuple[tuple[str, int, float], ...] | None:
+    """Return a filecmp-style (name, size, mtime) tree signature.
+
+    Returns ``None`` when the tree contains special entries, so the caller can
+    fall back to the recursive filecmp comparison for those cases.
+    """
+    entries: list[tuple[str, int, float]] = []
+    stack: list[tuple[str, Path]] = [("", root)]
+    while stack:
+        relative_dir, directory = stack.pop()
+        try:
+            iterator = os.scandir(directory)
+        except OSError:
+            return None
+        with iterator:
+            for entry in iterator:
+                try:
+                    file_stat = entry.stat()
+                except OSError:
+                    return None
+                relative = (
+                    entry.name
+                    if not relative_dir
+                    else f"{relative_dir}/{entry.name}"
+                )
+                if stat.S_ISDIR(file_stat.st_mode):
+                    entries.append((relative + "/", file_stat.st_size, file_stat.st_mtime))
+                    stack.append((relative, Path(entry.path)))
+                elif stat.S_ISREG(file_stat.st_mode):
+                    entries.append((relative, file_stat.st_size, file_stat.st_mtime))
+                else:
+                    return None
+    return tuple(sorted(entries))
+
+
+def _directories_equivalent_deep(left: Path, right: Path) -> bool:
+    try:
+        comparison = filecmp.dircmp(left, right, ignore=[], hide=[])
+    except OSError:
+        return False
+    if (
+        comparison.left_only
+        or comparison.right_only
+        or comparison.diff_files
+        or comparison.funny_files
+        or comparison.common_funny
+    ):
+        return False
+    return all(
+        _directories_equivalent_deep(left / name, right / name)
+        for name in comparison.common_dirs
+    )
+
+
+
+
+def _lockfile_root_request_signature(requests: Iterable[pm.RootRequest]) -> str:
+    """Serialize root requests for comparison, ignoring namespace patches."""
+    normalized = [
+        request.model_copy(update={"namespace": None}).model_dump(mode="json", exclude_defaults=True)
+        for request in requests
+    ]
+    return json.dumps(
+        sorted(normalized, key=lambda item: (item.get("type", ""), item.get("id", ""), repr(item))),
+        sort_keys=True,
+    )
+
+
+def reusable_project_lockfile(
+    lock_path: Path,
+    manifest: ProjectManifest,
+    runtime_id: str,
+    install_scope: str,
+    *,
+    refresh_lock: bool,
+    sync_repo: bool,
+    cli_upgrade: bool,
+) -> pm.Lockfile | None:
+    """Return the existing lockfile when the declared manifest state is unchanged."""
+    if (
+        not lock_path.exists()
+        or refresh_lock
+        or sync_repo
+        or cli_upgrade
+    ):
+        return None
+    try:
+        existing = pm.read_lockfile(lock_path)
+    except Exception:
+        return None
+    if (
+        existing.runtime != runtime_id
+        or existing.install_scope != install_scope
+        or sorted(existing.features) != sorted(manifest_declared_features(manifest))
+        or existing.roots != project_root_ids(manifest)
+        or _lockfile_root_request_signature(existing.root_requests)
+        != _lockfile_root_request_signature(project_manifest_root_requests(manifest))
+    ):
+        return None
+    return existing
+
+
+
 
 
 def run_project_sync(
@@ -855,6 +1031,8 @@ def run_project_sync(
     offline: bool,
     dry_run: bool,
     cli_upgrade: bool,
+    refresh_lock: bool = False,
+    refresh_cache: bool = False,
 ) -> dict[str, Any]:
     runtime_id = runtime_override or manifest.runtime
     install_scope = scope_override or manifest.scope
@@ -873,8 +1051,27 @@ def run_project_sync(
         raise ValueError("Project sync needs a bootstrapped local repository or explicit --repo-root when managed assets are declared.")
     repo_root_for_target = repo_root or manifest_path.parent
     target_dir = manifest_target_dir(manifest_path, runtime_id, install_scope, target_dir_override)
-    lockfile = project_lockfile_from_manifest(repo_root_for_target, config, manifest, runtime_id, install_scope, offline=offline)
     lock_path = project_lock_path_for_manifest(manifest_path, target_dir, install_scope)
+    lockfile = reusable_project_lockfile(
+        lock_path,
+        manifest,
+        runtime_id,
+        install_scope,
+        refresh_lock=refresh_lock,
+        sync_repo=sync_repo,
+        cli_upgrade=cli_upgrade,
+    )
+    lockfile_reused = lockfile is not None
+    if lockfile is None:
+        lockfile = project_lockfile_from_manifest(
+            repo_root_for_target,
+            config,
+            manifest,
+            runtime_id,
+            install_scope,
+            offline=offline,
+            refresh_cache=refresh_cache,
+        )
     desired_skill_ids = _domain_project_sync.desired_skill_ids(lockfile)
     desired_managed_assets = _domain_project_sync.desired_managed_assets(lockfile)
     prune_scope_skill_ids = managed_project_skill_ids(lock_path, desired_skill_ids) if install_scope == "project" else set()
@@ -893,10 +1090,12 @@ def run_project_sync(
             managed_assets=prune_scope_managed_assets,
         )
     else:
-        pm.write_lockfile(_domain_project_sync.lockfile_to_resolution_plan(lockfile), lock_path)
+        if not lockfile_reused:
+            pm.write_lockfile(_domain_project_sync.lockfile_to_resolution_plan(lockfile), lock_path)
         removed_skills = []
         removed_assets = []
-    cli_records = select_cli_records_for_lock(lockfile, repo_root, config)
+    cli_records = select_cli_records_for_lock(lockfile, repo_root, config, offline=offline)
+    cli_records = [record for record in cli_records if not is_self_cli_package(record.package_name)]
     if dry_run:
         return project_sync_results.base_project_sync_summary(
             lockfile=lockfile,
@@ -912,7 +1111,15 @@ def run_project_sync(
         )
     installed_paths = []
     if any(node.type == "skill" for node in lockfile.nodes):
-        installed_paths = apply_skill_lockfile(repo_root_for_target, config, lockfile, target_dir, runtime_id, offline)
+        installed_paths = apply_skill_lockfile(
+            repo_root_for_target,
+            config,
+            lockfile,
+            target_dir,
+            runtime_id,
+            offline,
+            refresh_cache=refresh_cache,
+        )
     installed_asset_paths = apply_managed_asset_lockfile(lockfile, target_dir, runtime_id)
     if install_scope == "project":
         removed_skills = prune_orphaned_project_skills(
@@ -964,6 +1171,8 @@ def run_project_sync(
                 continue
             if not secondary_target.exists():
                 continue  # 不创建不存在的目录
+            if secondary_target == target_dir:
+                continue  # 同目录守卫：dsh 与 codex 共享 .agents/skills，禁止自我扇出
             fanout_paths = fanout_canonical_to_runtime(
                 canonical_dir=target_dir,
                 target_dir=secondary_target,
@@ -1174,7 +1383,3 @@ _EXPORTED_COMMAND_HANDLER_NAMES = [
     'command_validate',
 ]
 __all__ = [name for name in globals() if not name.startswith('_') and name not in _EXPORTED_COMMAND_HANDLER_NAMES]
-
-
-
-

@@ -35,6 +35,7 @@ packages:
     test_command: "{python} -c \"import harness_ai_kit; print('harness-ai-kit import OK')\""
     included_paths:
       - harness_ai_kit
+      - cli/harness-ai-kit
       - pyproject.toml
       - README.md
       - LICENSE

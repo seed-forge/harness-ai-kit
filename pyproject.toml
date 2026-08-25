@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "harness-ai-kit"
-version = "0.2.2"
-description = "Package manager for AI agent assets (skills / CLIs / MCPs / loops) across Codex, Claude Code, Cursor and Kiro."
+version = "0.18.1"
+description = "Package manager for AI agent assets (skills / CLIs / MCPs / plugins / loops) across Codex, Claude Code, Cursor, Kiro and DeepSeek Harness (dsh)."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
@@ -23,8 +23,7 @@ dependencies = [
 ]
 
 [project.scripts]
-harness-ai-kit = "harness_ai_kit.main:ai_kit_main"
-ai-kit = "harness_ai_kit.main:ai_kit_main"  # short alias
+harness-ai-kit = "harness_ai_kit.main:harness_ai_kit_main"
 
 [tool.setuptools]
 py-modules = []

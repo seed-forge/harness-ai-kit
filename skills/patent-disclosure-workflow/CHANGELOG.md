@@ -1,5 +1,9 @@
 # 变更记录
 
+## 0.1.5 - 2026-08-25
+
+- Public OSS metadata uses the `public` namespace and `seedforge` owner, and source resolution now uses public-registry instead of the retired private registry label.
+
 ## 0.1.4 - 2026-08-14
 
 - 依赖修复：word-export 依赖从旧 ID patent-docx-exporter 改指 work-sc-patent-docx-exporter。

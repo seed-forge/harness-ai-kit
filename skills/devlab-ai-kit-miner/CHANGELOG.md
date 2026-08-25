@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.6 - 2026-08-25
+
+- Public OSS metadata uses the `public` namespace and `seedforge` owner, and source resolution now uses public-registry instead of the retired private registry label.
+
 ## 0.4.5 - 2026-08-17
 
 - 来源脱敏纪律：复盘产出草案（SKILL.md/CHANGELOG/元数据）不得深度包含具体项目名、产品名、会话 ID、内部域名或路径；来源统一匿名化（如"某上游产品二开项目（已脱敏）"），量化锚点可保留。沉淀自 2026-08-17 首跑反哺批次审查（来源项目已脱敏）。

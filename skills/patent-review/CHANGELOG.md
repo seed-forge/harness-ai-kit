@@ -1,5 +1,9 @@
 # 变更记录
 
+## 0.1.6 - 2026-08-25
+
+- Public OSS metadata uses the `public` namespace and `seedforge` owner, and source resolution now uses public-registry instead of the retired private registry label.
+
 ## 0.1.5 - 2026-08-21
 
 - Replaced the instruction-only `drawio-skill` dependency with

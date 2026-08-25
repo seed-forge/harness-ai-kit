@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5 - 2026-08-25
+
+- Public OSS metadata uses the `public` namespace and `seedforge` owner, and source resolution now uses public-registry instead of the retired private registry label.
+
 ## 0.1.4 - 2026-08-20
 - 环境值占位符抽取：组织内部集群 IP/域名改为 {<host>_host}/{<host>_host}/{<host>_host}/{base_domain}/{service_domain}/{root_domain} config 占位符（docs/config-governance.md §12）
 

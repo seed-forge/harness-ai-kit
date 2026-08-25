@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import io
 import json
+import logging
 import os
 import re
 import time
@@ -13,6 +14,8 @@ from typing import Any, Iterable
 
 from harness_ai_kit import package_manager as pm
 from harness_ai_kit.domain import cli_assets
+from harness_ai_kit.domain.dependencies import DependencySpec
+from harness_ai_kit.domain.loop_manifest import LoopManifest
 from harness_ai_kit.domain.models import (
     ASSET_DIRECTORY_NAMES, REFERENCE_DOC_RE, REQUIRED_CLI_FIELDS, REQUIRED_SKILL_FIELDS,
     USAGE_PROMPT_CJK_RE, USAGE_PROMPT_SECTION_RE,
@@ -26,6 +29,8 @@ from harness_ai_kit.infrastructure.config_io import read_json_file
 from harness_ai_kit.infrastructure.registry_cli import cli_registry_metadata_url, load_cli_registry_index, normalize_cli_versions
 from harness_ai_kit.infrastructure.registry_skill import download_skill_metadata, load_skill_registry_index, registry_skill_metadata_url
 
+logger = logging.getLogger(__name__)
+
 
 def skill_record_from_payload(
     metadata: dict[str, object],
@@ -34,7 +39,11 @@ def skill_record_from_payload(
     source: str,
     metadata_url: str = "",
 ) -> SkillRecord:
-    manifest = pm.SkillManifest.model_validate(metadata)
+    manifest = (
+        LoopManifest.model_validate(metadata)
+        if metadata.get("package_type") == "loop"
+        else pm.SkillManifest.model_validate(metadata)
+    )
     return SkillRecord(
         skill_id=manifest.id,
         path=path,
@@ -141,21 +150,27 @@ def load_skill_registry_inventory(config: CliConfig) -> dict[str, SkillRecord]:
     registry_index = load_skill_registry_index(config)
     inventory: dict[str, SkillRecord] = {}
     for item in registry_index.get("skills", []):
-        latest_version = str(item.get("latest_version", "")).strip()
-        if not latest_version:
-            raise ValueError(f"Skill registry entry is missing latest_version for {item.get('id', '<unknown>')}")
-        raw_versions = item.get("versions", [])
-        versions = raw_versions if isinstance(raw_versions, list) else []
-        entry = next((version for version in versions if isinstance(version, dict) and version.get("version") == latest_version), None)
-        if entry is None:
-            raise ValueError(
-                f"Skill registry entry {item.get('id', '<unknown>')} is missing version metadata for {latest_version}"
-            )
-        metadata_url = registry_skill_metadata_url(entry)
-        payload = http_request(metadata_url, headers=skill_registry_headers())
-        metadata = json.loads(payload.decode("utf-8"))
-        record = skill_record_from_payload(metadata, path=None, source="registry", metadata_url=metadata_url)
-        inventory[record.skill_id] = record
+        skill_id = str(item.get("id", "<unknown>"))
+        try:
+            latest_version = str(item.get("latest_version", "")).strip()
+            if not latest_version:
+                raise ValueError(f"Skill registry entry is missing latest_version for {skill_id}")
+            raw_versions = item.get("versions", [])
+            versions = raw_versions if isinstance(raw_versions, list) else []
+            entry = next((version for version in versions if isinstance(version, dict) and version.get("version") == latest_version), None)
+            if entry is None:
+                raise ValueError(
+                    f"Skill registry entry {skill_id} is missing version metadata for {latest_version}"
+                )
+            metadata_url = registry_skill_metadata_url(entry)
+            payload = http_request(metadata_url, headers=skill_registry_headers())
+            metadata = json.loads(payload.decode("utf-8"))
+            record = skill_record_from_payload(metadata, path=None, source="registry", metadata_url=metadata_url)
+            inventory[record.skill_id] = record
+        except (KeyError, ValueError, json.JSONDecodeError, OSError, urllib.error.URLError) as exc:
+            # One malformed/legacy registry record must not block consumers of
+            # the remaining registry: skip the record and surface a warning.
+            logger.warning("Skipping malformed skill registry entry %r: %s", skill_id, exc)
     return inventory
 
 
@@ -194,6 +209,8 @@ def cli_record_from_payload(
         raise ValueError(f"CLI metadata is missing required field(s): {missing_display}. Source: {source_display}")
     publish_paths_value = metadata.get("publish_paths", [])
     publish_paths = tuple(str(item) for item in publish_paths_value) if publish_paths_value else ()
+    dependencies = _parse_cli_dependencies(metadata)
+    runtime_requirements = _parse_cli_runtime_requirements(metadata)
     return CliAssetRecord(
         cli_id=str(metadata.get("id", "")).strip(),
         path=path,
@@ -208,7 +225,52 @@ def cli_record_from_payload(
         publish_paths=publish_paths,
         source=source,
         metadata_url=metadata_url,
+        dependencies=dependencies,
+        runtime_requirements=runtime_requirements,
     )
+
+
+def _parse_cli_dependencies(metadata: dict[str, object]) -> tuple[dict[str, object], ...]:
+    """Parse and schema-validate cli.json `dependencies`.
+
+    The field must be a list of DependencySpec-compatible objects (the same
+    contract as skill.json). Anything else — dict environment maps, bare
+    strings, non-list values — is a hard error so dead declarations cannot
+    silently pass validation. Python/runtime package requirements belong in
+    pyproject.toml; non-Python runtime needs belong in `runtime_requirements`.
+    """
+    raw = metadata.get("dependencies", [])
+    if raw is None:
+        return ()
+    if not isinstance(raw, list):
+        raise ValueError(
+            f"CLI metadata 'dependencies' must be a list of DependencySpec objects, got {type(raw).__name__}"
+        )
+    parsed: list[dict[str, object]] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            raise ValueError(
+                f"CLI dependency entry must be an object (DependencySpec), got: {item!r}. "
+                "Python packages belong in pyproject.toml; runtime tools belong in `runtime_requirements`."
+            )
+        try:
+            DependencySpec.model_validate(item)
+        except Exception as exc:
+            raise ValueError(f"Invalid CLI dependency entry {item!r}: {exc}") from exc
+        parsed.append(item)
+    return tuple(parsed)
+
+
+def _parse_cli_runtime_requirements(metadata: dict[str, object]) -> tuple[str, ...]:
+    """Parse cli.json `runtime_requirements` (list of strings, mirrors loop.json)."""
+    raw = metadata.get("runtime_requirements", [])
+    if raw is None:
+        return ()
+    if not isinstance(raw, list) or not all(isinstance(x, str) for x in raw):
+        raise ValueError(
+            f"CLI metadata 'runtime_requirements' must be a list of strings, got: {raw!r}"
+        )
+    return tuple(str(x) for x in raw)
 
 
 
@@ -267,9 +329,11 @@ _cli_registry_cache: dict[str, Any] | None = None
 _cli_registry_cache_ts: float = 0.0
 
 
-def load_cli_registry_inventory(config: CliConfig) -> dict[str, CliAssetRecord]:
+def load_cli_registry_inventory(config: CliConfig, *, offline: bool = False) -> dict[str, CliAssetRecord]:
     global _cli_registry_cache, _cli_registry_cache_ts
     if not config.cli_registry_index_url.strip():
+        return {}
+    if offline:
         return {}
     # Return cached result if still fresh.
     now = time.monotonic()
@@ -279,20 +343,32 @@ def load_cli_registry_inventory(config: CliConfig) -> dict[str, CliAssetRecord]:
     registry_index = load_cli_registry_index(config)
     inventory: dict[str, CliAssetRecord] = {}
     for item in registry_index.get("clis", []):
-        latest_version = str(item.get("latest_version", "")).strip()
-        if not latest_version:
-            raise ValueError(f"CLI registry entry is missing latest_version for {item.get('id', '<unknown>')}")
-        versions = normalize_cli_versions(item, config)
-        entry = next((version for version in versions if version.get("version") == latest_version), None)
-        if entry is None:
-            raise ValueError(
-                f"CLI registry entry {item.get('id', '<unknown>')} is missing version metadata for {latest_version}"
-            )
-        metadata_url = cli_registry_metadata_url(entry)
-        payload = http_request(metadata_url, headers=registry_auth_headers())
-        metadata = json.loads(payload.decode("utf-8"))
-        record = cli_record_from_payload(metadata, path=None, source="registry", metadata_url=metadata_url)
-        inventory[record.cli_id] = record
+        cli_id = str(item.get("id", "<unknown>"))
+        # Retired entries remain in the registry during the migration window,
+        # but are no longer installable and may contain legacy metadata that
+        # cannot satisfy the current schema. Do not let such tombstones block
+        # consumers resolving active CLIs.
+        if str(item.get("status", "")).strip().lower() in {"deprecated", "retired"}:
+            continue
+        try:
+            latest_version = str(item.get("latest_version", "")).strip()
+            if not latest_version:
+                raise ValueError(f"CLI registry entry is missing latest_version for {cli_id}")
+            versions = normalize_cli_versions(item, config)
+            entry = next((version for version in versions if version.get("version") == latest_version), None)
+            if entry is None:
+                raise ValueError(
+                    f"CLI registry entry {cli_id} is missing version metadata for {latest_version}"
+                )
+            metadata_url = cli_registry_metadata_url(entry)
+            payload = http_request(metadata_url, headers=registry_auth_headers())
+            metadata = json.loads(payload.decode("utf-8"))
+            record = cli_record_from_payload(metadata, path=None, source="registry", metadata_url=metadata_url)
+            inventory[record.cli_id] = record
+        except (KeyError, ValueError, json.JSONDecodeError, OSError, urllib.error.URLError) as exc:
+            # One malformed/legacy registry record must not block consumers of
+            # the remaining registry: skip the record and surface a warning.
+            logger.warning("Skipping malformed CLI registry entry %r: %s", cli_id, exc)
     _cli_registry_cache = inventory
     _cli_registry_cache_ts = time.monotonic()
     return inventory
@@ -300,10 +376,15 @@ def load_cli_registry_inventory(config: CliConfig) -> dict[str, CliAssetRecord]:
 
 
 
-def load_combined_cli_inventory(repo_root: Path | None, config: CliConfig) -> dict[str, CliAssetRecord]:
+def load_combined_cli_inventory(
+    repo_root: Path | None,
+    config: CliConfig,
+    *,
+    offline: bool = False,
+) -> dict[str, CliAssetRecord]:
     local_inventory = load_cli_inventory(repo_root) if repo_root is not None else {}
     try:
-        registry_inventory = load_cli_registry_inventory(config)
+        registry_inventory = load_cli_registry_inventory(config, offline=offline)
     except urllib.error.URLError:
         if local_inventory:
             return local_inventory
@@ -489,7 +570,3 @@ def skill_entry_text(skill_dir: Path) -> tuple[str, str]:
     if not entry_path.exists():
         raise FileNotFoundError(f"Skill entry not found: {entry_path}")
     return entry_name, entry_path.read_text(encoding="utf-8")
-
-
-
-

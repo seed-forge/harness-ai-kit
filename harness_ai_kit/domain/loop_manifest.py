@@ -5,7 +5,7 @@ Implements F-001 (loop-asset-schema) and F-002 (loop-specific fields).
 from __future__ import annotations
 
 import re
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -20,6 +20,7 @@ from harness_ai_kit.domain.loop_contract import (
     validate_execution_mode,
     validate_predicate,
 )
+from harness_ai_kit.domain.manifest import ExecutionContext
 from harness_ai_kit.domain.policies import InstallationPolicy, SourcePolicy
 from harness_ai_kit.domain.versions import ensure_version
 
@@ -34,7 +35,7 @@ class MakerConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     entry: str = "LOOP.md"
-    agent_type: Literal["subagent", "self-check-context", "qoder-agent"] = "subagent"
+    agent_type: Literal["subagent", "self-check-context"] = "subagent"
     description: str = ""
 
 
@@ -59,7 +60,7 @@ class CheckerConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     entry: str = "CHECK.md"
-    agent_type: Literal["subagent", "self-check-context", "qoder-agent"] = "subagent"
+    agent_type: Literal["subagent", "self-check-context"] = "subagent"
     description: str = ""
     rubric: CheckerRubric = Field(default_factory=CheckerRubric)
 
@@ -87,17 +88,20 @@ class LoopSpecific(BaseModel):
 
     # Domain extension blocks already in use across team loops (F-002 extension).
     # Keep them optional so extra="forbid" still rejects truly unknown keys.
-    schedule: Any = None
-    target_repo: Any = None
-    report_output: Any = None
-    human_decisions: Any = None
-    audit_delegate: Any = None
-    audit_scope: Any = None
-    audit_dimensions: Any = None
-    handling_tiers: Any = None
-    newapi: Any = None
-    target_workspaces: Any = None
-    publish_targets: Any = None
+    target_repo: dict | list | str | None = None
+    report_output: dict | list | str | None = None
+    human_decisions: dict | list | str | None = None
+    audit_delegate: dict | list | str | None = None
+    audit_scope: dict | list | str | None = None
+    audit_dimensions: dict | list | str | None = None
+    handling_tiers: dict | list | str | None = None
+    newapi: dict | list | str | None = None
+    draft_source: dict | list | str | None = None
+    boundaries: dict | list | str | None = None
+    target_scope: dict | list | str | None = None
+    ledger: dict | list | str | None = None
+    target_workspaces: dict | list | str | None = None
+    publish_targets: dict | list | str | None = None
 
     @model_validator(mode="after")
     def validate_execution_mode_constraint(self) -> "LoopSpecific":
@@ -121,6 +125,20 @@ class LoopCompanionDocs(BaseModel):
     example_required: bool = False
 
 
+class TriggerContract(BaseModel):
+    """Machine-readable contract for a scheduler's thin loop invocation."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    entry: str = "LOOP.md"
+    profile: str | None = None
+    mode: str = "maker"
+    output: str = "standard"
+    mutation_policy: str = "controlled"
+    scheduler_ownership: str = "external"
+    prompt: str = ""
+
+
 # ---------------------------------------------------------------------------
 # Main loop manifest
 # ---------------------------------------------------------------------------
@@ -141,7 +159,7 @@ class LoopManifest(BaseModel):
     tags: list[str] = Field(default_factory=list)
     summary: str = ""
     description: str = ""
-    compatible_clients: list[str] = Field(default_factory=list)
+    execution_context: ExecutionContext = Field(default_factory=ExecutionContext)
     installation: InstallationPolicy = Field(
         default_factory=lambda: InstallationPolicy(default_scope="project", install_mode="skill_dir")
     )
@@ -149,6 +167,7 @@ class LoopManifest(BaseModel):
     dependencies: list[DependencySpec] = Field(default_factory=list)
     sources: SourcePolicy = Field(default_factory=SourcePolicy)
     companion_docs: LoopCompanionDocs = Field(default_factory=LoopCompanionDocs)
+    trigger_contract: TriggerContract | None = None
     environment: dict = Field(default_factory=dict)
     runtime_requirements: list[str] = Field(default_factory=list)
     post_install_hints: list[str] = Field(default_factory=list)
@@ -201,6 +220,16 @@ class LoopManifest(BaseModel):
         if not v:
             raise ValueError("schema_version cannot be empty")
         return v
+
+    @model_validator(mode="after")
+    def reject_runtime_specific_execution_context(self) -> "LoopManifest":
+        """Keep the portable Loop contract separate from its runner."""
+        if self.execution_context.server_runtime is not None:
+            raise ValueError(
+                "Loop manifests must not bind to a server_runtime; "
+                "configure the execution environment outside the Loop asset."
+            )
+        return self
 
 
 def load_loop_manifest(data: dict) -> LoopManifest:

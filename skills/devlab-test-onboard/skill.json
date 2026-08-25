@@ -1,9 +1,9 @@
 {
-  "namespace": "community",
+  "namespace": "public",
   "id": "devlab-test-onboard",
   "name": "DevLab Test Onboard",
   "owner": "seedforge",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -26,7 +26,7 @@
   "dependencies": [
     {
       "type": "skill",
-      "namespace": "community",
+      "namespace": "public",
       "id": "devlab-web-test-e2e",
       "version": ">=0.1.0",
       "scope": "optional",
@@ -34,7 +34,7 @@
     },
     {
       "type": "skill",
-      "namespace": "community",
+      "namespace": "public",
       "id": "devlab-srv-test-api",
       "version": ">=0.1.0",
       "scope": "optional",
@@ -42,7 +42,7 @@
     },
     {
       "type": "skill",
-      "namespace": "community",
+      "namespace": "public",
       "id": "devlab-integration-fullstack",
       "version": ">=0.1.0",
       "scope": "optional",
@@ -50,7 +50,7 @@
     },
     {
       "type": "skill",
-      "namespace": "community",
+      "namespace": "public",
       "id": "devlab-test-expert",
       "version": ">=0.1.0",
       "scope": "optional",
@@ -60,7 +60,7 @@
   "sources": {
     "preferred": [
       "repo-checkout",
-      "skill-registry"
+      "public-registry"
     ],
     "allow_fallback": true
   },
@@ -80,5 +80,5 @@
     "根据项目类型选择子技能：前端 → devlab-web-test-e2e，后端 → devlab-srv-test-api，全栈 → devlab-integration-fullstack"
   ],
   "skill_type": "workflow",
-  "updated_at": "2026-08-14"
+  "updated_at": "2026-08-25"
 }

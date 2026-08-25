@@ -20,12 +20,12 @@
   },
   "sources": {
     "preferred": [
-      "skill-registry"
+      "public-registry"
     ],
     "allow_fallback": true
   },
-  "namespace": "community",
-  "version": "0.1.4",
+  "namespace": "public",
+  "version": "0.1.5",
   "installation": {
     "default_scope": "project"
   },
@@ -37,7 +37,7 @@
     "Production migration MUST use standalone script with backup/dry-run/rollback"
   ],
   "name": "devlab-db-data-migration",
-  "updated_at": "2026-08-20",
+  "updated_at": "2026-08-25",
   "id": "devlab-db-data-migration",
   "tags": [
     "db-migration",

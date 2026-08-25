@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 import time
-from base64 import b64encode
 from typing import Any
 
 import httpx
@@ -31,6 +31,48 @@ class RegistryUnavailableError(Exception):
 # surface as "package not found".
 _REGISTRY_HTTP_RETRIES = 2
 _REGISTRY_RETRY_BACKOFF = 0.5
+_DEFAULT_REGISTRY_CACHE_TTL = 300.0
+_registry_client: httpx.Client | None = None
+_registry_client_factory: Any = None
+_registry_client_lock = threading.Lock()
+
+
+def _shared_registry_client() -> httpx.Client:
+    """Return a process-local client so registry calls reuse connections."""
+    global _registry_client, _registry_client_factory
+    factory = httpx.Client
+    with _registry_client_lock:
+        if _registry_client is None or _registry_client_factory is not factory:
+            if _registry_client is not None:
+                _registry_client.close()
+            _registry_client = factory(timeout=30.0, follow_redirects=True)
+            _registry_client_factory = factory
+        return _registry_client
+
+
+def registry_cache_ttl() -> float:
+    """Return the online registry cache TTL in seconds.
+
+    ``0`` disables cache reuse. Invalid values fall back to the safe default
+    so a malformed environment variable cannot break sync.
+    """
+    raw = os.environ.get("HARNESS_AI_KIT_REGISTRY_CACHE_TTL", "")
+    if not raw.strip():
+        return _DEFAULT_REGISTRY_CACHE_TTL
+    try:
+        return max(0.0, float(raw))
+    except ValueError:
+        return _DEFAULT_REGISTRY_CACHE_TTL
+
+
+def _online_cache_is_fresh(cache_path: Any) -> bool:
+    ttl = registry_cache_ttl()
+    if ttl <= 0:
+        return False
+    try:
+        return (time.time() - cache_path.stat().st_mtime) <= ttl
+    except OSError:
+        return False
 
 
 def registry_item_matches(item: dict[str, Any], package_ref: str) -> bool:
@@ -47,12 +89,12 @@ def registry_item_matches(item: dict[str, Any], package_ref: str) -> bool:
 
 
 def registry_headers() -> dict[str, str]:
-    username = os.environ.get("AI_KIT_REGISTRY_USERNAME") or os.environ.get("TWINE_USERNAME")
-    password = os.environ.get("AI_KIT_REGISTRY_PASSWORD") or os.environ.get("TWINE_PASSWORD")
-    if not username or not password:
-        return {}
-    token = b64encode(f"{username}:{password}".encode("utf-8")).decode("ascii")
-    return {"Authorization": f"Basic {token}"}
+    # Delegate to the single source of truth (infrastructure.http_client):
+    # ~/.harness-ai-kit/config.yaml publish.registry credentials first, then
+    # HARNESS_AI_KIT_REGISTRY_* / TWINE_* env fallback for CI/CD.
+    from harness_ai_kit.infrastructure.http_client import registry_auth_headers
+
+    return registry_auth_headers()
 
 
 def http_request_json(
@@ -62,6 +104,7 @@ def http_request_json(
     offline: bool = False,
     cache_suffix: str,
     data: bytes | None = None,
+    force_refresh: bool = False,
 ) -> dict[str, Any]:
     cache_path = cache_file_for_url(url, cache_suffix)
     lock = FileLock(str(cache_path) + ".lock", timeout=30)
@@ -70,16 +113,22 @@ def http_request_json(
             if not cache_path.exists():
                 raise FileNotFoundError(f"Offline cache miss: {url}")
             return json.loads(cache_path.read_text(encoding="utf-8"))
+        if not force_refresh and cache_path.exists() and _online_cache_is_fresh(cache_path):
+            try:
+                return json.loads(cache_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                # A partial/corrupt cache must not block a fresh request.
+                pass
         last_exc: Exception | None = None
         for attempt in range(_REGISTRY_HTTP_RETRIES + 1):
             try:
-                with httpx.Client(timeout=30.0, follow_redirects=True) as client:
-                    response = client.request(method, url, headers=registry_headers(), content=data)
-                    if response.status_code == 404 and method == "GET":
-                        return {"skills": []}
-                    response.raise_for_status()
-                    cache_path.write_text(response.text, encoding="utf-8")
-                    return response.json()
+                client = _shared_registry_client()
+                response = client.request(method, url, headers=registry_headers(), content=data)
+                if response.status_code == 404 and method == "GET":
+                    return {"skills": []}
+                response.raise_for_status()
+                cache_path.write_text(response.text, encoding="utf-8")
+                return response.json()
             except (httpx.TransportError, httpx.TimeoutException) as exc:
                 last_exc = exc
                 if attempt < _REGISTRY_HTTP_RETRIES:
@@ -95,6 +144,7 @@ def http_request_bytes(
     *,
     offline: bool = False,
     cache_suffix: str,
+    force_refresh: bool = False,
 ) -> bytes:
     cache_path = cache_file_for_url(url, cache_suffix)
     lock = FileLock(str(cache_path) + ".lock", timeout=30)
@@ -103,14 +153,19 @@ def http_request_bytes(
             if not cache_path.exists():
                 raise FileNotFoundError(f"Offline cache miss: {url}")
             return cache_path.read_bytes()
+        if not force_refresh and cache_path.exists() and _online_cache_is_fresh(cache_path):
+            try:
+                return cache_path.read_bytes()
+            except OSError:
+                pass
         last_exc: Exception | None = None
         for attempt in range(_REGISTRY_HTTP_RETRIES + 1):
             try:
-                with httpx.Client(timeout=30.0, follow_redirects=True) as client:
-                    response = client.get(url, headers=registry_headers())
-                    response.raise_for_status()
-                    cache_path.write_bytes(response.content)
-                    return response.content
+                client = _shared_registry_client()
+                response = client.get(url, headers=registry_headers())
+                response.raise_for_status()
+                cache_path.write_bytes(response.content)
+                return response.content
             except (httpx.TransportError, httpx.TimeoutException) as exc:
                 last_exc = exc
                 if attempt < _REGISTRY_HTTP_RETRIES:
@@ -121,8 +176,8 @@ def http_request_bytes(
         ) from last_exc
 
 
-def load_registry_index(index_url: str, *, offline: bool = False) -> dict[str, Any]:
-    return http_request_json(index_url, offline=offline, cache_suffix="index.json")
+def load_registry_index(index_url: str, *, offline: bool = False, force_refresh: bool = False) -> dict[str, Any]:
+    return http_request_json(index_url, offline=offline, cache_suffix="index.json", force_refresh=force_refresh)
 
 
 def registry_skill_version_entry(index_payload: dict[str, Any], skill_id: str, version: str | None = None) -> dict[str, Any]:
@@ -154,17 +209,17 @@ def registry_artifact_url(entry: dict[str, Any]) -> str:
     return explicit
 
 
-def download_registry_manifest(index_url: str, skill_id: str, version: str | None = None, *, offline: bool = False) -> tuple[SkillManifest, dict[str, Any]]:
-    index_payload = load_registry_index(index_url, offline=offline)
+def download_registry_manifest(index_url: str, skill_id: str, version: str | None = None, *, offline: bool = False, force_refresh: bool = False) -> tuple[SkillManifest, dict[str, Any]]:
+    index_payload = load_registry_index(index_url, offline=offline, force_refresh=force_refresh)
     entry = registry_skill_version_entry(index_payload, skill_id, version)
-    payload = http_request_json(registry_metadata_url(entry), offline=offline, cache_suffix="skill.json")
+    payload = http_request_json(registry_metadata_url(entry), offline=offline, cache_suffix="skill.json", force_refresh=force_refresh)
     return SkillManifest.model_validate(payload), entry
 
 
-def download_registry_artifact(index_url: str, skill_id: str, version: str | None = None, *, offline: bool = False) -> tuple[bytes, dict[str, Any]]:
-    index_payload = load_registry_index(index_url, offline=offline)
+def download_registry_artifact(index_url: str, skill_id: str, version: str | None = None, *, offline: bool = False, force_refresh: bool = False) -> tuple[bytes, dict[str, Any]]:
+    index_payload = load_registry_index(index_url, offline=offline, force_refresh=force_refresh)
     entry = registry_skill_version_entry(index_payload, skill_id, version)
-    return http_request_bytes(registry_artifact_url(entry), offline=offline, cache_suffix="zip"), entry
+    return http_request_bytes(registry_artifact_url(entry), offline=offline, cache_suffix="zip", force_refresh=force_refresh), entry
 
 
 def update_registry_index_payload(
@@ -178,6 +233,11 @@ def update_registry_index_payload(
 ) -> dict[str, Any]:
     namespace = normalize_namespace(manifest.namespace)
     canonical_id = manifest_canonical_id(manifest)
+    visibility = getattr(manifest, "visibility", None) or ""
+    owners = list(getattr(manifest, "owners", []) or [])
+    license_name = getattr(manifest, "license", "") or ""
+    homepage = getattr(manifest, "homepage", "") or ""
+    repository = getattr(manifest, "repository", "") or ""
     skill_entry = {
         "namespace": namespace,
         "canonical_id": canonical_id,
@@ -186,7 +246,7 @@ def update_registry_index_payload(
         "metadata_url": metadata_url,
         "checksum": checksum,
         "source": source,
-        "visibility": manifest.visibility or "",
+        "visibility": visibility,
         "status": manifest.status,
         "published_at": utc_now_iso(),
     }
@@ -204,11 +264,11 @@ def update_registry_index_payload(
         item["latest_version"] = manifest.version
         item["summary"] = manifest.summary
         item["description"] = manifest.description
-        item["owners"] = list(manifest.owners)
-        item["license"] = manifest.license
-        item["homepage"] = manifest.homepage
-        item["repository"] = manifest.repository
-        item["visibility"] = manifest.visibility or ""
+        item["owners"] = owners
+        item["license"] = license_name
+        item["homepage"] = homepage
+        item["repository"] = repository
+        item["visibility"] = visibility
         item["status"] = manifest.status
         item["versions"] = versions
         replaced = True
@@ -223,11 +283,11 @@ def update_registry_index_payload(
                 "latest_version": manifest.version,
                 "summary": manifest.summary,
                 "description": manifest.description,
-                "owners": list(manifest.owners),
-                "license": manifest.license,
-                "homepage": manifest.homepage,
-                "repository": manifest.repository,
-                "visibility": manifest.visibility or "",
+                "owners": owners,
+                "license": license_name,
+                "homepage": homepage,
+                "repository": repository,
+                "visibility": visibility,
                 "status": manifest.status,
                 "versions": [skill_entry],
             }

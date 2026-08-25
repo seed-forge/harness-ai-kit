@@ -56,7 +56,7 @@ def command_bind(args: argparse.Namespace, config_path: Path) -> int:
     """Update project metadata bindings in current directory."""
     cwd = Path.cwd()
     metadata_path = cwd / ".platform" / "project-metadata.yml"
-    
+
     # Check if metadata exists
     if not metadata_path.exists():
         print(f"当前目录无项目元数据：{metadata_path}")
@@ -68,14 +68,14 @@ def command_bind(args: argparse.Namespace, config_path: Path) -> int:
         else:
             print("已取消")
             return 0
-    
+
     # Load metadata
     metadata = _load_metadata(metadata_path)
-    
+
     # Parse binding path and value
     binding_path = args.path
     value = args.value
-    
+
     # Try to convert value to appropriate type
     if value.isdigit():
         value = int(value)
@@ -83,7 +83,7 @@ def command_bind(args: argparse.Namespace, config_path: Path) -> int:
         value = float(value)
     elif value.lower() in ("true", "false"):
         value = value.lower() == "true"
-    
+
     # Update binding
     full_path = f"bindings.{binding_path}"
     try:
@@ -91,11 +91,11 @@ def command_bind(args: argparse.Namespace, config_path: Path) -> int:
     except (KeyError, TypeError) as e:
         print(f"错误：无法设置 {binding_path}: {e}")
         return 1
-    
+
     # Save metadata
     _save_metadata(metadata_path, metadata)
     print(f"已更新绑定：{binding_path} = {value}")
-    
+
     return 0
 
 

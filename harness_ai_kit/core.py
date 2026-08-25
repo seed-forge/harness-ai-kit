@@ -728,5 +728,3 @@ _EXPORTED_COMMAND_HANDLER_NAMES = [
     'command_validate',
 ]
 __all__ = [name for name in globals() if not name.startswith('_') and name not in _EXPORTED_COMMAND_HANDLER_NAMES]
-
-

@@ -52,6 +52,7 @@ from harness_ai_kit.domain.manifest import (
 from harness_ai_kit.domain.manifest_io import (
     dependency_summary,
     find_lock_node,
+    load_loop_manifest,
     load_skill_manifest,
     manifest_canonical_id,
     manifest_metadata_filename,
@@ -64,8 +65,6 @@ from harness_ai_kit.domain.policies import (
     SOURCE_PUBLIC_REGISTRY,
     SOURCE_REGISTRY,
     SOURCE_REPO,
-    SOURCE_WORKSPACE_REPO,
-    SOURCE_INTERNAL_REGISTRY,
     SOURCE_GIT_REPO,
     SOURCE_LOCAL_CACHE,
     SOURCE_LOCKFILE,
@@ -123,6 +122,7 @@ def build_resolution_plan(
     install_scope: str,
     selected_features: Iterable[str] = (),
     offline: bool = False,
+    refresh_cache: bool = False,
     cli_versions: dict[str, str] | None = None,
     preferred_sources: list[str] | None = None,
     public_registry_index_url: str = "",
@@ -140,6 +140,7 @@ def build_resolution_plan(
         install_scope=install_scope,
         selected_features=selected_features,
         offline=offline,
+        refresh_cache=refresh_cache,
         cli_versions=cli_versions or {},
         preferred_sources=preferred_sources,
         public_registry_index_url=public_registry_index_url,
@@ -152,9 +153,8 @@ def build_resolution_plan(
             skill_id,
             version,
             offline=offline,
+            force_refresh=refresh_cache,
         ),
         registry_artifact_url_resolver=registry_artifact_url,
         registry_metadata_url_resolver=registry_metadata_url,
     )
-
-

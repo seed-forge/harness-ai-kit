@@ -187,24 +187,24 @@ def _compute_cascade_removals(
     """
     target_ns, target_base = split_canonical_id(asset_id)
     target_key = package_key_for(asset_kind, target_base, target_ns)
-    
+
     # Build node-key → LockNode mapping
     node_map: dict[str, Any] = {}
     for node in lockfile.nodes:
         key = package_key_for(node.type, node.id, node.namespace)
         node_map[key] = node
-    
+
     target_node = node_map.get(target_key)
     if target_node is None:
         return []
-    
+
     # Remaining nodes = everything except the target
     remaining_keys = {
         package_key_for(n.type, n.id, n.namespace)
         for n in lockfile.nodes
     }
     remaining_keys.discard(target_key)
-    
+
     # Iterative convergence: mark orphan nodes whose only consumers
     # are themselves being removed, until the set stabilises.
     removed_keys: set[str] = {target_key}
@@ -223,7 +223,7 @@ def _compute_cascade_removals(
             req_key = package_key_for(req.type, req.id, req.namespace)
             if req_key not in removed_keys:
                 required_by_survivors.add(req_key)
-    
+
         for key in list(remaining_keys):
             if key in removed_keys:
                 continue
@@ -231,7 +231,7 @@ def _compute_cascade_removals(
                 removed_keys.add(key)
                 remaining_keys.discard(key)
                 changed = True
-    
+
     # Collect canonical IDs of orphaned nodes (excluding the target itself)
     orphans: list[str] = []
     for key in removed_keys:
@@ -325,6 +325,63 @@ def _remove_from_secondary_runtimes(
             if context.remove_installed_skill(secondary_target, skill_id, secondary_runtime):
                 removed_from.append(secondary_runtime)
     return removed_from
+
+
+def _resolve_plugin_host(record: Any, requested_host: str | None) -> str:
+    """Resolve which host adapter to use for a plugin install/uninstall."""
+    hosts = tuple(getattr(record, "hosts", ()) or ()) or ("dsh",)
+    if requested_host:
+        if requested_host not in hosts:
+            raise ValueError(
+                f"Plugin {record.plugin_id} declares hosts={list(hosts)}; --host {requested_host} is not supported."
+            )
+        return requested_host
+    if len(hosts) == 1:
+        return hosts[0]
+    raise ValueError(
+        f"Plugin {record.plugin_id} supports multiple hosts {list(hosts)}; pass --host to choose one."
+    )
+
+
+def _uninstall_plugin_host_side(args: argparse.Namespace, config: Any, context: InstallCommandContext) -> None:
+    """Best-effort host-side plugin removal before local directory cleanup.
+
+    Host installs live outside .agents/ (dsh profile layers, pi npm packages),
+    so directory cleanup alone would leave residue. Failures are warnings only.
+    """
+    from harness_ai_kit.infrastructure.plugin_installer import (
+        dsh_plugin_remove,
+        find_plugin_registry_entry,
+        load_plugin_registry_index,
+        pi_plugin_remove,
+        plugin_record_from_registry_entry,
+    )
+
+    requested_host = getattr(args, "host", None)
+    record = None
+    try:
+        index = load_plugin_registry_index(config)
+        found = find_plugin_registry_entry(index, args.asset_id)
+        if found is not None:
+            item, entry = found
+            record = plugin_record_from_registry_entry(item, entry)
+    except Exception:
+        record = None
+    if record is None and requested_host is None:
+        print(f"  note: plugin {args.asset_id} not resolvable from registry; skipping host-side removal (pass --host to force).")
+        return
+    host = requested_host or _resolve_plugin_host(record, None)
+    npm_name = record.npm_name if record is not None else args.asset_id
+    try:
+        if host == "dsh":
+            profile = getattr(args, "profile", None) or (record.default_profile if record is not None else "web")
+            print(dsh_plugin_remove(npm_name, profile, dry_run=getattr(args, "dry_run", False)))
+        elif host == "pi":
+            scope = getattr(args, "scope", None)
+            scope = scope if scope in ("global", "project") else (record.default_scope if record is not None else "global")
+            print(pi_plugin_remove(npm_name, scope=scope, dry_run=getattr(args, "dry_run", False)))
+    except (OSError, RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(f"  warning: host-side removal failed for {host}: {exc}")
 
 
 def command_uninstall(args: argparse.Namespace, config_path: Path, context: InstallCommandContext) -> int:
@@ -429,6 +486,8 @@ def command_uninstall(args: argparse.Namespace, config_path: Path, context: Inst
         repo_root = context.resolve_repo_root_if_available(getattr(args, "repo_root", None), config)
         base_root = repo_root or Path.cwd()
         target_dir = context.resolve_target_dir(base_root, getattr(args, "target_dir", None), runtime_id=args.runtime, scope=args.scope)
+        if args.asset_kind == "plugin":
+            _uninstall_plugin_host_side(args, config, context)
         removed = context.remove_installed_managed_asset(target_dir, args.asset_kind, args.asset_id, args.runtime)
         managed_root = context.runtime_managed_asset_root(target_dir, args.runtime)
         if not removed:
@@ -698,7 +757,9 @@ def command_sync(args: argparse.Namespace, config_path: Path, context: InstallCo
             sync_repo=getattr(args, "sync_repo", False),
             offline=getattr(args, "offline", False),
             dry_run=getattr(args, "dry_run", False),
-            cli_upgrade=True,
+            cli_upgrade=False,
+            refresh_lock=getattr(args, "refresh_lock", False),
+            refresh_cache=getattr(args, "refresh_cache", False),
         )
         if getattr(args, "dry_run", False):
             external_lines = (
@@ -735,6 +796,7 @@ def command_sync(args: argparse.Namespace, config_path: Path, context: InstallCo
             offline=getattr(args, "offline", False),
             dry_run=getattr(args, "dry_run", False),
             cli_upgrade=args.command == "update",
+            refresh_lock=getattr(args, "refresh_lock", False),
         )
         if getattr(args, "dry_run", False):
             print_project_sync_dry_run_summary(summary, context)
@@ -783,6 +845,38 @@ def command_sync(args: argparse.Namespace, config_path: Path, context: InstallCo
             action=action,
             include_operator_hint=any(record.cli_id == "harness-ai-kit" for record in records),
         ):
+            print(line)
+        return 0
+    if mode == "plugin":
+        from harness_ai_kit.infrastructure.plugin_installer import (
+            find_plugin_registry_entry,
+            install_dsh_plugin,
+            install_pi_plugin,
+            load_plugin_registry_index,
+            plugin_record_from_registry_entry,
+        )
+
+        index = load_plugin_registry_index(config)
+        requested_profile = getattr(args, "profile", None)
+        requested_host = getattr(args, "host", None)
+        requested_scope = getattr(args, "scope", None)
+        outputs = []
+        for plugin_id in asset_ids:
+            found = find_plugin_registry_entry(index, plugin_id)
+            if found is None:
+                raise FileNotFoundError(f"Plugin {plugin_id} not found in the CLI registry index.")
+            item, entry = found
+            record = plugin_record_from_registry_entry(item, entry)
+            host = _resolve_plugin_host(record, requested_host)
+            if host == "dsh":
+                profile = requested_profile or record.default_profile
+                outputs.append(install_dsh_plugin(record, config, profile=profile, dry_run=args.dry_run))
+            elif host == "pi":
+                scope = requested_scope if requested_scope in ("global", "project") else record.default_scope
+                outputs.append(install_pi_plugin(record, config, scope=scope, dry_run=args.dry_run))
+            else:  # pragma: no cover - guarded by _resolve_plugin_host
+                raise ValueError(f"Unsupported plugin host adapter: {host}")
+        for line in outputs:
             print(line)
         return 0
     if mode == "loop":
@@ -1141,4 +1235,3 @@ def _restore_loop_deps(repo_root: Path | None, loop_ids: list[str]) -> None:
         data = _json.loads(loop_json.read_text(encoding="utf-8"))
         data["dependencies"] = _LOOP_DEPS_BACKUP.pop(lid)
         loop_json.write_text(_json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-

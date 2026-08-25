@@ -26,6 +26,10 @@ class ManagedAssetLockEntry:
     recommended_tools: Sequence[str]
     contributors: Sequence[dict[str, str]]
     skill_type: str
+    provenance: Mapping[str, Any] | None = None
+    structure_profile: str | None = None
+    responsibility_keys: Sequence[str] = ()
+    load_plan: Mapping[str, Any] | None = None
     agents_md_inject: str = ""
     config_schema: str | None = None
 
@@ -143,6 +147,10 @@ def append_managed_asset_lock_nodes(nodes: Sequence[LockNode], entries: Sequence
             post_install_hints=list(entry.post_install_hints),
             recommended_tools=list(entry.recommended_tools),
             contributors=list(entry.contributors),
+            provenance=dict(entry.provenance) if entry.provenance else None,
+            structure_profile=entry.structure_profile,
+            responsibility_keys=list(entry.responsibility_keys),
+            load_plan=dict(entry.load_plan) if entry.load_plan else None,
             skill_type=entry.skill_type,
             agents_md_inject=entry.agents_md_inject,
             config_schema=entry.config_schema,

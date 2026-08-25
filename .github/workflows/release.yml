@@ -48,6 +48,7 @@ jobs:
       - name: Run complete release gate and create explicit plan
         id: plan
         run: |
+          python -m harness_ai_kit.main validate --repo-root .
           echo "channel=${{ inputs.channel || 'pypi' }}" >> "$GITHUB_OUTPUT"
           release_args=()
           if [[ "${{ inputs.release_wave || 'all' }}" != "all" ]]; then

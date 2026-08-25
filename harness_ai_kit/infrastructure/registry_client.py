@@ -20,8 +20,8 @@ _PROTECTED_INFRA = {'registry_auth_headers', 'upload_file', 'download_skill_arch
 
 
 def registry_auth_headers() -> dict[str, str]:
-    username = os.environ.get("AI_KIT_REGISTRY_USERNAME") or os.environ.get("TWINE_USERNAME")
-    password = os.environ.get("AI_KIT_REGISTRY_PASSWORD") or os.environ.get("TWINE_PASSWORD")
+    username = os.environ.get("HARNESS_AI_KIT_REGISTRY_USERNAME") or os.environ.get("TWINE_USERNAME")
+    password = os.environ.get("HARNESS_AI_KIT_REGISTRY_PASSWORD") or os.environ.get("TWINE_PASSWORD")
     if not username or not password:
         return {}
     token = b64encode(f"{username}:{password}".encode("utf-8")).decode("ascii")

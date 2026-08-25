@@ -31,7 +31,27 @@ RUNTIME_PROFILES: dict[str, RuntimeProfile] = {
         project_target=".agents/skills",
         global_target="~/.codex/skills",
         install_mode="skill_dir",
-        notes="Project scope installs raw skills into the nearest .agents/skills directory."
+        notes="Project scope installs raw team skills into the nearest .agents/skills directory.",
+    ),
+    "dsh": RuntimeProfile(
+        runtime_id="dsh",
+        display_name="DeepSeek Harness",
+        status="supported",
+        config_dirname=".dsh",
+        project_target=".agents/skills",
+        global_target="~/.agents/skills",
+        install_mode="skill_dir",
+        notes="DSH natively scans .agents/skills (rank 200) and ~/.agents/skills (rank 500); project target reuses the codex canonical directory.",
+    ),
+    "pi": RuntimeProfile(
+        runtime_id="pi",
+        display_name="Pi Coding Agent",
+        status="supported",
+        config_dirname=".pi",
+        project_target=".agents/skills",
+        global_target="~/.agents/skills",
+        install_mode="skill_dir",
+        notes="Pi natively scans .agents/skills, .pi/skills, ~/.agents/skills and ~/.pi/agent/skills (Agent Skills standard); project target reuses the codex canonical directory.",
     ),
     "claude-code": RuntimeProfile(
         runtime_id="claude-code",
@@ -58,10 +78,10 @@ RUNTIME_PROFILES: dict[str, RuntimeProfile] = {
         display_name="Cursor",
         status="supported",
         config_dirname=".cursor",
-        project_target=".cursor/rules",
+        project_target=".cursor/skills",
         global_target=None,
-        install_mode="cursor_rule",
-        notes="Cursor project rules live in .cursor/rules. Global user rules live in settings, so only project scope is file-backed.",
+        install_mode="skill_dir",
+        notes="Cursor native skills live in .cursor/skills (one directory per skill with SKILL.md). Global user skills live in ~/.cursor/skills.",
     ),
     "opencode": RuntimeProfile(
         runtime_id="opencode",
@@ -89,6 +109,8 @@ RUNTIME_PROFILES: dict[str, RuntimeProfile] = {
 # Projects can override this in harness-ai-kit.yml via the `runtime_priority` field.
 DEFAULT_RUNTIME_PRIORITY: list[str] = [
     "codex",
+    "dsh",
+    "pi",
     "qoder",
     "claude-code",
     "opencode",
@@ -346,7 +368,7 @@ def resolve_target_dir(
         base_home = (home_dir or default_home_dir()).resolve()
         return (base_home / ".agents" / "skills").resolve()
 
-    if runtime_id == "codex":
+    if runtime_id in {"codex", "dsh", "pi"}:
         for probe in [base_cwd, *base_cwd.parents]:
             candidate = probe / ".agents" / "skills"
             if candidate.exists():

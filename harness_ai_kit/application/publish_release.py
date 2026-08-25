@@ -24,4 +24,3 @@ class PublishReleaseService:
 
     def release(self, args: Any, config_path: Path) -> int:
         return self.release_command(args, config_path)
-

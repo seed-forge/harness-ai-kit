@@ -20,4 +20,3 @@ class UpgradeService:
 
     def upgrade(self, args: Any, config_path: Path) -> int:
         return self.upgrade_command(args, config_path)
-

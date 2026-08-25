@@ -1,9 +1,9 @@
 {
-  "namespace": "community",
+  "namespace": "public",
   "id": "work-sc-document-sop-builder",
   "name": "work-sc-document-sop-builder",
   "owner": "seedforge",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -28,7 +28,7 @@
   "dependencies": [
     {
       "type": "skill",
-      "namespace": "community",
+      "namespace": "public",
       "id": "docx",
       "source_url": "https://github.com/anthropics/skills/tree/main/skills/docx",
       "version": "latest",
@@ -36,7 +36,7 @@
     },
     {
       "type": "skill",
-      "namespace": "community",
+      "namespace": "public",
       "id": "pdf",
       "source_url": "https://github.com/anthropics/skills/tree/main/skills/pdf",
       "version": "latest",
@@ -45,7 +45,7 @@
   ],
   "sources": {
     "preferred": [
-      "skill-registry"
+      "public-registry"
     ],
     "allow_fallback": true
   },
@@ -62,5 +62,5 @@
   },
   "runtime_requirements": [],
   "post_install_hints": [],
-  "updated_at": "2026-08-20"
+  "updated_at": "2026-08-25"
 }

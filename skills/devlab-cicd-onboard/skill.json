@@ -1,0 +1,65 @@
+{
+  "namespace": "public",
+  "id": "devlab-cicd-onboard",
+  "name": "DevLab CI/CD Onboard",
+  "owner": "seedforge",
+  "version": "0.10.5",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "devlab",
+    "ci-cd",
+    "github-actions",
+    "jenkins",
+    "woodpecker",
+    "pipeline",
+    "quality-gate"
+  ],
+  "summary": "Provider-neutral CI/CD onboarding: inspect repository facts, select a minimal pipeline, separate repository configuration from secrets, and verify releases without binding to a private platform.",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "cursor"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [],
+  "sources": {
+    "preferred": [
+      "repo-checkout",
+      "public-registry"
+    ],
+    "allow_fallback": true
+  },
+  "companion_docs": {
+    "usage": "USAGE.md",
+    "example_required": false
+  },
+  "environment": {
+    "dependency_groups": [],
+    "system": [],
+    "python_strategy": "none",
+    "python_packages": [],
+    "fonts": [],
+    "verify_commands": []
+  },
+  "runtime_requirements": [],
+  "post_install_hints": [
+    "Review existing CI files before proposing a provider migration.",
+    "Use the CI provider's secret store for credentials and endpoints; keep tracked configuration portable.",
+    "Validate any project-local Jenkins-style configuration with scripts/validate-jenkins-yml.py before committing it."
+  ],
+  "skill_type": "workflow",
+  "config_schema": "config.defaults.yaml",
+  "updated_at": "2026-08-25",
+  "execution_context": {
+    "ide": true,
+    "server": false,
+    "requires_codebase": true,
+    "requires_browser": false,
+    "requires_interactive": true,
+    "server_runtime": "cli-direct"
+  }
+}

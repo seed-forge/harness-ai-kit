@@ -24,4 +24,3 @@ class CommandRouter:
             parser.error(f"Unsupported command: {command}")
             return 2
         return handler(args)
-

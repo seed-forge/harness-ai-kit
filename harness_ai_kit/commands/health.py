@@ -85,7 +85,37 @@ def command_doctor(args: argparse.Namespace, config_path: Path, context: HealthC
             else:
                 print("✅ 所有绑定检查通过")
         return 1 if has_error else 0
-    
+
+    if getattr(args, "subject", "") == "dsh":
+        from harness_ai_kit.domain.doctor_checks import DSH_BASELINE_VERSION, doctor_dsh_results
+
+        results = doctor_dsh_results()
+        has_error = any(item["status"] == "error" for item in results)
+        if args.json:
+            print(json.dumps(results, ensure_ascii=False, indent=2))
+        else:
+            rows = [(item["subject"], item["status"], item["message"]) for item in results]
+            print(context.format_table(("SUBJECT", "STATUS", "MESSAGE"), rows))
+            print(f"Baseline: dsh {DSH_BASELINE_VERSION} / pnpm >=10 (see docs/dsh-integration.md)")
+            print("[ERROR] dsh 环境检查发现错误" if has_error else "[OK] dsh 环境检查完成")
+        return 1 if has_error else 0
+
+    if getattr(args, "subject", "") == "pi":
+        from harness_ai_kit.domain.doctor_checks import doctor_pi_results
+
+        config = context.load_config(config_path)
+        effective = context.effective_config(config) if hasattr(context, "effective_config") else config
+        results = doctor_pi_results(config=effective)
+        has_error = any(item["status"] == "error" for item in results)
+        if args.json:
+            print(json.dumps(results, ensure_ascii=False, indent=2))
+        else:
+            rows = [(item["subject"], item["status"], item["message"]) for item in results]
+            print(context.format_table(("SUBJECT", "STATUS", "MESSAGE"), rows))
+            print("Baseline: pi (no pinned version) + configured npm registry (see docs/pi-integration.md)")
+            print("[ERROR] pi 环境检查发现错误" if has_error else "[OK] pi 环境检查完成")
+        return 1 if has_error else 0
+
     if getattr(args, "subject", "") == "runtimes":
         profiles = list(context.runtime_profiles.values())
         if args.json:
@@ -344,7 +374,17 @@ def command_doctor(args: argparse.Namespace, config_path: Path, context: HealthC
                     print(f"[{item['status'].upper()}] {item['subject']}: {item['message']}")
     except Exception:
         pass  # Non-fatal: skip duplicate check if manifest not found
-    
+
+    # namespace 治理检查（2026-08-16 统一 team/ 后生效）
+    try:
+        repo_root = context.resolve_repo_root(getattr(args, "repo_root", None), config)
+        from harness_ai_kit.domain.doctor_checks import check_namespace_conventions
+        ns_results = check_namespace_conventions(repo_root)
+        for item in ns_results:
+            print(f"[{item['status'].upper()}] {item['subject']}: {item['message']}")
+    except Exception:
+        pass  # Non-fatal: skip namespace check if repo not available
+
     checks: list[dict[str, str]] = [
         {
             "check": "git",

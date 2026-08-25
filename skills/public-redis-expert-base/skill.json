@@ -1,9 +1,9 @@
 {
-  "namespace": "team",
+  "namespace": "public",
   "id": "public-redis-expert-base",
   "name": "public-redis-expert-base",
-  "owner": "team",
-  "version": "0.1.2",
+  "owner": "seedforge",
+  "version": "0.1.3",
   "status": "draft",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -27,7 +27,7 @@
   "dependencies": [],
   "sources": {
     "preferred": [
-      "skill-registry",
+      "public-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -51,5 +51,5 @@
     "Always use connection pooling or multiplexing; never one connection per request."
   ],
   "post_install_hints": [],
-  "updated_at": "2026-08-14"
+  "updated_at": "2026-08-25"
 }

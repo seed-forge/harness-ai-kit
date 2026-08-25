@@ -208,5 +208,3 @@ class StopConditionExtractor:
 # ---------------------------------------------------------------------------
 
 # Template paths and convergence thresholds are imported from ._utils
-
-

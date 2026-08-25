@@ -32,9 +32,13 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
         command_name="harness-ai-kit",
         config_dirname=".harness-ai-kit",
         default_checkout_dirname="harness-ai-kit",
-        default_repo_url="https://github.com/seed-forge/harness-ai-kit.git",
+        # Repository endpoints belong in ~/.harness-ai-kit/config.yaml.
+        default_repo_url="",
         self_cli_package_name="harness-ai-kit",
-        cli_description="Package manager for AI agent assets (skills / CLIs / MCPs / loops).",
+        cli_description=(
+            "Package manager for AI agent assets (skills / CLIs / MCPs / plugins / loops) "
+            "across Codex, Claude Code, Cursor, Kiro and DeepSeek Harness (dsh)."
+        ),
         project_manifest_filename="harness-ai-kit.yml",
         lockfile_name="harness-ai-kit.lock",
         managed_asset_bundle_root="",

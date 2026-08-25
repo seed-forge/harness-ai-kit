@@ -1,9 +1,9 @@
 {
-  "namespace": "community",
+  "namespace": "public",
   "id": "infra-sonarqube-ops",
   "name": "infra-sonarqube-ops",
   "owner": "seedforge",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -25,7 +25,7 @@
   "sources": {
     "preferred": [
       "repo-checkout",
-      "skill-registry"
+      "public-registry"
     ],
     "allow_fallback": true
   },
@@ -48,7 +48,7 @@
     "配套 CLI sonarqubectl 可简化日常操作"
   ],
   "skill_type": "operational",
-  "updated_at": "2026-08-20",
+  "updated_at": "2026-08-25",
   "config_schema": "config.defaults.yaml",
   "companion_cli": "sonarqubectl"
 }

@@ -140,7 +140,6 @@ class LoopAssetGenerator:
             "tags": mapped.get("tags", []),
             "summary": mapped.get("summary", ""),
             "description": mapped.get("description", ""),
-            "compatible_clients": ["codex", "claude-code"],
             "installation": {
                 "default_scope": "project",
                 "install_mode": "skill_dir",
@@ -148,7 +147,7 @@ class LoopAssetGenerator:
             "entry": "LOOP.md",
             "dependencies": mapped.get("dependencies", []),
             "sources": {
-                "preferred": ["repo-checkout", "skill-registry"],
+                "preferred": ["repo-checkout", "public-registry"],
                 "allow_fallback": True,
             },
             "companion_docs": {
@@ -309,7 +308,7 @@ def _load_template(name: str) -> str | None:
             except OSError:
                 return None
         # Also try repo-style lookup
-        template_path = parent / "skills" / "post-task-skill-miner" / "templates" / name
+        template_path = parent / "skills" / "base-session-ai-kit-miner" / "templates" / name
         if template_path.exists():
             try:
                 return template_path.read_text(encoding="utf-8")

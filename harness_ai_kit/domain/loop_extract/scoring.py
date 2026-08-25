@@ -1,6 +1,6 @@
 """Loop extraction engine: value scoring, field mapping, rubric extraction.
 
-Implements the core logic for Loop extraction (merged from session-to-loop into post-task-skill-miner):
+Implements the core logic for Loop extraction (merged from session-to-loop into base-session-ai-kit-miner):
 - ValueScorer: 6-signal scoring model (REF-VALUE-SCORING)
 - LoopFieldMapper: 14-field skill-to-loop mapping (REF-EXTRACTION-RUBRIC)
 - RubricExtractor: 3-layer rubric dimension extraction
@@ -356,5 +356,3 @@ class ValueScorer:
 # ---------------------------------------------------------------------------
 
 # Map risk keywords to risk levels
-
-

@@ -19,7 +19,8 @@ from harness_ai_kit.product import active_product_profile
 
 
 def project_manifest_path(base_dir: Path) -> Path:
-    return base_dir.resolve() / active_product_profile().project_manifest_filename
+    base = base_dir.resolve()
+    return base / active_product_profile().project_manifest_filename
 
 
 
@@ -368,7 +369,3 @@ def save_project_manifest(manifest_path: Path, manifest: ProjectManifest) -> Non
         yaml.safe_dump(project_manifest_payload(manifest), sort_keys=False, allow_unicode=True),
         encoding="utf-8",
     )
-
-
-
-

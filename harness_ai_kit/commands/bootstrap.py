@@ -236,37 +236,39 @@ ROLE_DESCRIPTIONS = {
 
 def command_whoami(args: argparse.Namespace, config_path: Path, context: BootstrapCommandContext) -> int:
     import os
-    
+
     raw_config = context.load_config(config_path)
     config = context.effective_config(raw_config)
     effective = effective_role(config)
-    
+
     # Determine role source
     if raw_config.role.strip():
         role_source = "config.yaml"
         env_override_note = ""
-    elif os.environ.get("AI_KIT_ROLE"):
-        role_source = "config.yaml (env var AI_KIT_ROLE overrides temporarily)"
-        env_override_note = f" (temp override: {os.environ['AI_KIT_ROLE']})"
+    elif os.environ.get("HARNESS_AI_KIT_ROLE"):
+        role_source = "config.yaml (env var HARNESS_AI_KIT_ROLE overrides temporarily)"
+        env_override_note = (
+            f" (temp override: {os.environ.get('HARNESS_AI_KIT_ROLE')})"
+        )
     else:
         role_source = "default (consumer)"
         env_override_note = ""
-    
+
     role_desc = ROLE_DESCRIPTIONS.get(effective, "Run `harness-ai-kit config set --role <role>` to choose: consumer, contributor, or maintainer.")
-    
+
     # Role permissions summary
     permissions = {
         "consumer": ["Read-only operations", "Install from registry", "Local sync"],
         "contributor": ["Consumer + dry-run writes", "Draft submission"],
-        "maintainer": ["Full write access", "Publish to Nexus", "Governance"]
+        "maintainer": ["Full write access", "Publish to configured registries", "Governance"]
     }
     perm_list = "; ".join(permissions.get(effective, []))
-    
+
     print(f"Role:      {effective}{env_override_note}")
     print(f"Source:    {role_source}")
     print(f"Permits:   {perm_list}")
     print(f"Description:\n           {role_desc}")
-    
+
     # Existing identity output...
     explicit_name = bool(raw_config.identity.name.strip())
     explicit_email = bool(raw_config.identity.email.strip())
@@ -279,7 +281,7 @@ def command_whoami(args: argparse.Namespace, config_path: Path, context: Bootstr
     print(f"InstallExt:{'auto' if config.defaults.install_external_immediately else 'manual'}  (config set --install-external-immediately true/false)")
     print(f"Git:       {config.publish.git}  Push: {config.publish.push}")
     print(f"Config:    {config_path}")
-    if not raw_config.role.strip() and not os.environ.get("AI_KIT_ROLE"):
+    if not raw_config.role.strip() and not os.environ.get("HARNESS_AI_KIT_ROLE"):
         print()
         print("Hint: role not set — running as consumer (registry-only installs, no local repo needed).")
         print("      Maintainers/contributors opt in: `harness-ai-kit config set --role maintainer` (or contributor).")

@@ -18,6 +18,17 @@ class TriggerConfig(BaseModel):
     event_source: str | None = None
     event_filter: dict[str, Any] = Field(default_factory=dict)
     cron_expression: str | None = None
+    timezone: str = "UTC"
+
+    @model_validator(mode="after")
+    def validate_trigger_shape(self) -> "TriggerConfig":
+        if self.type == TriggerType.CRON and not self.cron_expression:
+            raise ValueError("cron trigger requires cron_expression")
+        if self.type == TriggerType.EVENT and not self.event_source:
+            raise ValueError("event trigger requires event_source")
+        if self.type != TriggerType.CRON and self.cron_expression:
+            raise ValueError("cron_expression is only valid for cron triggers")
+        return self
 
 
 class EscalationTarget(BaseModel):

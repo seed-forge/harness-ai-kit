@@ -1,5 +1,9 @@
 # 变更记录
 
+## 0.3.2 - 2026-08-25
+
+- Public OSS metadata uses the `public` namespace and `seedforge` owner, and source resolution now uses public-registry instead of the retired private registry label.
+
 ## 0.3.1 - 2026-08-18
 
 - `references/REFERENCE-AI-SERVICE-TEST-TIERING.md` 末尾新增「延伸：Agent 测试的 L0-L4 分层（指针）」：

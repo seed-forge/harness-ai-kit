@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import functools
 import hashlib
 import io
+import os
 import zipfile
 from pathlib import Path
 from typing import Sequence
@@ -66,6 +68,30 @@ def _should_ignore_hash_path(path: Path) -> bool:
     return any(part in IGNORED_HASH_FILENAMES or part == "__pycache__" for part in path.parts)
 
 
+def iter_regular_files(root: Path) -> list[Path]:
+    """Return regular files under ``root`` in deterministic order."""
+    files: list[Path] = []
+    stack = [root]
+    while stack:
+        directory = stack.pop()
+        try:
+            iterator = os.scandir(directory)
+        except OSError:
+            continue
+        with iterator:
+            for entry in iterator:
+                try:
+                    is_file = entry.is_file()
+                    is_dir = entry.is_dir(follow_symlinks=False)
+                except OSError:
+                    continue
+                if is_file:
+                    files.append(Path(entry.path))
+                elif is_dir:
+                    stack.append(Path(entry.path))
+    return sorted(files)
+
+
 def hash_named_bytes(entries: Sequence[tuple[str, bytes]]) -> str:
     digest = hashlib.sha256()
     for relative_path, payload in sorted(entries, key=lambda item: item[0].replace("\\", "/")):
@@ -82,10 +108,10 @@ def hash_named_bytes(entries: Sequence[tuple[str, bytes]]) -> str:
     return digest.hexdigest()
 
 
-# Directories excluded from published skill archives (producer-side working material,
-# not part of the installable asset). Convention: <asset>/visual/ holds visual
-# promotion kits (cnt-aikit-visual); consumers must not receive them.
+# Producer-side material excluded from published asset archives. Execution ledgers
+# are consumer-local state and must not be shipped with a reusable asset.
 PUBLISH_EXCLUDE_DIR_NAMES = frozenset({"visual", "__pycache__"})
+PUBLISH_EXCLUDE_FILE_NAMES = frozenset({"execution-ledger.yaml", ".publish-lag.json"})
 
 
 def build_skill_archive_bytes(skill_dir: Path) -> bytes:
@@ -95,18 +121,27 @@ def build_skill_archive_bytes(skill_dir: Path) -> bytes:
             if file_path.is_file() and not any(
                 part in PUBLISH_EXCLUDE_DIR_NAMES
                 for part in file_path.relative_to(skill_dir).parts
-            ):
+            ) and file_path.name not in PUBLISH_EXCLUDE_FILE_NAMES:
                 archive.write(file_path, arcname=str(file_path.relative_to(skill_dir.parent)).replace("\\", "/"))
     return buffer.getvalue()
 
 
-def hash_skill_directory(skill_dir: Path) -> str:
+@functools.lru_cache(maxsize=None)
+def _hash_skill_directory_cached(skill_dir: Path) -> str:
     entries: list[tuple[str, bytes]] = []
-    for file_path in sorted(skill_dir.rglob("*")):
-        if not file_path.is_file():
-            continue
+    for file_path in iter_regular_files(skill_dir):
         relative = file_path.relative_to(skill_dir)
         if _should_ignore_hash_path(relative):
             continue
         entries.append((relative.as_posix(), file_path.read_bytes()))
     return hash_named_bytes(entries)
+
+
+def hash_skill_directory(skill_dir: Path) -> str:
+    """Hash a skill directory, caching the result per path in this process.
+
+    Dependency resolution and sync treat source skill directories as immutable
+    during a single run, and the same directory is hashed many times (resolver,
+    materialization, drift checks). The cache avoids re-reading those files.
+    """
+    return _hash_skill_directory_cached(Path(os.path.abspath(skill_dir)))

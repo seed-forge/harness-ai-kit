@@ -25,8 +25,8 @@ def add_config_bootstrap_parsers(subparsers: Any, *, runtime_choices: Sequence[s
     )
     config_set_parser.add_argument("--repo-url", help=f"Persist the default {profile.command_name} remote repository URL.")
     config_set_parser.add_argument("--checkout-dir", help="Persist the default local checkout directory.")
-    config_set_parser.add_argument("--registry-upload-url", help="Persist the private PyPI/Nexus upload URL.")
-    config_set_parser.add_argument("--registry-index-url", help="Persist the private package install index URL.")
+    config_set_parser.add_argument("--registry-upload-url", help="Persist the configured Python package upload URL.")
+    config_set_parser.add_argument("--registry-index-url", help="Persist the configured package install index URL.")
     config_set_parser.add_argument("--skill-registry-upload-url", help="Persist the raw skill registry upload URL.")
     config_set_parser.add_argument("--skill-registry-index-url", help="Persist the raw skill registry index URL.")
     config_set_parser.add_argument("--public-skill-registry-upload-url", help="Persist the public skill registry upload URL.")
@@ -63,8 +63,8 @@ def add_config_bootstrap_parsers(subparsers: Any, *, runtime_choices: Sequence[s
     )
     init_parser.add_argument("--repo-url", help=f"Override the default {profile.command_name} remote repository URL.")
     init_parser.add_argument("--checkout-dir", help="Override the default checkout directory.")
-    init_parser.add_argument("--registry-upload-url", help="Override the default private registry upload URL.")
-    init_parser.add_argument("--registry-index-url", help="Override the default private registry install index URL.")
+    init_parser.add_argument("--registry-upload-url", help="Override the configured package registry upload URL.")
+    init_parser.add_argument("--registry-index-url", help="Override the configured package registry install index URL.")
     init_parser.add_argument("--skill-registry-upload-url", help="Override the default raw skill registry upload URL.")
     init_parser.add_argument("--skill-registry-index-url", help="Override the default raw skill registry index URL.")
     init_parser.add_argument("--public-skill-registry-upload-url", help="Override the public skill registry upload URL.")
@@ -131,16 +131,16 @@ def add_inspect_resolution_parsers(subparsers: Any, *, runtime_choices: Sequence
     list_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
     list_parser.add_argument("--sync-repo", action="store_true", help="Sync the repo before listing skills.")
 
-    resolve_parser = subparsers.add_parser("resolve", help="Resolve a skill dependency graph without installing it.")
+    resolve_parser = subparsers.add_parser("resolve", help="Resolve a team skill dependency graph without installing it.")
     resolve_parser.add_argument("asset_kind", choices=["skill", "loop"], help="Asset kind to resolve.")
     resolve_parser.add_argument("asset_id", help="Root asset id to resolve.")
     resolve_parser.add_argument("--feature", action="append", default=[], help="Enable optional dependency features.")
     resolve_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
     resolve_parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON.")
     resolve_parser.add_argument("--offline", action="store_true", help="Resolve using local cache only.")
-    resolve_parser.add_argument("--from", dest="source_selector", choices=["auto", "workspace-repo", "internal-registry", "public-registry", "git-repo", "repo", "registry"], default="auto", help="Prefer one source family when resolving.")
+    resolve_parser.add_argument("--from", dest="source_selector", choices=["auto", "repo-checkout", "registry", "public-registry", "git-repo", "repo"], default="auto", help="Prefer one source family when resolving.")
 
-    lock_parser = subparsers.add_parser("lock", help="Resolve a skill graph and write harness-ai-kit.lock.")
+    lock_parser = subparsers.add_parser("lock", help="Resolve a team skill graph and write harness-ai-kit.lock.")
     lock_parser.add_argument("asset_kind", nargs="?", choices=["skill", "loop"], help="Asset kind to lock.")
     lock_parser.add_argument("asset_id", nargs="?", help="Root asset id to lock.")
     lock_parser.add_argument("--feature", action="append", default=[], help="Enable optional dependency features.")
@@ -148,16 +148,16 @@ def add_inspect_resolution_parsers(subparsers: Any, *, runtime_choices: Sequence
     lock_parser.add_argument("--scope", choices=["project", "global"], default=None, help="Override the install scope recorded in the lockfile.")
     lock_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
     lock_parser.add_argument("--offline", action="store_true", help="Resolve using local cache only.")
-    lock_parser.add_argument("--from", dest="source_selector", choices=["auto", "workspace-repo", "internal-registry", "public-registry", "git-repo", "repo", "registry"], default="auto", help="Prefer one source family when resolving.")
+    lock_parser.add_argument("--from", dest="source_selector", choices=["auto", "repo-checkout", "registry", "public-registry", "git-repo", "repo"], default="auto", help="Prefer one source family when resolving.")
 
-    graph_parser = subparsers.add_parser("graph", help="Render the resolved dependency tree for one skill.")
+    graph_parser = subparsers.add_parser("graph", help="Render the resolved dependency tree for one team skill.")
     graph_parser.add_argument("asset_kind", choices=["skill", "loop"], help="Asset kind to graph.")
     graph_parser.add_argument("asset_id", help="Root asset id to graph.")
     graph_parser.add_argument("--feature", action="append", default=[], help="Enable optional dependency features.")
     graph_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
     graph_parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON.")
     graph_parser.add_argument("--offline", action="store_true", help="Resolve using local cache only.")
-    graph_parser.add_argument("--from", dest="source_selector", choices=["auto", "workspace-repo", "internal-registry", "public-registry", "git-repo", "repo", "registry"], default="auto", help="Prefer one source family when resolving.")
+    graph_parser.add_argument("--from", dest="source_selector", choices=["auto", "repo-checkout", "registry", "public-registry", "git-repo", "repo"], default="auto", help="Prefer one source family when resolving.")
 
     why_parser = subparsers.add_parser("why", help="Explain why a dependency appears in the resolved graph.")
     why_parser.add_argument("asset_kind", choices=["skill", "loop"], help="Asset kind to inspect.")
@@ -166,7 +166,7 @@ def add_inspect_resolution_parsers(subparsers: Any, *, runtime_choices: Sequence
     why_parser.add_argument("--feature", action="append", default=[], help="Enable optional dependency features.")
     why_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
     why_parser.add_argument("--offline", action="store_true", help="Resolve using local cache only.")
-    why_parser.add_argument("--from", dest="source_selector", choices=["auto", "workspace-repo", "internal-registry", "public-registry", "git-repo", "repo", "registry"], default="auto", help="Prefer one source family when resolving.")
+    why_parser.add_argument("--from", dest="source_selector", choices=["auto", "repo-checkout", "registry", "public-registry", "git-repo", "repo"], default="auto", help="Prefer one source family when resolving.")
 
     show_parser = subparsers.add_parser("show", help="Show metadata for one team asset.")
     show_parser.add_argument("asset_kind", choices=["skill", "plugin", "hook", "subagent", "mcp", "loop"], help="Asset kind to inspect.")
@@ -221,7 +221,7 @@ def add_project_runtime_parsers(subparsers: Any, *, runtime_choices: Sequence[st
     add_parser.add_argument("--no-install", action="store_true", help="Only update harness-ai-kit.yml without syncing runtime state.")
     add_parser.add_argument("--no-input", action="store_true", help="Do not prompt when a Git source contains multiple skills.")
     add_parser.add_argument("--extends", action="append", default=None, help="Base skill to extend (format: namespace/id). Repeatable for multi-inheritance.")
-    add_parser.add_argument("--extends-version", default=None, help="Base skill version (pinned ==X.Y.Z format). Required when --extends is specified.")
+    add_parser.add_argument("--extends-version", default=None, help="Base skill version specifier (>=X.Y.Z recommended for auto-upgrade, or ==X.Y.Z exact pin). Required when --extends is specified.")
     add_parser.add_argument("--extends-strategy", choices=["prepend", "append", "replace"], default="prepend", help="Merge strategy for SKILL.md content (default: prepend).")
 
     remove_parser = subparsers.add_parser("remove", help="Remove one asset from harness-ai-kit.yml and reconcile runtime state.")
@@ -246,6 +246,8 @@ def add_project_runtime_parsers(subparsers: Any, *, runtime_choices: Sequence[st
     sync_parser.add_argument("--no-install-external", action="store_true", help="Skip external dependency installation even if defaults.install_external_immediately is true.")
     sync_parser.add_argument("--dry-run", action="store_true", help="Preview the sync action.")
     sync_parser.add_argument("--all-runtimes", action="store_true", help="After syncing to canonical .agents, fan-out to all discovered runtime directories.")
+    sync_parser.add_argument("--refresh-lock", action="store_true", help="Ignore the existing harness-ai-kit.lock and resolve again.")
+    sync_parser.add_argument("--refresh-cache", action="store_true", help="Ignore online registry caches and replace them with fresh responses.")
 
     prune_parser = subparsers.add_parser("prune", help="Remove orphaned project skill installs that are no longer declared.")
     prune_parser.add_argument("--target-dir", help="Override the local runtime target directory.")
@@ -271,20 +273,10 @@ def add_project_runtime_parsers(subparsers: Any, *, runtime_choices: Sequence[st
     uninstall_parser.add_argument("--target-dir", help="Override the local runtime target directory for skills.")
     uninstall_parser.add_argument("--runtime", choices=runtime_choices, default="codex", help="Runtime selector for skill uninstall.")
     uninstall_parser.add_argument("--scope", choices=["project", "global"], default="project", help="Install scope selector for skill uninstall.")
+    uninstall_parser.add_argument("--host", choices=["dsh", "pi"], default=None, help="Plugin host adapter for `uninstall plugin` (defaults to the plugin's only declared host).")
+    uninstall_parser.add_argument("--profile", default=None, help="DSH profile name for `uninstall plugin` host-side removal.")
     uninstall_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
     uninstall_parser.add_argument("--dry-run", action="store_true", help="Preview the uninstall action.")
-
-    deprecate_parser = subparsers.add_parser("deprecate", help="Mark one local skill or CLI as deprecated.")
-    deprecate_parser.add_argument("asset_kind", choices=["skill", "cli", "plugin", "hook", "subagent", "mcp", "loop"], help="Asset kind to deprecate.")
-    deprecate_parser.add_argument("asset_id", help="Asset id to deprecate.")
-    deprecate_parser.add_argument("--replacement", required=True, help="Replacement asset id to point users to.")
-    deprecate_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-
-    retire_parser = subparsers.add_parser("retire", help="Mark one local skill or CLI as retired.")
-    retire_parser.add_argument("asset_kind", choices=["skill", "cli", "plugin", "hook", "subagent", "mcp", "loop"], help="Asset kind to retire.")
-    retire_parser.add_argument("asset_id", help="Asset id to retire.")
-    retire_parser.add_argument("--replacement", help="Optional replacement asset id to point users to.")
-    retire_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
 
     for command_name in ("install", "update"):
         command_parser = subparsers.add_parser(command_name, help=f"{command_name.title()} one or more skills into the local execution directory.")
@@ -296,12 +288,14 @@ def add_project_runtime_parsers(subparsers: Any, *, runtime_choices: Sequence[st
         command_parser.add_argument("--with-recommended", action="store_true", help="Also install recommended companion skills declared by the selected skills.")
         command_parser.add_argument("--feature", action="append", default=[], help="Enable optional dependency features.")
         command_parser.add_argument("--offline", action="store_true", help="Use local cache only for registry-backed skills.")
-        command_parser.add_argument("--from", dest="source_selector", choices=["auto", "workspace-repo", "internal-registry", "public-registry", "git-repo", "repo", "registry"], default="auto", help="Prefer one source family when resolving and installing.")
+        command_parser.add_argument("--from", dest="source_selector", choices=["auto", "repo-checkout", "registry", "public-registry", "git-repo", "repo"], default="auto", help="Prefer one source family when resolving and installing.")
         command_parser.add_argument("--refresh-lock", action="store_true", help="Ignore the existing harness-ai-kit.lock and resolve again.")
         command_parser.add_argument("--install-external", action="store_true", help="Install declared external system and Python dependencies after resolving the asset graph.")
         command_parser.add_argument("--no-install-external", action="store_true", help="Skip external dependency installation even if defaults.install_external_immediately is true.")
         command_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
         command_parser.add_argument("--sync-repo", action="store_true", help="Sync the repo before copying skills.")
+        command_parser.add_argument("--profile", default=None, help="DSH profile name for `install plugin` (defaults to the plugin's default_profile).")
+        command_parser.add_argument("--host", choices=["dsh", "pi"], default=None, help="Plugin host adapter for `install plugin` (defaults to the plugin's only declared host; pi installs map --scope to global/project package targets).")
         command_parser.add_argument("--dry-run", action="store_true", help="Preview the install or update action.")
 
     upgrade_parser = subparsers.add_parser("upgrade", help="Upgrade synced skills, installed CLIs, or both.")
@@ -314,140 +308,6 @@ def add_project_runtime_parsers(subparsers: Any, *, runtime_choices: Sequence[st
     upgrade_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
     upgrade_parser.add_argument("--sync-repo", action="store_true", help="Sync the repo before upgrading assets.")
     upgrade_parser.add_argument("--dry-run", action="store_true", help="Preview the upgrade actions.")
-
-
-def add_loop_parsers(subparsers: Any) -> None:
-    """Add loop execution parsers."""
-    from harness_ai_kit.commands.loop_run import add_run_parser
-    add_run_parser(subparsers)
-
-
-def add_loop_extract_parsers(subparsers: Any) -> None:
-    """Add loop extraction and promotion parsers."""
-    extract_parser = subparsers.add_parser(
-        "extract",
-        help="Extract loop assets from a completed workflow session.",
-    )
-    extract_parser.add_argument("wfs_id", help="Workflow session ID (e.g., WFS-loop-runtime-engine).")
-    extract_parser.add_argument("--dry-run", action="store_true", help="Only score the session without generating assets.")
-    extract_parser.add_argument("--force", action="store_true", help="Generate assets even if score is below threshold.")
-    extract_parser.add_argument("--loop-id", default=None, help="Override the generated loop ID.")
-    extract_parser.add_argument("--output", "-o", default=None, help="Output directory (default: loops/{id}/draft/).")
-    extract_parser.add_argument("--skill-dir", default=None, help="Explicit skill directory to read metadata from.")
-
-    promote_parser = subparsers.add_parser(
-        "promote",
-        help="Promote a draft loop to official status.",
-    )
-    promote_parser.add_argument("loop_id", help="Loop ID to promote.")
-    promote_parser.add_argument("--force", action="store_true", help="Promote even if validation fails.")
-
-
-def add_authoring_publish_release_parsers(subparsers: Any, *, runtime_choices: Sequence[str]) -> None:
-    create_parser = subparsers.add_parser("create", help="Scaffold a new skill or CLI inside the repository.")
-    create_subparsers = create_parser.add_subparsers(dest="create_subject", required=True)
-    create_skill_parser = create_subparsers.add_parser("skill", help="Create a new skill scaffold.")
-    create_skill_parser.add_argument("asset_id", help="New skill ID.")
-    create_skill_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    for managed_type in ("plugin", "hook", "subagent", "mcp", "loop"):
-        managed_parser = create_subparsers.add_parser(managed_type, help=f"Create a new {managed_type} scaffold.")
-        managed_parser.add_argument("asset_id", help=f"New {managed_type} ID.")
-        managed_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    create_cli_parser = create_subparsers.add_parser("cli", help="Create a new CLI scaffold.")
-    create_cli_parser.add_argument("asset_id", help="New CLI ID.")
-    create_cli_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-
-    submit_parser = subparsers.add_parser("submit", help="Commit and push a member-facing skill or CLI update without exposing git steps.")
-    submit_subparsers = submit_parser.add_subparsers(dest="submit_subject", required=True)
-    submit_skill_parser = submit_subparsers.add_parser("skill", help="Submit one skill update.")
-    submit_skill_parser.add_argument("asset_id", help="Skill ID to submit.")
-    submit_skill_parser.add_argument("--message", help="Override the generated commit message.")
-    submit_skill_parser.add_argument("--no-push", action="store_true", help="Commit locally without pushing.")
-    submit_skill_parser.add_argument("--dry-run", action="store_true", help="Preview which files would be submitted.")
-    submit_skill_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    for managed_type in ("plugin", "hook", "subagent", "mcp", "loop"):
-        managed_submit_parser = submit_subparsers.add_parser(managed_type, help=f"Submit one {managed_type} update.")
-        managed_submit_parser.add_argument("asset_id", help=f"{managed_type.title()} ID to submit.")
-        managed_submit_parser.add_argument("--message", help="Override the generated commit message.")
-        managed_submit_parser.add_argument("--no-push", action="store_true", help="Commit locally without pushing.")
-        managed_submit_parser.add_argument("--dry-run", action="store_true", help="Preview which files would be submitted.")
-        managed_submit_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    submit_cli_parser = submit_subparsers.add_parser("cli", help="Submit one CLI update.")
-    submit_cli_parser.add_argument("asset_id", help="CLI ID to submit.")
-    submit_cli_parser.add_argument("--message", help="Override the generated commit message.")
-    submit_cli_parser.add_argument("--no-push", action="store_true", help="Commit locally without pushing.")
-    submit_cli_parser.add_argument("--dry-run", action="store_true", help="Preview which files would be submitted.")
-    submit_cli_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-
-    publish_skill_parser = subparsers.add_parser("publish-skill", help="Package one skill and publish it to the configured raw skill registry.")
-    publish_skill_parser.add_argument("skill_id", help="Skill ID to package and publish.")
-    publish_skill_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    publish_skill_parser.add_argument("--dry-run", action="store_true", help="Preview the skill publish steps.")
-    publish_skill_parser.add_argument(
-        "--from", dest="source_scope",
-        choices=["repo", "project", "global"], default="repo",
-        help="Where to find the skill: repo (default), project (.agents/skills), or global (~/.agents/skills)"
-    )
-    publish_skill_parser.add_argument("--git", action="store_true", help="Git add + commit after publish")
-    publish_skill_parser.add_argument("--no-git", action="store_true", help="Override config to skip git")
-    publish_skill_parser.add_argument("--push", action="store_true", help="Git pull --rebase + push (implies --git)")
-    publish_skill_parser.add_argument("--no-sync", action="store_true", help="Skip auto sync after publish")
-    publish_skill_parser.add_argument("--no-sync-repo", action="store_true", help="Skip SSOT repo pull before publish")
-    publish_skill_parser.add_argument("-m", "--message", help="Custom git commit message")
-
-    publish_cli_parser = subparsers.add_parser("publish-cli", help="Build one CLI package, upload it to the configured package registry, and refresh the raw CLI registry.")
-    publish_cli_parser.add_argument("cli_id", help="CLI ID to package and publish.")
-    publish_cli_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    publish_cli_parser.add_argument("--dry-run", action="store_true", help="Preview the CLI publish steps.")
-
-    publish_parser = subparsers.add_parser("publish", help="Stage, commit, and optionally push skill or repository changes without manual git ceremony.")
-    publish_parser.add_argument("paths", nargs="*", help="Repo-relative file or directory paths to stage, such as catalog.md or cli/harness_ai_kit/main.py.")
-    publish_parser.add_argument("--skill-id", action="append", default=[], help="Convenience selector for skills/<skill-id>. Repeat for multiple skills.")
-    publish_parser.add_argument("--all", action="store_true", help="Stage all repo changes before committing.")
-    publish_parser.add_argument("--message", required=True, help="Git commit message to use for the publish operation.")
-    publish_parser.add_argument("--push", action="store_true", help="Push the resulting commit to origin.")
-    publish_parser.add_argument("--dry-run", action="store_true", help="Preview which paths would be published without staging, committing, or pushing.")
-    publish_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-
-    release_parser = subparsers.add_parser("release", help="Run version bump, package build, metadata check, and registry publish workflows.")
-    release_subparsers = release_parser.add_subparsers(dest="release_command", required=True)
-    release_skill_build_parser = release_subparsers.add_parser("skill-build", help="Build a zip artifact for one skill.")
-    release_skill_build_parser.add_argument("skill_id", help="Skill ID to package.")
-    release_skill_build_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    release_skill_publish_parser = release_subparsers.add_parser("skill-publish", help="Upload one skill zip and refresh the raw skill registry index.")
-    release_skill_publish_parser.add_argument("skill_id", help="Skill ID to publish.")
-    release_skill_publish_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    release_skill_publish_parser.add_argument("--dry-run", action="store_true", help="Preview the skill publish steps.")
-    release_version_parser = release_subparsers.add_parser("version", help="Show the current project version.")
-    release_version_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    release_bump_parser = release_subparsers.add_parser("bump", help="Bump the project version.")
-    release_bump_parser.add_argument("part", choices=["patch", "minor", "major"], nargs="?", default="patch", help="Version part to bump. Defaults to patch.")
-    release_bump_parser.add_argument("--set-version", help="Set an explicit version instead of bumping.")
-    release_bump_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    release_bump_parser.add_argument("--dry-run", action="store_true", help="Preview the version change without writing.")
-    release_build_parser = release_subparsers.add_parser("build", help="Clean and build wheel plus sdist.")
-    release_build_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    release_build_parser.add_argument("--skip-clean", action="store_true", help="Keep existing build artifacts.")
-    release_check_parser = release_subparsers.add_parser("check", help="Run twine check on built artifacts.")
-    release_check_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    release_publish_parser = release_subparsers.add_parser("publish", help="Upload built artifacts to the configured private registry and optionally tag the release.")
-    release_publish_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    release_publish_parser.add_argument("--repository-url", help="Override the registry upload URL for this publish.")
-    release_publish_parser.add_argument("--trusted-host", help="Override the trusted host for this publish.")
-    release_publish_parser.add_argument("--skip-build", action="store_true", help="Skip rebuilding artifacts before upload.")
-    release_publish_parser.add_argument("--skip-check", action="store_true", help="Skip twine check before upload.")
-    release_publish_parser.add_argument("--tag", action="store_true", help="Create a git tag after successful upload.")
-    release_publish_parser.add_argument("--push-tag", action="store_true", help="Push the created git tag to origin.")
-    release_publish_parser.add_argument("--dry-run", action="store_true", help="Preview the upload and tagging steps.")
-    publish_loop_parser = subparsers.add_parser("publish-loop", help="Package one loop and publish it to the configured raw asset registry.")
-    publish_loop_parser.add_argument("loop_id", help="Loop ID to package and publish.")
-    publish_loop_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    publish_loop_parser.add_argument("--dry-run", action="store_true", help="Preview the loop publish steps.")
-
-    release_loop_publish_parser = release_subparsers.add_parser("loop-publish", help="Upload one loop zip and refresh the raw asset registry index.")
-    release_loop_publish_parser.add_argument("loop_id", help="Loop ID to publish.")
-    release_loop_publish_parser.add_argument("--repo-root", help="Explicit harness-ai-kit repository root.")
-    release_loop_publish_parser.add_argument("--dry-run", action="store_true", help="Preview the loop publish steps.")
 
 
 def add_asset_config_parser(subparsers: Any) -> None:

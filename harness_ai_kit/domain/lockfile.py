@@ -37,6 +37,10 @@ class LockNode(BaseModel):
     post_install_hints: list[str] = Field(default_factory=list)
     recommended_tools: list[str] = Field(default_factory=list)
     contributors: list[dict[str, str]] = Field(default_factory=list)
+    provenance: dict[str, Any] | None = None
+    structure_profile: str | None = None
+    responsibility_keys: list[str] = Field(default_factory=list)
+    load_plan: dict[str, Any] | None = None
     skill_type: str = "operational"
     agents_md_inject: str = ""
     config_schema: str | None = None
@@ -53,7 +57,7 @@ class RootRequest(BaseModel):
     source_policy: list[
         Literal[
             "repo-checkout",
-            "skill-registry",
+            "public-registry",
             "public-registry",
             "git-repo",
             "local-cache",

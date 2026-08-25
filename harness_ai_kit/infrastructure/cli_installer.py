@@ -19,9 +19,10 @@ from typing import Any, Sequence
 
 from harness_ai_kit.domain.models import CliAssetRecord, CliConfig
 from harness_ai_kit.domain.models.constants import ASSET_DIRECTORY_NAMES
-from harness_ai_kit.domain.dependency_expansion import SELF_CLI_PACKAGE_NAME, ordered_unique
+from harness_ai_kit.domain.dependency_expansion import SELF_CLI_ASSET_ID, SELF_CLI_PACKAGE_NAME, ordered_unique
 from harness_ai_kit.domain.install_state import installed_cli_version
 from harness_ai_kit.domain.inventory import load_cli_metadata_for_record
+from harness_ai_kit.domain.versions import compare_versions_safe
 from harness_ai_kit.infrastructure.config_io import console_safe_text
 from harness_ai_kit.infrastructure.http_client import http_request
 
@@ -44,7 +45,7 @@ def pip_install_command(
 
 
 def is_self_cli_package(package_name: str) -> bool:
-    return package_name == SELF_CLI_PACKAGE_NAME
+    return package_name == SELF_CLI_PACKAGE_NAME or package_name == SELF_CLI_ASSET_ID
 
 
 def self_upgrade_recovery_command(config: CliConfig) -> str:
@@ -194,6 +195,11 @@ def install_cli_packages(
     outputs: list[str] = []
     for record in records:
         if record.install_type == "python-package":
+            if not upgrade and not dry_run:
+                installed_version = installed_cli_version(record)
+                if installed_version and record.version and compare_versions_safe(installed_version, record.version) == 0:
+                    outputs.append(f"Requirement already satisfied: {record.package_name}=={installed_version}")
+                    continue
             command = pip_install_command(record.package_name, config.registry_index_url, config.trusted_host, upgrade)
             if dry_run:
                 outputs.append(" ".join(command))
@@ -274,5 +280,3 @@ def catalog_versions(catalog_path: Path) -> dict[str, str]:
             continue
         versions[asset_id.strip("`")] = version
     return versions
-
-

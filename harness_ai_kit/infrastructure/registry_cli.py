@@ -199,7 +199,3 @@ def merge_manifest_cli_into_refresh_lockfile(
         declared_cli_ids=declared_ids,
     )
     return lockfile.model_copy(update={"nodes": new_nodes})
-
-
-
-

@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.1] - 2026-08-25
+
+### Changed
+
+- Synced the reviewed public core from the private source line through the OSS
+  build projection. The public package now carries the current portable
+  configuration, registry, plugin, validation, and manifest behavior without
+  private publish, role, governance, or loop-run commands.
+
+### Added
+
+- Added the provider-neutral `devlab-cicd-onboard` Skill to public staging.
+
 ## [0.2.2] - 2026-08-24
 
 ### Fixed

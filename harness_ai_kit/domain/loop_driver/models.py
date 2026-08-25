@@ -54,4 +54,3 @@ class IterationRecord:
     convergence_status: ConvergenceStatus
     files_changed: list[str] = field(default_factory=list)
     maker_output: str = ""
-

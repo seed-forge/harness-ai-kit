@@ -17,14 +17,7 @@ from harness_ai_kit.domain.models.config import PublishConfig, IdentityConfig, D
 from harness_ai_kit.domain.models.constants import (
     CONFIG_FILENAME,
     LEGACY_CONFIG_FILENAME,
-    DEFAULT_CLI_REGISTRY_INDEX_URL,
-    DEFAULT_CLI_REGISTRY_UPLOAD_URL,
-    DEFAULT_REGISTRY_INDEX_URL,
-    DEFAULT_REGISTRY_UPLOAD_URL,
-    DEFAULT_SKILL_REGISTRY_INDEX_URL,
-    DEFAULT_SKILL_REGISTRY_UPLOAD_URL,
     DEFAULT_TAG_PREFIX,
-    DEFAULT_TRUSTED_HOST,
 )
 from harness_ai_kit.product import active_product_profile
 
@@ -142,12 +135,24 @@ def load_config(config_path: Path) -> CliConfig:
     # CI/CD fallback only: env var applies when config.yaml has no role.
     # config.yaml stays the source of truth (higher priority than env).
     if not raw_role:
-        env_role = str(os.environ.get("AI_KIT_ROLE", "")).strip()
+        env_role = str(os.environ.get("HARNESS_AI_KIT_ROLE", "")).strip()
         if env_role in VALID_ROLES:
             raw_role = env_role
+    # Standards dirs: new full names win; legacy names remain as one-release
+    # fallback so existing config.yaml keeps working during migration.
+    web_standards_dir = str(payload.get("web_engineering_standards_dir", "")).strip()
+    if not web_standards_dir:
+        web_standards_dir = str(payload.get("frontend_engineering_standards_dir", "")).strip()
+    srv_standards_dir = str(payload.get("srv_engineering_standards_dir", "")).strip()
+    if not srv_standards_dir:
+        srv_standards_dir = str(payload.get("backend_engineering_standards_dir", "")).strip()
     return CliConfig(
         repo_url=payload.get("repo_url", ""),
         checkout_dir=payload.get("checkout_dir", ""),
+        web_engineering_standards_dir=web_standards_dir,
+        srv_engineering_standards_dir=srv_standards_dir,
+        frontend_engineering_standards_dir=web_standards_dir,
+        backend_engineering_standards_dir=srv_standards_dir,
         registry_upload_url=payload.get("registry_upload_url", ""),
         registry_index_url=payload.get("registry_index_url", ""),
         skill_registry_upload_url=payload.get("skill_registry_upload_url", ""),
@@ -156,6 +161,8 @@ def load_config(config_path: Path) -> CliConfig:
         public_skill_registry_index_url=payload.get("public_skill_registry_index_url", ""),
         cli_registry_upload_url=payload.get("cli_registry_upload_url", ""),
         cli_registry_index_url=payload.get("cli_registry_index_url", ""),
+        npm_registry_upload_url=payload.get("npm_registry_upload_url", ""),
+        npm_registry_install_url=payload.get("npm_registry_install_url", ""),
         trusted_host=payload.get("trusted_host", ""),
         tag_prefix=payload.get("tag_prefix", "v"),
         publish=_load_publish_config(payload.get("publish", {})),
@@ -198,18 +205,30 @@ def effective_config(config: CliConfig, home_dir: Path | None = None) -> CliConf
         name=config.identity.name.strip() or git_name,
         email=config.identity.email.strip() or git_email,
     )
+    web_standards_dir = (config.web_engineering_standards_dir.strip()
+                         or config.frontend_engineering_standards_dir.strip())
+    srv_standards_dir = (config.srv_engineering_standards_dir.strip()
+                         or config.backend_engineering_standards_dir.strip())
     return CliConfig(
         repo_url=config.repo_url.strip() or _DEFAULT_REPO_URL,
         checkout_dir=config.checkout_dir.strip() or str(default_checkout_dir(home_dir)),
-        registry_upload_url=config.registry_upload_url.strip() or DEFAULT_REGISTRY_UPLOAD_URL,
-        registry_index_url=config.registry_index_url.strip() or DEFAULT_REGISTRY_INDEX_URL,
-        skill_registry_upload_url=config.skill_registry_upload_url.strip() or DEFAULT_SKILL_REGISTRY_UPLOAD_URL,
-        skill_registry_index_url=config.skill_registry_index_url.strip() or DEFAULT_SKILL_REGISTRY_INDEX_URL,
+        web_engineering_standards_dir=web_standards_dir,
+        srv_engineering_standards_dir=srv_standards_dir,
+        frontend_engineering_standards_dir=web_standards_dir,
+        backend_engineering_standards_dir=srv_standards_dir,
+        # Registry endpoints are intentionally config-only. The seed file or
+        # an explicit CI config supplies the deployment-specific values.
+        registry_upload_url=config.registry_upload_url.strip(),
+        registry_index_url=config.registry_index_url.strip(),
+        skill_registry_upload_url=config.skill_registry_upload_url.strip(),
+        skill_registry_index_url=config.skill_registry_index_url.strip(),
         public_skill_registry_upload_url=config.public_skill_registry_upload_url.strip(),
         public_skill_registry_index_url=config.public_skill_registry_index_url.strip(),
-        cli_registry_upload_url=config.cli_registry_upload_url.strip() or DEFAULT_CLI_REGISTRY_UPLOAD_URL,
-        cli_registry_index_url=config.cli_registry_index_url.strip() or DEFAULT_CLI_REGISTRY_INDEX_URL,
-        trusted_host=config.trusted_host.strip() or DEFAULT_TRUSTED_HOST,
+        cli_registry_upload_url=config.cli_registry_upload_url.strip(),
+        cli_registry_index_url=config.cli_registry_index_url.strip(),
+        npm_registry_upload_url=config.npm_registry_upload_url.strip(),
+        npm_registry_install_url=config.npm_registry_install_url.strip(),
+        trusted_host=config.trusted_host.strip(),
         tag_prefix=config.tag_prefix.strip() or DEFAULT_TAG_PREFIX,
         publish=config.publish,
         role=config.role,

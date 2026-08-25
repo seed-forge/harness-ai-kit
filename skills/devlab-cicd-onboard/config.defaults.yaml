@@ -1,0 +1,20 @@
+$schema: harness-ai-kit-config/v1
+config:
+  - key: preferred_ci
+    type: string
+    required: false
+    sensitivity: normal
+    description: "Preferred CI provider for a new repository: auto | github-actions | jenkins | woodpecker."
+    default: auto
+  - key: default_deploy_transport
+    type: string
+    required: false
+    sensitivity: normal
+    description: "Default deployment transport when the project has confirmed its target: rsync | scp | webhook | none."
+    default: none
+  - key: default_jvm_args
+    type: string
+    required: false
+    sensitivity: normal
+    description: Optional JVM arguments for a Java service; project configuration takes precedence.
+    default: ""

@@ -3,16 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .constants import (
-    DEFAULT_CLI_REGISTRY_INDEX_URL,
-    DEFAULT_CLI_REGISTRY_UPLOAD_URL,
-    DEFAULT_REGISTRY_INDEX_URL,
-    DEFAULT_REGISTRY_UPLOAD_URL,
-    DEFAULT_SKILL_REGISTRY_INDEX_URL,
-    DEFAULT_SKILL_REGISTRY_UPLOAD_URL,
-    DEFAULT_TAG_PREFIX,
-    DEFAULT_TRUSTED_HOST,
-)
+from .constants import DEFAULT_TAG_PREFIX
 
 
 VALID_ROLES = ("consumer", "contributor", "maintainer")
@@ -71,6 +62,11 @@ class PublishConfig:
 class CliConfig:
     repo_url: str = ""
     checkout_dir: str = ""
+    jenkins_shared_library_dir: str = ""
+    backend_engineering_standards_dir: str = ""
+    frontend_engineering_standards_dir: str = ""
+    web_engineering_standards_dir: str = ""
+    srv_engineering_standards_dir: str = ""
     registry_upload_url: str = ""
     registry_index_url: str = ""
     skill_registry_upload_url: str = ""
@@ -79,6 +75,8 @@ class CliConfig:
     public_skill_registry_index_url: str = ""
     cli_registry_upload_url: str = ""
     cli_registry_index_url: str = ""
+    npm_registry_upload_url: str = ""
+    npm_registry_install_url: str = ""
     trusted_host: str = ""
     tag_prefix: str = DEFAULT_TAG_PREFIX
     publish: PublishConfig = PublishConfig()

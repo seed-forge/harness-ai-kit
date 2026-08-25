@@ -152,9 +152,19 @@ def append_note_to_top_changelog(changelog_path: Path, note: str) -> None:
 def prepend_document_banner(document_path: Path, banner: str) -> None:
     if not document_path.exists():
         return
-    content = document_path.read_text(encoding="utf-8")
-    if content.startswith(banner):
+    content = document_path.read_text(encoding="utf-8").replace("\r\n", "\n")
+    if banner in content:
         return
+    if content.startswith("---\n"):
+        closing = content.find("\n---\n", len("---\n"))
+        if closing >= 0:
+            insert_at = closing + len("\n---\n")
+            remainder = content[insert_at:].lstrip("\n")
+            document_path.write_text(
+                content[:insert_at] + "\n" + banner + remainder,
+                encoding="utf-8",
+            )
+            return
     document_path.write_text(banner + content, encoding="utf-8")
 
 
@@ -192,7 +202,13 @@ def publish_selection(
 
 
 def twine_environment_ready() -> bool:
-    return bool(os.environ.get("TWINE_USERNAME")) and bool(os.environ.get("TWINE_PASSWORD"))
+    try:
+        from harness_ai_kit.infrastructure.http_client import _registry_credentials
+
+        username, password = _registry_credentials()
+        return bool(username and password)
+    except Exception:  # noqa: BLE001 - readiness check must remain non-fatal
+        return bool(os.environ.get("TWINE_USERNAME")) and bool(os.environ.get("TWINE_PASSWORD"))
 
 
 
@@ -221,11 +237,18 @@ def release_subprocess_env(repo_root: Path | None = None) -> dict[str, str]:
 
 def twine_subprocess_env(repo_root: Path | None = None) -> dict[str, str]:
     env = release_subprocess_env(repo_root)
-    team_username = os.environ.get("AI_KIT_REGISTRY_USERNAME")
-    team_password = os.environ.get("AI_KIT_REGISTRY_PASSWORD")
-    if team_username and team_password:
-        env.setdefault("TWINE_USERNAME", team_username)
-        env.setdefault("TWINE_PASSWORD", team_password)
+    # Resolve registry credentials from config.yaml (assets.nexusctl, source of
+    # truth) with env fallback, then hand them to twine via TWINE_USERNAME /
+    # TWINE_PASSWORD. Avoids a hardcoded ~/.pypirc section name.
+    try:
+        from harness_ai_kit.infrastructure.http_client import _registry_credentials
+
+        username, password = _registry_credentials()
+    except Exception:  # noqa: BLE001 - credential lookup must never crash publish
+        username, password = None, None
+    if username and password:
+        env["TWINE_USERNAME"] = username
+        env["TWINE_PASSWORD"] = password
     return env
 
 
@@ -241,8 +264,14 @@ def clean_release_artifacts(repo_root: Path) -> None:
 
 
 def build_artifacts(repo_root: Path) -> str:
+    command = [sys.executable, "-m", "build"]
+    # CI and air-gapped maintainers may have the build backend installed but
+    # no route to fetch build-isolation requirements. Keep standard isolation
+    # by default; make the controlled fallback explicit and auditable.
+    if os.environ.get("HARNESS_AI_KIT_RELEASE_NO_ISOLATION") == "1":
+        command.append("--no-isolation")
     result = subprocess.run(
-        [sys.executable, "-m", "build"],
+        command,
         cwd=repo_root,
         env=release_subprocess_env(repo_root),
         check=True,
@@ -292,6 +321,7 @@ def twine_upload_command(files: Sequence[str], repository_url: str) -> list[str]
         "twine",
         "upload",
         "--disable-progress-bar",
+        "--non-interactive",
         "--repository-url",
         repository_url,
     ]
@@ -335,7 +365,3 @@ def create_git_tag(repo_root: Path, tag_name: str, push: bool) -> tuple[str, str
         push_result = run_git(repo_root, ["push", "origin", tag_name])
         push_output = push_result.stdout.strip() or f"Pushed tag {tag_name}."
     return tag_result.stdout.strip(), push_output
-
-
-
-

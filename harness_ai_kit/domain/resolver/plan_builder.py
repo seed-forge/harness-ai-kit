@@ -27,7 +27,17 @@ RegistryManifestDownloader = Callable[
 ]
 RegistryUrlResolver = Callable[[dict[str, Any]], str]
 
-DEFAULT_RESOLUTION_TIMEOUT = 300  # 5 分钟
+DEFAULT_RESOLUTION_TIMEOUT = 120  # 2 分钟
+
+
+class ResolutionTimeout(RuntimeError, TimeoutError):
+    """Dependency resolution exceeded its time budget.
+
+    Subclasses ``RuntimeError`` so the top-level CLI handler
+    (``HANDLED_COMMAND_EXCEPTIONS``) renders it as a friendly one-line reminder
+    instead of a traceback; also a ``TimeoutError`` for backward compatibility
+    with any caller that catches that type.
+    """
 
 
 def _resolve_with_timeout(resolver: Any, requirements: list[Any], timeout: int) -> Any:
@@ -45,11 +55,11 @@ def _resolve_with_timeout(resolver: Any, requirements: list[Any], timeout: int) 
     worker.start()
     worker.join(timeout=timeout)
     if worker.is_alive():
-        raise TimeoutError(
-            f"Dependency resolution timed out after {timeout}s. "
-            f"This may indicate conflicting version constraints or unreachable registry. "
-            f"Try: harness-ai-kit sync --offline --dry-run to diagnose. "
-            f"Or set AI_KIT_RESOLUTION_TIMEOUT=<seconds> to adjust."
+        raise ResolutionTimeout(
+            f"依赖解析超时（{timeout}s）。这通常是网络抖动或首次拉取较慢导致的临时问题，"
+            f"重试一次多半即可通过。若仍失败："
+            f"① harness-ai-kit sync --offline --dry-run 离线诊断（离线秒过则确认是网络）；"
+            f"② 设环境变量 HARNESS_AI_KIT_RESOLUTION_TIMEOUT=<秒> 调大超时（当前 {timeout}s）。"
         )
     if error_box[0] is not None:
         raise error_box[0]
@@ -66,6 +76,7 @@ def build_resolution_plan(
     install_scope: str,
     selected_features: Iterable[str] = (),
     offline: bool = False,
+    refresh_cache: bool = False,
     cli_versions: dict[str, str] | None = None,
     preferred_sources: list[str] | None = None,
     public_registry_index_url: str = "",
@@ -102,6 +113,7 @@ def build_resolution_plan(
         selected_features=set(features),
         cli_versions=cli_versions or {},
         offline=offline,
+        refresh_cache=refresh_cache,
         public_registry_index_url=public_registry_index_url,
         cli_registry_index_url=cli_registry_index_url,
         git_sources=root_sources,
@@ -172,7 +184,7 @@ def build_resolution_plan(
                 specifier=specifier, source_ref=source_ref, ref=ref, subpath=subpath,
             )
         )
-    resolution_timeout = int(os.environ.get("AI_KIT_RESOLUTION_TIMEOUT", DEFAULT_RESOLUTION_TIMEOUT))
+    resolution_timeout = int(os.environ.get("HARNESS_AI_KIT_RESOLUTION_TIMEOUT", DEFAULT_RESOLUTION_TIMEOUT))
     try:
         result = _resolve_with_timeout(resolver, requirements, timeout=resolution_timeout)
     except ResolutionImpossible as exc:
@@ -297,6 +309,10 @@ def build_resolution_plan(
                 environment=candidate.manifest.environment.model_dump(mode="json") if candidate.manifest else {},
                 runtime_requirements=list(candidate.manifest.runtime_requirements) if candidate.manifest else [],
                 post_install_hints=list(candidate.manifest.post_install_hints) if candidate.manifest else [],
+                provenance=candidate.manifest.provenance.model_dump(mode="json") if candidate.manifest and candidate.manifest.provenance else None,
+                structure_profile=candidate.manifest.structure_profile if candidate.manifest else None,
+                responsibility_keys=list(candidate.manifest.responsibility_keys) if candidate.manifest else [],
+                load_plan=candidate.manifest.load_plan.model_dump(mode="json") if candidate.manifest and candidate.manifest.load_plan else None,
                 agents_md_inject=str(candidate.manifest.agents_md_inject).strip() if candidate.manifest else "",
                 config_schema=candidate.manifest.config_schema if candidate.manifest else None,
             )

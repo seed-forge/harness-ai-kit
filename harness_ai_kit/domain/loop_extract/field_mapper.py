@@ -259,5 +259,3 @@ class LoopFieldMapper:
 # ---------------------------------------------------------------------------
 
 # Layer 1 patterns are imported from ._utils
-
-

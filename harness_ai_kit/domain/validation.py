@@ -12,6 +12,59 @@ from harness_ai_kit.domain.inventory import (
 )
 
 
+# These paths identify the maintainer checkout, not a member's installed asset.
+# Keep the check deliberately narrow: deployment paths and user-configured
+# workspace locations are valid contracts when expressed through placeholders.
+_NON_PORTABLE_CHECKOUT_MARKERS = (
+    "工程规范/harness-ai-kit",
+    "工程规范\\harness-ai-kit",
+    "工程规范/harness-ai-kit",
+    "工程规范\\harness-ai-kit",
+    "02-工程工作空间/工程规范/harness-ai-kit",
+    "02-工程工作空间\\工程规范\\harness-ai-kit",
+    "02-工程工作空间/工程规范/harness-ai-kit",
+    "02-工程工作空间\\工程规范\\harness-ai-kit",
+)
+_PORTABILITY_EXCLUDED_NAMES = {
+    "CHANGELOG.md",
+    ".publish-lag.json",
+    "schedule-ledger.yaml",
+    # This governance reference intentionally shows forbidden examples.
+    "REFERENCE-ASSET-PORTABILITY.md",
+}
+_PORTABILITY_EXCLUDED_DIRS = {".git", ".venv", "__pycache__", ".pytest_cache", ".tmp"}
+
+
+def validate_asset_portability(asset_dir: Path) -> list[str]:
+    """Reject maintainer checkout paths from installable asset payloads."""
+    errors: list[str] = []
+    for path in asset_dir.rglob("*"):
+        if not path.is_file() or path.name in _PORTABILITY_EXCLUDED_NAMES:
+            continue
+        if any(part in _PORTABILITY_EXCLUDED_DIRS for part in path.parts) or any(
+            part.startswith(".bak-") for part in path.parts
+        ):
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        for marker in _NON_PORTABLE_CHECKOUT_MARKERS:
+            if marker in text:
+                errors.append(
+                    f"{asset_dir.name}: non-portable maintainer checkout path "
+                    f"'{marker}' in {path.relative_to(asset_dir).as_posix()}; "
+                    "use a package-relative reference or {checkout_dir}"
+                )
+                break
+    return errors
+
+
+def validate_cli_portability(cli_dir: Path) -> list[str]:
+    """Apply the same checkout-path guard to CLI docs and config defaults."""
+    return validate_asset_portability(cli_dir)
+
+
 def skill_has_reference_section(entry_text: str) -> bool:
     for line in entry_text.splitlines():
         heading = line.strip()

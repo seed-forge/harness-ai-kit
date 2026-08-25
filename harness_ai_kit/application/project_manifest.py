@@ -204,7 +204,7 @@ class ProjectManifestService:
                 sync_repo=request.sync_repo,
                 offline=request.offline,
                 dry_run=False,
-                cli_upgrade=True,
+                cli_upgrade=False,
             )
         except ResolutionImpossible as exc:
             if request.asset_kind == "skill":
@@ -252,7 +252,7 @@ class ProjectManifestService:
             sync_repo=request.sync_repo,
             offline=request.offline,
             dry_run=False,
-            cli_upgrade=True,
+            cli_upgrade=False,
         )
         return ProjectRemoveResult(
             manifest_path=manifest_path,

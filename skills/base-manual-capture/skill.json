@@ -1,9 +1,9 @@
 {
-  "namespace": "community",
+  "namespace": "public",
   "id": "base-manual-capture",
   "name": "base-manual-capture",
   "owner": "seedforge",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -28,7 +28,7 @@
   "dependencies": [],
   "sources": {
     "preferred": [
-      "skill-registry",
+      "public-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -42,5 +42,5 @@
     "Never write real credentials into the ledger or trace; follow references/REFERENCE-REDACTION-RULES.md.",
     "Beware of common pitfalls: polling SPA timeouts, headless layout collapse, route guard redirects, Windows GBK printing crashes, toast capture timing."
   ],
-  "updated_at": "2026-08-14"
+  "updated_at": "2026-08-25"
 }

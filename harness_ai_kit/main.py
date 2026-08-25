@@ -212,7 +212,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--version", "-V",
         action="version",
-        version=f"{profile.display_name} {_get_cli_version()}",
+        version=f"harness-ai-kit {_get_cli_version()}",
         help="Show the CLI version and exit.",
     )
     parser.add_argument(
@@ -261,7 +261,6 @@ def build_command_router(config_path: Path) -> CommandRouter:
         return handler(args, config_path)
 
     config_path_handlers["shared-resources"] = _shared_resources_router
-
     config_path_handlers.update(bootstrap_handlers)
     config_path_handlers.update(resolution_handlers)
     config_path_handlers.update(inspect_handlers)
@@ -274,8 +273,7 @@ def build_command_router(config_path: Path) -> CommandRouter:
         config_path=config_path,
         config_path_handlers=config_path_handlers,
         plain_handlers={
-            "cache": command_cache,
-            **build_project_plain_handlers(project_context),
+            "cache": command_cache,            **build_project_plain_handlers(project_context),
         },
         config_path_alias_handlers=[],
     )
@@ -284,6 +282,16 @@ def build_command_router(config_path: Path) -> CommandRouter:
 
 def main(argv: list[str] | None = None, *, product_key: str | None = None) -> int:
     activate_entry_product(product_key)
+    # Windows consoles often default to GBK/CP936, which cannot encode emoji
+    # present in skill metadata or dependency notes. Replace undecodable
+    # characters instead of aborting the whole command.
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            try:
+                reconfigure(errors="replace")
+            except (OSError, ValueError):
+                pass
     parser = build_parser()
     args = parser.parse_args(argv)
     config_path = resolve_config_path(getattr(args, "config_path", None))
@@ -295,8 +303,12 @@ def main(argv: list[str] | None = None, *, product_key: str | None = None) -> in
         return 1
 
 
-def ai_kit_main(argv: list[str] | None = None) -> int:
+def harness_ai_kit_main(argv: list[str] | None = None) -> int:
     return main(argv, product_key="harness-ai-kit")
+
+
+def ai_kit_main(argv: list[str] | None = None) -> int:
+    return main(argv, product_key="ai-kit")
 
 
 if __name__ == "__main__":

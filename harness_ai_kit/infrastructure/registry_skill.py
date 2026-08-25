@@ -68,15 +68,18 @@ def save_skill_registry_index(config: CliConfig, payload: dict[str, object]) -> 
 
 
 
-# Directories excluded from published skill archives (producer-side working material,
-# not part of the installable asset). Convention: <asset>/visual/ holds visual
-# promotion kits (cnt-aikit-visual); consumers must not receive them.
+# Producer-side material excluded from published asset archives. Execution ledgers
+# are consumer-local state and must not be shipped with a reusable asset.
 PUBLISH_EXCLUDE_DIR_NAMES = frozenset({"visual", "__pycache__"})
+PUBLISH_EXCLUDE_FILE_NAMES = frozenset({"execution-ledger.yaml", ".publish-lag.json"})
 
 
 def _is_publishable(file_path: Path, root: Path) -> bool:
     rel_parts = file_path.relative_to(root).parts
-    return not any(part in PUBLISH_EXCLUDE_DIR_NAMES for part in rel_parts)
+    return (
+        file_path.name not in PUBLISH_EXCLUDE_FILE_NAMES
+        and not any(part in PUBLISH_EXCLUDE_DIR_NAMES for part in rel_parts)
+    )
 
 
 def build_skill_archive(repo_root: Path, record: SkillRecord, output_dir: Path | None = None) -> Path:
@@ -191,7 +194,3 @@ def install_skill_archive_bytes(payload: bytes, target_dir: Path, runtime_id: st
         render_kiro_steering=_render_kiro_steering,
         render_cursor_rule=_render_cursor_rule,
     )
-
-
-
-

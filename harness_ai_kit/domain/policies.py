@@ -5,9 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 SOURCE_REPO = "repo-checkout"
-SOURCE_REGISTRY = "skill-registry"
-SOURCE_WORKSPACE_REPO = SOURCE_REPO
-SOURCE_INTERNAL_REGISTRY = SOURCE_REGISTRY
+SOURCE_REGISTRY = "registry"
 SOURCE_PUBLIC_REGISTRY = "public-registry"
 SOURCE_GIT_REPO = "git-repo"
 SOURCE_LOCAL_CACHE = "local-cache"
@@ -24,13 +22,11 @@ SUPPORTED_SOURCES = {
 LEGACY_SOURCE_ALIASES = {
     "repo": SOURCE_REPO,
     "registry": SOURCE_REGISTRY,
-    SOURCE_WORKSPACE_REPO: SOURCE_REPO,
-    SOURCE_INTERNAL_REGISTRY: SOURCE_REGISTRY,
 }
 INSTALL_SOURCE_SELECTORS = {
     "auto",
-    SOURCE_WORKSPACE_REPO,
-    SOURCE_INTERNAL_REGISTRY,
+    SOURCE_REPO,
+    SOURCE_REGISTRY,
     SOURCE_PUBLIC_REGISTRY,
     SOURCE_GIT_REPO,
     "repo",
@@ -57,8 +53,8 @@ def selectable_install_source(value: str | None) -> str | None:
     if normalized is None or normalized == "auto":
         return None
     if normalized not in {
-        SOURCE_WORKSPACE_REPO,
-        SOURCE_INTERNAL_REGISTRY,
+        SOURCE_REPO,
+        SOURCE_REGISTRY,
         SOURCE_PUBLIC_REGISTRY,
         SOURCE_GIT_REPO,
     }:
@@ -70,7 +66,7 @@ def source_order_for_selector(selector: str | None) -> list[str] | None:
     selected = selectable_install_source(selector)
     if selected is None:
         return None
-    if selected == SOURCE_WORKSPACE_REPO:
+    if selected == SOURCE_REPO:
         return [SOURCE_REPO]
     return [selected]
 
@@ -78,11 +74,11 @@ def source_order_for_selector(selector: str | None) -> list[str] | None:
 def consumer_source_order() -> list[str]:
     """Source order for the consumer role: registry-only, no local repo/git.
 
-    Consumers never depend on a local repo checkout, so we skip repo-checkout
-    and git-repo entirely and resolve straight from the private registry
-    (falling back to the public registry when configured).
+    Consumers never depend on a local repo checkout, so they resolve from an
+    explicitly configured public registry first and then the configured
+    registry. Git remains opt-in through an explicit selector.
     """
-    return [SOURCE_REGISTRY, SOURCE_PUBLIC_REGISTRY]
+    return [SOURCE_PUBLIC_REGISTRY, SOURCE_REGISTRY]
 
 
 class SourcePolicy(BaseModel):
@@ -91,14 +87,14 @@ class SourcePolicy(BaseModel):
     preferred: list[
         Literal[
             "repo-checkout",
-            "skill-registry",
             "public-registry",
+            "registry",
             "git-repo",
             "local-cache",
             "lockfile",
         ]
     ] = Field(
-        default_factory=lambda: [SOURCE_REPO, SOURCE_REGISTRY, SOURCE_PUBLIC_REGISTRY, SOURCE_GIT_REPO]
+        default_factory=lambda: [SOURCE_REPO, SOURCE_PUBLIC_REGISTRY, SOURCE_REGISTRY, SOURCE_GIT_REPO]
     )
     allow_fallback: bool = True
 

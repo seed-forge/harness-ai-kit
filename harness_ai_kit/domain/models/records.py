@@ -34,3 +34,24 @@ class CliAssetRecord:
     publish_paths: tuple[str, ...]
     source: str = "local"
     metadata_url: str = ""
+    dependencies: tuple[dict[str, object], ...] = ()
+    runtime_requirements: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class PluginRecord:
+    """Metadata for a plugin asset (package_type=plugin) with host adapters."""
+
+    plugin_id: str
+    path: Path | None
+    name: str
+    status: str
+    owner: str
+    version: str
+    summary: str
+    hosts: tuple[str, ...] = ()
+    npm_name: str = ""
+    default_profile: str = ""
+    default_scope: str = "global"
+    source: str = "local"
+    metadata_url: str = ""

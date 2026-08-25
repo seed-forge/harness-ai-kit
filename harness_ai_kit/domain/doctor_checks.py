@@ -18,9 +18,14 @@ from pydantic import ValidationError
 from harness_ai_kit import package_manager as pm
 from harness_ai_kit.domain import doctor_registry_lock
 from harness_ai_kit.domain.models import CliAssetRecord, CliConfig, SkillRecord
-from harness_ai_kit.domain.models.constants import ASSET_DIRECTORY_NAMES, MANAGED_ASSET_TYPES
+from harness_ai_kit.domain.models.constants import (
+    ASSET_DIRECTORY_NAMES,
+    MANAGED_ASSET_TYPES,
+    TEAM_NAMESPACE,
+)
 from harness_ai_kit.domain.inventory import (
     iter_cli_dirs,
+    iter_managed_asset_dirs,
     load_cli_inventory,
     load_cli_metadata,
     load_managed_asset_inventory,
@@ -29,6 +34,7 @@ from harness_ai_kit.domain.inventory import (
     load_skill_registry_inventory,
 )
 from harness_ai_kit.domain.identity import (
+    PUBLIC_NAMESPACE,
     namespaced_asset_id,
     normalize_namespace,
 )
@@ -64,28 +70,23 @@ from harness_ai_kit.product import active_product_profile
 LOCKFILE_NAME = active_product_profile().lockfile_name
 SELF_CLI_PACKAGE_NAME = active_product_profile().self_cli_package_name
 
-
-def _exact_repo_file(repo_root: Path, name: str) -> Path | None:
-    """Return a root file only when its on-disk spelling matches exactly.
-
-    Public repositories use ``CATALOG.md`` while internal checkouts use
-    ``catalog.md``. Windows resolves both spellings to the same path, so
-    ``Path.exists()`` alone cannot distinguish the two repository contracts.
-    """
-    try:
-        return next(
-            (path for path in repo_root.iterdir() if path.is_file() and path.name == name),
-            None,
-        )
-    except OSError:
-        return None
+# DSH acceptance baseline (see docs/dsh-integration.md).
+DSH_BASELINE_VERSION = "0.1.0-rc.6"
+PNPM_MIN_MAJOR = 10
 
 
 def public_catalog_path(repo_root: Path) -> Path | None:
-    """Return the public catalog when this checkout uses the public layout."""
-    public_catalog = _exact_repo_file(repo_root, "CATALOG.md")
-    private_catalog = _exact_repo_file(repo_root, "catalog.md")
-    return public_catalog if public_catalog is not None and private_catalog is None else None
+    """Return the public catalog when this checkout uses the public layout.
+
+    Windows may retain the old spelling after a case-only Git rename, so the
+    public title is the layout discriminator rather than filesystem case.
+    """
+    catalog_path = repo_root / "CATALOG.md"
+    try:
+        content = catalog_path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    return catalog_path if content.startswith("# harness-ai-kit Asset Catalog") else None
 
 
 def public_catalog_asset_ids(catalog_path: Path) -> set[str]:
@@ -118,15 +119,12 @@ def public_doctor_versions_results(repo_root: Path, catalog_path: Path) -> list[
                 "message": changelog_message,
             }
         )
-
         listed = record.skill_id in catalog_ids
         results.append(
             {
                 "subject": f"skill:{record.skill_id}:catalog",
                 "status": "success" if listed else "error",
-                "message": (
-                    f"skill.json={record.version}; CATALOG.md={'listed' if listed else '<missing>'}"
-                ),
+                "message": f"skill.json={record.version}; CATALOG.md={'listed' if listed else '<missing>'}",
             }
         )
 
@@ -138,6 +136,177 @@ def public_doctor_versions_results(repo_root: Path, catalog_path: Path) -> list[
             "message": f"pyproject.toml={project_version or '<missing>'}; public package layout",
         }
     )
+    return results
+
+
+def _run_version_command(command: list[str]) -> str:
+    import subprocess
+
+    try:
+        proc = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+        return (proc.stdout or proc.stderr or "").strip().splitlines()[0] if (proc.stdout or proc.stderr) else ""
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
+def doctor_dsh_results(home_dir: Path | None = None) -> list[dict[str, str]]:
+    """Check the DSH environment: dsh CLI, pnpm, DSH_HOME, and profile dirs."""
+    import os
+    import shutil
+
+    results: list[dict[str, str]] = []
+
+    dsh_bin = shutil.which("dsh")
+    if dsh_bin is None:
+        results.append(
+            {
+                "subject": "dsh:cli",
+                "status": "error",
+                "message": "dsh not found on PATH (install via `npm i -g @deepseek-ai/dsh@0.1.0-rc.6` or `npx @deepseek-ai/dsh`)",
+            }
+        )
+    else:
+        version = _run_version_command([dsh_bin, "--version"])
+        matched = version.startswith(DSH_BASELINE_VERSION)
+        results.append(
+            {
+                "subject": "dsh:version",
+                "status": "success" if matched else "warning",
+                "message": f"{version or '<unknown>'} (baseline {DSH_BASELINE_VERSION})",
+            }
+        )
+
+    pnpm_bin = shutil.which("pnpm")
+    if pnpm_bin is None:
+        results.append(
+            {
+                "subject": "dsh:pnpm",
+                "status": "error",
+                "message": "pnpm not found on PATH (required >=10 for dsh plugin management)",
+            }
+        )
+    else:
+        version = _run_version_command([pnpm_bin, "--version"])
+        major_ok = False
+        try:
+            major_ok = int(version.split(".")[0]) >= PNPM_MIN_MAJOR
+        except (ValueError, IndexError):
+            major_ok = False
+        results.append(
+            {
+                "subject": "dsh:pnpm",
+                "status": "success" if major_ok else "warning",
+                "message": f"{version or '<unknown>'} (required >=10)",
+            }
+        )
+
+    base_home = home_dir or Path.home()
+    dsh_home = os.environ.get("DSH_HOME", "").strip()
+    dsh_home_path = Path(dsh_home).expanduser() if dsh_home else base_home / ".dsh"
+    results.append(
+        {
+            "subject": "dsh:home",
+            "status": "success" if dsh_home_path.exists() else "warning",
+            "message": str(dsh_home_path) + (" (DSH_HOME)" if dsh_home else " (default ~/.dsh)"),
+        }
+    )
+
+    profiles_dir = dsh_home_path / "profiles"
+    if profiles_dir.is_dir():
+        profile_names = sorted(p.name for p in profiles_dir.iterdir() if p.is_dir())
+        results.append(
+            {
+                "subject": "dsh:profiles",
+                "status": "success",
+                "message": ", ".join(profile_names) if profile_names else "(none yet)",
+            }
+        )
+    else:
+        results.append(
+            {
+                "subject": "dsh:profiles",
+                "status": "warning",
+                "message": f"{profiles_dir} does not exist (created on first `dsh plugin --profile <name> add`)",
+            }
+        )
+
+    return results
+
+
+def doctor_pi_results(home_dir: Path | None = None, config: Any = None) -> list[dict[str, str]]:
+    """Check the Pi Coding Agent environment: pi CLI, version, home, npm package dir, registry config.
+
+    Pi evolves quickly, so no pinned version baseline: the version check only
+    reports what is installed. See docs/pi-integration.md.
+    """
+    import shutil
+
+    results: list[dict[str, str]] = []
+
+    pi_bin = shutil.which("pi")
+    if pi_bin is None:
+        results.append(
+            {
+                "subject": "pi:cli",
+                "status": "error",
+                "message": "pi not found on PATH (install via `npm i -g --ignore-scripts @earendil-works/pi-coding-agent` or `curl -fsSL https://pi.dev/install.sh | sh`)",
+            }
+        )
+    else:
+        version = _run_version_command([pi_bin, "--version"])
+        results.append(
+            {
+                "subject": "pi:version",
+                "status": "success" if version else "warning",
+                "message": version or "<unknown> (no pinned baseline; see docs/pi-integration.md)",
+            }
+        )
+
+    base_home = home_dir or Path.home()
+    pi_home = base_home / ".pi" / "agent"
+    results.append(
+        {
+            "subject": "pi:home",
+            "status": "success" if pi_home.is_dir() else "warning",
+            "message": str(pi_home) + ("" if pi_home.is_dir() else " (created on first pi run)"),
+        }
+    )
+
+    npm_dir = pi_home / "npm"
+    if npm_dir.is_dir():
+        packages = sorted(p.name for p in npm_dir.iterdir() if p.is_dir())
+        results.append(
+            {
+                "subject": "pi:npm-packages",
+                "status": "success",
+                "message": ", ".join(packages) if packages else "(none installed)",
+            }
+        )
+    else:
+        results.append(
+            {
+                "subject": "pi:npm-packages",
+                "status": "warning",
+                "message": f"{npm_dir} does not exist (no pi packages installed yet)",
+            }
+        )
+
+    install_url = getattr(config, "npm_registry_install_url", "") if config is not None else ""
+    results.append(
+        {
+            "subject": "pi:npm-registry",
+            "status": "success" if str(install_url or "").strip() else "warning",
+            "message": str(install_url or "").strip()
+            or "npm_registry_install_url not configured; pi package installs will fail (see docs/pi-integration.md)",
+        }
+    )
+
     return results
 
 
@@ -204,7 +373,7 @@ def doctor_versions_results(repo_root: Path) -> list[dict[str, str]]:
             )
             continue
         content = document_path.read_text(encoding="utf-8")
-        expected = f"harness-ai-kit=={project_version}"
+        expected = f"{SELF_CLI_PACKAGE_NAME}=={project_version}"
         results.append(
             {
                 "subject": f"cli:harness-ai-kit:{relative_path}",
@@ -213,47 +382,6 @@ def doctor_versions_results(repo_root: Path) -> list[dict[str, str]]:
             }
         )
 
-    skill_inventory = load_skill_inventory(repo_root)
-    for skill_id in ("harness-ai-kit-ops", "harness-ai-kit-maintainer"):
-        record = skill_inventory.get(skill_id)
-        if record is None or record.path is None:
-            results.append(
-                {
-                    "subject": f"skill:{skill_id}:cli-dependency",
-                    "status": "error",
-                    "message": "Missing skill inventory record.",
-                }
-            )
-            continue
-        metadata = load_skill_metadata(record.path)
-        declared_version = None
-        for dependency in metadata.get("dependencies", []):
-            if (
-                str(dependency.get("type", "")).strip() == "cli"
-                and str(dependency.get("id", "")).strip() == SELF_CLI_PACKAGE_NAME
-            ):
-                declared_version = str(dependency.get("version", "")).strip()
-                break
-        expected_version = f">={project_version}"
-        # 向后兼容检查：验证声明的版本约束是否满足最小兼容要求
-        # 允许 >=X.Y.Z 或 ==X.Y.Z 形式，但 >= 是推荐形式
-        is_compatible = False
-        if declared_version:
-            if declared_version.startswith(">="):
-                # >= 形式：提取版本号并比较
-                declared_ver = declared_version[2:].strip()
-                is_compatible = declared_ver == project_version or declared_ver < project_version
-            elif declared_version.startswith("=="):
-                # == 形式：精确匹配（向后兼容旧格式）
-                declared_ver = declared_version[2:].strip()
-                is_compatible = declared_ver == project_version
-        results.append(
-            {
-                "subject": f"skill:{skill_id}:cli-dependency",
-                "status": "success" if is_compatible else "error",
-                "message": f"dependency={declared_version or '<missing>'}; expected={expected_version} (>= for backward compatibility)",
-            }
-        )
     return results
 
 
@@ -273,11 +401,11 @@ def check_yaml_duplicate_skills(manifest_path: Path) -> list[dict[str, str]]:
     results: list[dict[str, str]] = []
     if not manifest_path.exists():
         return results
-    
+
     manifest = load_project_manifest(manifest_path)
     skill_ids = [canonical_package_id(s.id, s.namespace) for s in manifest.assets.skills]
     duplicates = [sid for sid in skill_ids if skill_ids.count(sid) > 1]
-    
+
     if duplicates:
         unique_dups = set(duplicates)
         results.append({
@@ -285,7 +413,7 @@ def check_yaml_duplicate_skills(manifest_path: Path) -> list[dict[str, str]]:
             "status": "warning",
             "message": f"Duplicate skill entries found: {', '.join(unique_dups)}",
         })
-    
+
     return results
 
 
@@ -293,7 +421,7 @@ def check_bindings(cwd: Path) -> list[dict[str, str]]:
     """Check project metadata bindings validity in current directory."""
     results: list[dict[str, str]] = []
     metadata_path = cwd / ".platform" / "project-metadata.yml"
-    
+
     if not metadata_path.exists():
         results.append({
             "subject": "bindings:metadata",
@@ -301,13 +429,13 @@ def check_bindings(cwd: Path) -> list[dict[str, str]]:
             "message": f"No project metadata found at {metadata_path}",
         })
         return results
-    
+
     import yaml
     with open(metadata_path, encoding="utf-8") as f:
         metadata = yaml.safe_load(f)
-    
+
     bindings = metadata.get("bindings", {})
-    
+
     # Check zentao bindings
     zentao = bindings.get("zentao", {})
     if zentao.get("product_id"):
@@ -322,7 +450,7 @@ def check_bindings(cwd: Path) -> list[dict[str, str]]:
             "status": "success",
             "message": f"project_id={zentao['project_id']}",
         })
-    
+
     # Check gitea bindings
     gitea = bindings.get("gitea", {})
     if gitea.get("repo_url"):
@@ -331,7 +459,7 @@ def check_bindings(cwd: Path) -> list[dict[str, str]]:
             "status": "success",
             "message": f"repo_url={gitea['repo_url']}",
         })
-    
+
     # Check mattermost bindings
     mattermost = bindings.get("mattermost", {})
     channels = mattermost.get("channels", {})
@@ -341,7 +469,7 @@ def check_bindings(cwd: Path) -> list[dict[str, str]]:
             "status": "success",
             "message": f"channel={channel_value}",
         })
-    
+
     # Check jenkins bindings
     jenkins = bindings.get("jenkins", {})
     if jenkins.get("job_name"):
@@ -350,7 +478,33 @@ def check_bindings(cwd: Path) -> list[dict[str, str]]:
             "status": "success",
             "message": f"job_name={jenkins['job_name']}",
         })
-    
+
+    # Check woodpecker bindings
+    woodpecker = bindings.get("woodpecker", {})
+    if woodpecker.get("repo_name"):
+        results.append({
+            "subject": "bindings:woodpecker.repo_name",
+            "status": "success",
+            "message": f"repo_name={woodpecker['repo_name']}",
+        })
+    if woodpecker.get("pipeline_path"):
+        results.append({
+            "subject": "bindings:woodpecker.pipeline_path",
+            "status": "success",
+            "message": f"pipeline_path={woodpecker['pipeline_path']}",
+        })
+
+    # Check cicd engine declaration
+    cicd = bindings.get("cicd", {})
+    if cicd.get("engine"):
+        engine = cicd["engine"]
+        valid_engines = {"jenkins", "woodpecker"}
+        results.append({
+            "subject": "bindings:cicd.engine",
+            "status": "success" if engine in valid_engines else "warning",
+            "message": f"engine={engine}" if engine in valid_engines else f"engine={engine} (expected: jenkins|woodpecker)",
+        })
+
     # Check shared_resources references
     shared_refs = metadata.get("shared_resources", [])
     if shared_refs:
@@ -360,7 +514,7 @@ def check_bindings(cwd: Path) -> list[dict[str, str]]:
             with open(global_sr_path, encoding="utf-8") as f:
                 global_sr = yaml.safe_load(f) or {}
         global_resources = global_sr.get("resources", {})
-        
+
         for entry in shared_refs:
             ref = entry.get("ref", "") if isinstance(entry, dict) else str(entry)
             if not ref:
@@ -377,7 +531,7 @@ def check_bindings(cwd: Path) -> list[dict[str, str]]:
                 "status": "success" if exists else "error",
                 "message": "resolved" if exists else f"not found in {global_sr_path}",
             })
-    
+
     return results
 
 
@@ -498,14 +652,14 @@ def source_selection_reason(
             return "selected repo-checkout because registry was unavailable or did not satisfy the request"
     if selected_source == pm.SOURCE_REGISTRY:
         if preferred == pm.SOURCE_REGISTRY and registry_version:
-            return "selected skill-registry because it is the preferred available source"
+            return "selected registry because it is the preferred available source"
         if registry_version:
-            return "selected skill-registry because repo-checkout was unavailable or not selected"
+            return "selected registry because repo-checkout was unavailable or not selected"
     if selected_source == pm.SOURCE_PUBLIC_REGISTRY:
         if preferred == pm.SOURCE_PUBLIC_REGISTRY and registry_version:
             return "selected public-registry because it is the preferred available source"
         if registry_version:
-            return "selected public-registry because workspace-repo was unavailable or not selected"
+            return "selected public-registry because repo-checkout was unavailable or not selected"
     return f"selected {selected_source}"
 
 
@@ -843,6 +997,87 @@ def doctor_assets_results(repo_root: Path) -> list[dict[str, str]]:
         status = "success" if not doc_errors else "error"
         message = "companion docs ready" if not doc_errors else "; ".join(doc_errors)
         results.append({"subject": f"cli:{cli_dir.name}", "status": status, "message": message})
+    results.extend(check_namespace_conventions(repo_root))
+    return results
+
+
+# 资产 namespace 语义分组（2026-08-16 治理后生效）：
+# - bundle 资产（skill/loop/plugin/subagent）：可发布、可被依赖解析，namespace = 隔离域（team/public）
+# - manual 资产（hook/mcp/cli）：外部工具/分发配置，无隔离域语义，不应声明 namespace
+BUNDLE_NAMESPACED_ASSET_TYPES = ("skill", "loop", "plugin", "subagent")
+MANUAL_NAMESPACE_FREE_ASSET_TYPES = ("hook", "mcp")
+
+
+def check_namespace_conventions(repo_root: Path) -> list[dict[str, str]]:
+    """资产 namespace 治理门禁（2026-08-16 统一 team/ 后生效）。
+
+    namespace 语义 = 隔离域，仅适用于 bundle 可发布资产：
+    - skill/loop/plugin/subagent：内部一律 ``team/``，对外用 ``public/``；
+      缺失 → warning（应显式声明），不在白名单 → error（namespace 仅表示隔离域，禁止二级分类）
+    - hook/mcp/cli：manual 安装/分发资产，无隔离域语义；
+      声明了 namespace → warning（冗余字段，应移除）
+    """
+    results: list[dict[str, str]] = []
+    allowed_namespaces = {TEAM_NAMESPACE, PUBLIC_NAMESPACE}
+    for asset_type in (*BUNDLE_NAMESPACED_ASSET_TYPES, *MANUAL_NAMESPACE_FREE_ASSET_TYPES):
+        asset_root = repo_root / ASSET_DIRECTORY_NAMES[asset_type]
+        for asset_dir in iter_managed_asset_dirs(asset_root):
+            metadata_path = pm.manifest_metadata_path(asset_dir, asset_type)
+            if not metadata_path.exists():
+                continue
+            try:
+                manifest = pm.load_skill_manifest(asset_dir)
+            except Exception:
+                continue
+            namespace = normalize_namespace(manifest.namespace)
+            subject = f"namespace:{asset_type}:{manifest.id}"
+            if asset_type in MANUAL_NAMESPACE_FREE_ASSET_TYPES:
+                if namespace is not None:
+                    results.append(
+                        {
+                            "subject": subject,
+                            "status": "warning",
+                            "message": f"namespace=`{namespace}` 冗余：hook/mcp 是 manual 安装的外部工具，"
+                            "无隔离域语义（与 CLI 一致），请移除 namespace 字段",
+                        }
+                    )
+                continue
+            if namespace is None:
+                results.append(
+                    {
+                        "subject": subject,
+                        "status": "warning",
+                        "message": "缺少顶层 namespace；内部资产应声明 `namespace: team`（对外资产用 `public`）",
+                    }
+                )
+            elif namespace not in allowed_namespaces:
+                results.append(
+                    {
+                        "subject": subject,
+                        "status": "error",
+                        "message": f"namespace=`{namespace}` 不在白名单 team/public；内部资产应归入 team/，"
+                        "namespace 仅表示隔离域，禁止用作二级分类",
+                    }
+                )
+
+    # cli：manual 分发资产（pip/nexus index），与 hook/mcp 同规则——无隔离域语义。
+    # cli/ 目录不在 ASSET_DIRECTORY_NAMES 中，且 cli.json 结构独立，故单独扫描。
+    for cli_dir in iter_cli_dirs(repo_root / "cli"):
+        try:
+            metadata = load_cli_metadata(cli_dir)
+        except Exception:
+            continue
+        cli_id = str(metadata.get("id") or cli_dir.name)
+        namespace = normalize_namespace(metadata.get("namespace"))
+        if namespace is not None:
+            results.append(
+                {
+                    "subject": f"namespace:cli:{cli_id}",
+                    "status": "warning",
+                    "message": f"namespace=`{namespace}` 冗余：cli 是 manual 分发资产，"
+                    "无隔离域语义，请移除 namespace 字段",
+                }
+            )
     return results
 
 
@@ -973,5 +1208,3 @@ def doctor_extends_results(repo_root: Path, config: Any, target_dir: Path | None
         })
 
     return results
-
-

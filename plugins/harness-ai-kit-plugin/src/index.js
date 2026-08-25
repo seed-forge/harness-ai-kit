@@ -59,12 +59,6 @@ function runCli(cliCommand, args) {
 }
 
 async function readRegistryIndex(indexUrl) {
-  if (!indexUrl) {
-    throw new Error(
-      'No registry index URL configured. Install the `harness-ai-kit` CLI (pip install harness-ai-kit) for CLI-delegation mode, ' +
-        'or set skillRegistryIndexUrl / cliRegistryIndexUrl in the plugin config to enable the HTTP registry fallback.',
-    )
-  }
   const response = await fetch(indexUrl, { signal: AbortSignal.timeout(15000) })
   if (!response.ok) throw new Error(`registry index ${indexUrl} -> HTTP ${response.status}`)
   return response.json()
@@ -232,12 +226,10 @@ function createSkillProvider(config) {
 export function apply(ctx, pluginConfig = {}) {
   const config = {
     cliCommand: pluginConfig.cliCommand || 'harness-ai-kit',
-    // Registry index URLs are opt-in and empty by default. Empty = CLI-delegation
-    // mode (requires the `harness-ai-kit` CLI on PATH). Point these at your own
-    // registry index.json to enable the HTTP registry fallback used when the CLI
-    // is absent.
-    skillRegistryIndexUrl: pluginConfig.skillRegistryIndexUrl || '',
-    cliRegistryIndexUrl: pluginConfig.cliRegistryIndexUrl || '',
+    skillRegistryIndexUrl:
+      pluginConfig.skillRegistryIndexUrl || 'https://raw.githubusercontent.com/seed-forge/harness-ai-kit/main/registry/skills/index.json',
+    cliRegistryIndexUrl:
+      pluginConfig.cliRegistryIndexUrl || 'https://raw.githubusercontent.com/seed-forge/harness-ai-kit/main/registry/clis/index.json',
     defaultProfile: pluginConfig.defaultProfile || 'web',
   }
 

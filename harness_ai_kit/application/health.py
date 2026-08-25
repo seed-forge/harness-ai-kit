@@ -16,4 +16,3 @@ class HealthService:
 
     def validate(self, args: Any, config_path: Path) -> int:
         return self.validate_command(args, config_path)
-

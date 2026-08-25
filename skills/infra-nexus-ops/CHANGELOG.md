@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.7 - 2026-08-25
+
+- Public OSS metadata uses the `public` namespace and `seedforge` owner, and source resolution now uses public-registry instead of the retired private registry label.
+
 ## 0.3.6 - 2026-08-22
 
 - 新增 raw hosted 资产退役/清理 reference，覆盖 archive、metadata、checksum、index 与回读验收。

@@ -24,4 +24,3 @@ def register_command_routes(
         router.register(command, handler)
     for commands, handler in config_path_alias_handlers:
         router.register_many(commands, lambda args, handler=handler: handler(args, config_path))
-

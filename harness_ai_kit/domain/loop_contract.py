@@ -16,7 +16,6 @@ from typing import Any, Literal
 class ExecutionMode(str, Enum):
     SUB_AGENT = "sub-agent"
     SELF_CHECK = "self-check"
-    QODER_SCHEDULED_AGENT = "qoder-scheduled-agent"
 
 
 class LoopStatus(str, Enum):
@@ -62,10 +61,7 @@ class TriggerType(str, Enum):
 
 def validate_execution_mode(risk_level: RiskLevel, mode: ExecutionMode) -> None:
     """Enforce the execution mode constraint matrix from F-002."""
-    if risk_level == RiskLevel.HIGH and mode not in (
-        ExecutionMode.SUB_AGENT,
-        ExecutionMode.QODER_SCHEDULED_AGENT,
-    ):
+    if risk_level == RiskLevel.HIGH and mode != ExecutionMode.SUB_AGENT:
         raise ValueError(
             f"risk_level=high forces execution_mode=sub-agent, got {mode.value}"
         )

@@ -1,0 +1,14 @@
+{
+  "name": "hello-dsh-plugin",
+  "version": "0.1.0",
+  "description": "最小 dsh 插件示例：注册一个 hello 工具。",
+  "type": "module",
+  "main": "./src/index.js",
+  "files": ["src", "cordis.patch.yml", "README.md"],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "license": "MIT"
+}

@@ -1,9 +1,9 @@
 {
-  "namespace": "community",
+  "namespace": "public",
   "id": "base-cn-registry-mirror-strategy",
   "name": "base-cn-registry-mirror-strategy",
   "owner": "seedforge",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -32,7 +32,7 @@
   "dependencies": [],
   "sources": {
     "preferred": [
-      "skill-registry",
+      "public-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -42,5 +42,5 @@
     "镜像站可用性会随时间变化；正文以「变量 + 默认候选」为主，团队应在内网文档或私有 registry 中维护最终落点。",
     "涉及公司合规时，优先使用组织提供的制品库与代理，而不是公共镜像。"
   ],
-  "updated_at": "2026-08-22"
+  "updated_at": "2026-08-25"
 }

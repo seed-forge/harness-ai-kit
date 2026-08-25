@@ -65,6 +65,7 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
         *,
         public_registry_index_url: str = "",
         cli_registry_index_url: str = "",
+        refresh_cache: bool = False,
         git_sources: dict[str, tuple[str, str | None, str | None]] | None = None,
         git_skill_resolver: GitSkillResolver = default_git_skill_resolver,
         registry_manifest_downloader: RegistryManifestDownloader | None = None,
@@ -82,6 +83,7 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
         self.cli_versions = cli_versions
         self.offline = offline
         self.cli_registry_index_url = cli_registry_index_url
+        self.refresh_cache = refresh_cache
         self.registry_manifest_downloader = registry_manifest_downloader or self._download_registry_manifest
         self.registry_artifact_url_resolver = registry_artifact_url_resolver
         self.registry_metadata_url_resolver = registry_metadata_url_resolver
@@ -92,10 +94,18 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
         self._candidate_matches_cache: dict[tuple[str, str, str | None], list[PackageCandidate]] = {}
         self._skill_candidates_cache: dict[tuple[str, str | None], list[PackageCandidate]] = {}
         self._registry_exact_cache: dict[tuple[str, str | None, str], list[PackageCandidate]] = {}
+        self._git_resolution_notes: dict[str, str] = {}
+        self._git_discovery_cache: dict[tuple[str, str | None], list[Any]] = {}
 
     def _download_registry_manifest(self, index_url: str, skill_id: str, version: str | None) -> tuple[SkillManifest, dict[str, Any]]:
         from harness_ai_kit.domain.registry import download_registry_manifest
-        return download_registry_manifest(index_url, skill_id, version, offline=self.offline)
+        return download_registry_manifest(
+            index_url,
+            skill_id,
+            version,
+            offline=self.offline,
+            force_refresh=self.refresh_cache,
+        )
 
     def identify(self, requirement_or_candidate: DependencyRequirement | PackageCandidate) -> str:
         return package_key_for(
@@ -393,11 +403,12 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
         candidate_namespace = manifest.namespace or namespace
         if namespace is not None and candidate_namespace != namespace:
             return []
+        checksum = hash_skill_directory(asset_dir)
         return [
             PackageCandidate(
                 dep_type=dep_type, namespace=candidate_namespace, package_id=package_id,
                 version=manifest.version, source=SOURCE_REPO, manifest=manifest, path=asset_dir,
-                checksum=hash_skill_directory(asset_dir), source_checksum=hash_skill_directory(asset_dir),
+                checksum=checksum, source_checksum=checksum,
             )
         ]
 
@@ -421,10 +432,11 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
                         candidate_namespace = manifest.namespace or namespace
                         if namespace is not None and candidate_namespace != namespace:
                             continue
+                        checksum = hash_skill_directory(skill_dir)
                         candidates.append(PackageCandidate(
                             dep_type="skill", namespace=candidate_namespace, package_id=skill_id,
                             version=manifest.version, source=SOURCE_REPO, manifest=manifest, path=skill_dir,
-                            checksum=hash_skill_directory(skill_dir), source_checksum=hash_skill_directory(skill_dir),
+                            checksum=checksum, source_checksum=checksum,
                         ))
                 sources_tried.append(f"repo-checkout ({skill_dir})")
             elif source in {SOURCE_REGISTRY, SOURCE_PUBLIC_REGISTRY}:
@@ -569,21 +581,71 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
         effective_subpath = subpath or source.subpath
         try:
             skill_dir = self.git_skill_resolver(source_ref, effective_ref, effective_subpath, skill_id)
-        except KeyError:
-            return None
+        except KeyError as exc:
+            # Community repos often nest skills under non-obvious paths
+            # (e.g. .claude/skills/<id>, skills/<id>, src/skills/<id>), and many
+            # expose a root-level skill.json without a root SKILL.md. Before
+            # giving up, discover what the source actually contains and
+            # auto-match by exact skill id so `source_url` community
+            # dependencies install without a manually declared subpath.
+            note = f"git source '{source_ref}' does not expose skill '{skill_id}' at the resolved path ({exc})."
+            discovered = self._discover_git_skills_in_source(source_ref, effective_ref)
+            if discovered:
+                available = ", ".join(sorted({item.id for item in discovered}))
+                note += f" Available skills in source: {available}."
+                exact = next((item for item in discovered if item.id == skill_id), None)
+                if exact is not None and exact.subpath:
+                    try:
+                        skill_dir = self.git_skill_resolver(source_ref, effective_ref, exact.subpath, skill_id)
+                        note = ""
+                    except KeyError as exc2:
+                        note += f" Auto-match via subpath '{exact.subpath}' also failed ({exc2})."
+            if note:
+                self._git_resolution_notes[skill_id] = note
+                print(f"WARNING: {note}")
+                return None
         manifest = load_git_skill_manifest(skill_dir, fallback_id=skill_id)
         candidate_namespace = manifest.namespace or namespace
         if namespace is not None and candidate_namespace != namespace:
+            note = (
+                f"git source '{source_ref}' skill '{skill_id}' has namespace "
+                f"{candidate_namespace!r}, expected {namespace!r}."
+            )
+            self._git_resolution_notes[skill_id] = note
+            print(f"WARNING: {note}")
             return None
         if manifest.id != skill_id:
+            note = (
+                f"git source '{source_ref}' resolved skill id {manifest.id!r}, "
+                f"expected {skill_id!r}. Add a subpath pointing to the skill directory."
+            )
+            self._git_resolution_notes[skill_id] = note
+            print(f"WARNING: {note}")
             return None
         checkout_dir = git_skill_checkout_root(skill_dir, source_ref, effective_ref)
         source_commit = git_source_commit(checkout_dir)
         metadata_url = github_raw_metadata_url(source_ref, source_commit, effective_subpath) if manifest_metadata_path(skill_dir).exists() else None
+        checksum = hash_skill_directory(skill_dir)
         return PackageCandidate(
             dep_type="skill", namespace=candidate_namespace, package_id=skill_id,
             version=manifest.version, source=SOURCE_GIT_REPO, manifest=manifest, path=skill_dir,
             metadata_url=metadata_url, source_ref=source_ref, source_url=source.clone_url,
             source_commit=source_commit, ref=effective_ref, subpath=effective_subpath,
-            checksum=hash_skill_directory(skill_dir), source_checksum=hash_skill_directory(skill_dir),
+            checksum=checksum, source_checksum=checksum,
         )
+
+    def _discover_git_skills_in_source(self, source_ref: str, ref: str | None) -> list[Any]:
+        """Discover skills present in a git source, cached per (source_ref, ref)."""
+        cache_key = (source_ref, ref)
+        cached = self._git_discovery_cache.get(cache_key)
+        if cached is not None:
+            return cached
+        try:
+            from harness_ai_kit.domain.resolver.git_source import discover_git_skills
+
+            discovered = discover_git_skills(source_ref, ref)
+        except Exception as exc:  # noqa: BLE001 - network/git failures must not break resolution
+            self._git_resolution_notes[f"discover:{source_ref}"] = f"skill discovery in git source failed: {exc}"
+            discovered = []
+        self._git_discovery_cache[cache_key] = discovered
+        return discovered

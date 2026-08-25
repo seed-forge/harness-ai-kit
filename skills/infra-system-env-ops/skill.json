@@ -1,9 +1,9 @@
 {
-  "namespace": "community",
+  "namespace": "public",
   "id": "infra-system-env-ops",
   "name": "infra-system-env-ops",
   "owner": "seedforge",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -31,11 +31,11 @@
   "sources": {
     "preferred": [
       "repo-checkout",
-      "skill-registry"
+      "public-registry"
     ],
     "allow_fallback": true
   },
   "runtime_requirements": [],
   "post_install_hints": [],
-  "updated_at": "2026-08-20"
+  "updated_at": "2026-08-25"
 }

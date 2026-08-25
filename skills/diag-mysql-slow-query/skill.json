@@ -1,9 +1,9 @@
 {
-  "namespace": "community",
+  "namespace": "public",
   "id": "diag-mysql-slow-query",
   "name": "diag-mysql-slow-query",
   "owner": "seedforge",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -26,7 +26,7 @@
   "sources": {
     "preferred": [
       "repo-checkout",
-      "skill-registry"
+      "public-registry"
     ],
     "allow_fallback": true
   },
@@ -55,5 +55,5 @@
   ],
   "contributors": [],
   "skill_type": "diagnostic",
-  "updated_at": "2026-08-20"
+  "updated_at": "2026-08-25"
 }

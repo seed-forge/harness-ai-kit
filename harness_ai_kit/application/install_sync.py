@@ -20,4 +20,3 @@ class InstallSyncService:
 
     def uninstall(self, args: Any, config_path: Path) -> int:
         return self.uninstall_command(args, config_path)
-

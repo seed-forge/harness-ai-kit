@@ -1,9 +1,9 @@
 {
-  "namespace": "community",
+  "namespace": "public",
   "id": "devlab-eval-driven-agent",
   "name": "devlab-eval-driven-agent",
   "owner": "seedforge",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "status": "trial",
   "tags": [
     "eval",

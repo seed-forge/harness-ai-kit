@@ -20,6 +20,9 @@ from harness_ai_kit.product import active_product_profile
 
 
 SELF_CLI_PACKAGE_NAME = active_product_profile().self_cli_package_name
+# The repo's own CLI asset record uses this id/package name even though the
+# installable distribution is SELF_CLI_PACKAGE_NAME.
+SELF_CLI_ASSET_ID = "harness-ai-kit"
 
 
 def ordered_unique(values: Iterable[str]) -> list[str]:
@@ -136,12 +139,18 @@ def _load_cli_versions_from_index(config: CliConfig) -> dict[str, str]:
     return versions
 
 
-def current_cli_versions(repo_root: Path | None, config: CliConfig | None = None) -> dict[str, str]:
+def current_cli_versions(
+    repo_root: Path | None,
+    config: CliConfig | None = None,
+    *,
+    offline: bool = False,
+) -> dict[str, str]:
     """Return a mapping of CLI id → latest version.
 
     Uses the lightweight index-only path first (1 HTTP request) for resolution
     commands that only need version numbers.  Falls back to the full inventory
-    (N+1 HTTP requests) only when the index is unavailable.
+    (N+1 HTTP requests) only when the index is unavailable.  Offline resolution
+    skips the remote index and relies on local repo metadata only.
     """
     import urllib.error
 
@@ -153,7 +162,7 @@ def current_cli_versions(repo_root: Path | None, config: CliConfig | None = None
         versions.update({r.cli_id: r.version for r in local_inv.values()})
 
     # Fast-path: index-only (1 HTTP call vs 31 per-CLI metadata calls).
-    if config is not None and config.cli_registry_index_url.strip():
+    if not offline and config is not None and config.cli_registry_index_url.strip():
         index_versions = _load_cli_versions_from_index(config)
         for cli_id, ver in index_versions.items():
             versions.setdefault(cli_id, ver)

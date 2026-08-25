@@ -26,7 +26,7 @@ RISK_HIGH_KEYWORDS = frozenset({"delete", "remove", "deploy", "destroy", "drop",
 RISK_MEDIUM_KEYWORDS = frozenset({"write", "create", "modify", "update", "edit", "add", "install", "commit", "push"})
 
 # Template paths relative to repo root
-TEMPLATE_DIR_PARTS = ("skills", "post-task-skill-miner", "templates")
+TEMPLATE_DIR_PARTS = ("skills", "base-session-ai-kit-miner", "templates")
 LOOP_MD_TEMPLATE = "loop.md.template"
 CHECK_MD_TEMPLATE = "check.md.template"
 USAGE_MD_TEMPLATE = "usage.md.template"

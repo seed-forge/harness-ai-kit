@@ -1,5 +1,9 @@
 # Changelog — public-nl2sql-expert-base
 
+## 0.1.4 - 2026-08-25
+
+- Public OSS metadata uses the `public` namespace and `seedforge` owner, and source resolution now uses public-registry instead of the retired private registry label.
+
 ## 0.1.3 - 2026-08-17
 
 - 脱敏收口：0.1.0 初始草案条目中的来源会话标识匿名化（会话 ID 移除，避免具体项目/会话信息外泄）。

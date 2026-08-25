@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.6 - 2026-08-25
+
+- Public OSS metadata uses the `public` namespace and `seedforge` owner, and source resolution now uses public-registry instead of the retired private registry label.
+
 ## 0.1.5 - 2026-08-18
 
 - 场景识别矩阵新增「AI Agent / LLM 应用」档，路由到 `devlab-eval-driven-agent`（agent 评测域，L0-L4 分层）；

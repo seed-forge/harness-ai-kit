@@ -1,0 +1,17 @@
+decisions:
+  - id: HD-1
+    point: Deployment target confirmation
+    trigger: Before enabling any deploy-capable CI workflow.
+    options:
+      - Confirm target, credential reference, rollback path, and approval owner.
+      - Keep the workflow build-only until the missing information is supplied.
+    default: Keep the workflow build-only.
+    rationale: A CI configuration must not infer a production target or secret ownership.
+  - id: HD-2
+    point: Quality gate enforcement
+    trigger: Before a newly added quality gate can block pull requests or releases.
+    options:
+      - Run the gate in reporting mode first.
+      - Enable blocking after one failing and one passing verification run.
+    default: Run in reporting mode first.
+    rationale: Quality thresholds are product decisions and need evidence before they block delivery.

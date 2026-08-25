@@ -1,9 +1,9 @@
 {
-  "namespace": "community",
+  "namespace": "public",
   "id": "infra-dify-ops",
   "name": "infra-dify-ops",
   "owner": "seedforge",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -27,7 +27,6 @@
   "dependencies": [
     {
       "type": "cli",
-      "namespace": "community",
       "id": "difyctl",
       "version": ">=0.14.0",
       "scope": "required"
@@ -36,7 +35,7 @@
   "sources": {
     "preferred": [
       "repo-checkout",
-      "skill-registry"
+      "public-registry"
     ],
     "allow_fallback": true
   },
@@ -50,7 +49,7 @@
   "post_install_hints": [
     "Install the paired CLI difyctl and initialize a project workspace before using the resource capture commands."
   ],
-  "updated_at": "2026-08-23",
+  "updated_at": "2026-08-25",
   "config_schema": "config.defaults.yaml",
   "integrations": [
     {

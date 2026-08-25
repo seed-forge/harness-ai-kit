@@ -3,8 +3,6 @@
       name: harness-ai-kit-plugin
       config:
         cliCommand: harness-ai-kit
-        # Empty = CLI-delegation mode (needs the harness-ai-kit CLI on PATH).
-        # Set these to your own registry index.json to enable the HTTP fallback.
-        skillRegistryIndexUrl: ""
-        cliRegistryIndexUrl: ""
+        skillRegistryIndexUrl: https://raw.githubusercontent.com/seed-forge/harness-ai-kit/main/registry/skills/index.json
+        cliRegistryIndexUrl: https://raw.githubusercontent.com/seed-forge/harness-ai-kit/main/registry/clis/index.json
         defaultProfile: web

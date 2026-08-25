@@ -1,0 +1,21 @@
+{
+  "id": "harness-ai-kit",
+  "name": "harness-ai-kit",
+  "owner": "seedforge",
+  "version": "0.18.1",
+  "status": "trial",
+  "package_type": "cli",
+  "summary": "Portable package manager for AI agent assets across supported runtimes.",
+  "package_name": "harness-ai-kit",
+  "install_type": "python-package",
+  "publish_paths": [
+    "harness_ai_kit",
+    "pyproject.toml",
+    "README.md",
+    "INSTALL.md",
+    "LICENSE"
+  ],
+  "companion_docs": {
+    "usage": "USAGE.md"
+  }
+}

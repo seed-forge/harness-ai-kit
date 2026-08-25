@@ -24,6 +24,7 @@ from .git_source import (
 )
 from .plan_builder import (
     DEFAULT_RESOLUTION_TIMEOUT,
+    ResolutionTimeout,
     build_resolution_plan,
 )
 from .provider import (
@@ -43,6 +44,7 @@ __all__ = [
     "RegistryManifestDownloader",
     "RegistryUrlResolver",
     "ResolutionProvider",
+    "ResolutionTimeout",
     "build_resolution_plan",
     "default_git_repo_checkout",
     "default_git_skill_resolver",

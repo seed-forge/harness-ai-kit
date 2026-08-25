@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "jenkins.yml",
+  "description": "Shared Library 项目级配置文件 Schema",
+  "type": "object",
+  "properties": {
+    "general": {
+      "type": "object",
+      "description": "全局通用配置",
+      "properties": {
+        "credentialsId": { "type": "string", "description": "默认 Git 凭据 ID" },
+        "logFormat": { "type": "string", "enum": ["plain", "json"] }
+      }
+    },
+    "modules": {
+      "type": "object",
+      "description": "模块配置",
+      "properties": {
+        "pathMapping": {
+          "type": "object",
+          "description": "服务名 → 路径映射",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "编译路径 = 部署路径"
+              },
+              {
+                "type": "object",
+                "description": "编译路径 ≠ 部署路径",
+                "properties": {
+                  "compilePath": { "type": "string", "description": "Git 中的编译路径" },
+                  "deployPath": { "type": "string", "description": "生产部署路径" }
+                },
+                "required": ["compilePath", "deployPath"]
+              }
+            ]
+          }
+        },
+        "scanPaths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "模块扫描路径列表"
+        }
+      }
+    },
+    "environments": {
+      "type": "object",
+      "description": "部署环境定义",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "host": { "type": "string", "description": "目标服务器 (别名 deployHost)" },
+          "deployHost": { "type": "string" },
+          "port": { "type": ["string", "integer"], "description": "SSH 端口 (别名 deployPort)" },
+          "deployPort": { "type": ["string", "integer"] },
+          "user": { "type": "string", "description": "SSH 用户 (别名 deployUser)" },
+          "deployUser": { "type": "string" },
+          "remoteDir": { "type": "string", "description": "部署基础目录 (别名 deployDir)" },
+          "deployDir": { "type": "string" },
+          "credentialsId": { "type": "string", "description": "SSH 凭据 ID" }
+        }
+      }
+    },
+    "steps": {
+      "type": "object",
+      "description": "步骤级配置",
+      "properties": {
+        "sc_javaJarDeploy": {
+          "type": "object",
+          "properties": {
+            "transport": { "type": "string", "enum": ["rsync", "scp"], "default": "rsync" },
+            "rsyncExcludes": { "type": "array", "items": { "type": "string" } },
+            "deployScript": { "type": "string" },
+            "skipHealthCheck": { "type": "boolean", "default": false },
+            "healthCheck": {
+              "type": "object",
+              "description": "健康检查配置块 (自动展平为扁平字段)",
+              "properties": {
+                "script": { "type": "string", "description": "→ healthCheckCommand" },
+                "port": { "type": ["string", "integer"], "description": "→ healthCheckPort" },
+                "url": { "type": "string", "description": "→ healthCheckUrl" },
+                "dir": { "type": "string", "description": "→ healthCheckDir" },
+                "timeout": { "type": "integer", "default": 120 },
+                "retries": { "type": "integer", "default": 5 },
+                "delay": { "type": "integer", "default": 10 }
+              }
+            },
+            "healthCheckCommand": { "type": "string" },
+            "healthCheckPort": { "type": ["string", "integer"] },
+            "healthCheckUrl": { "type": "string" },
+            "healthCheckDir": { "type": "string" }
+          }
+        },
+        "buildMaven": {
+          "type": "object",
+          "properties": {
+            "goals": { "type": "string", "default": "clean package" },
+            "skipTests": { "type": "boolean", "default": true },
+            "profile": { "type": "string" },
+            "toolName": { "type": "string", "default": "maven-3.9" }
+          }
+        }
+      }
+    }
+  },
+  "required": ["environments"]
+}

@@ -1,9 +1,9 @@
 {
-  "namespace": "team",
+  "namespace": "public",
   "id": "public-oracle-expert-base",
   "name": "public-oracle-expert-base",
-  "owner": "team",
-  "version": "0.1.1",
+  "owner": "seedforge",
+  "version": "0.1.2",
   "status": "draft",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -27,7 +27,7 @@
   "dependencies": [],
   "sources": {
     "preferred": [
-      "skill-registry",
+      "public-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -50,5 +50,5 @@
     "Use thin JDBC driver for most cases; thick/OCI only for advanced features."
   ],
   "post_install_hints": [],
-  "updated_at": "2026-08-14"
+  "updated_at": "2026-08-25"
 }

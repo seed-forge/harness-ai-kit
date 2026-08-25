@@ -20,4 +20,3 @@ def command_cache(args: argparse.Namespace) -> int:
         print(project_sync_presentation.cache_clean_success_line(removed_count=removed))
         return 0
     raise ValueError(f"Unsupported cache command: {args.cache_command}")
-

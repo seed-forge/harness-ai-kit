@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.10 - 2026-08-25
+
+- Public OSS metadata uses the `public` namespace and `seedforge` owner, and source resolution now uses public-registry instead of the retired private registry label.
+
 ## 0.1.9 - 2026-08-22
 
 - 新增 Docker daemon 代理验收清单：大小写变量冲突、重复 systemd drop-in、NO_PROXY 覆盖范围，以及 daemon/容器代理层级区分。

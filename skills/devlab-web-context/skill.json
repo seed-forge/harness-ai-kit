@@ -1,9 +1,9 @@
 {
-  "namespace": "community",
+  "namespace": "public",
   "id": "devlab-web-context",
   "name": "devlab-web-context",
   "owner": "seedforge",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -28,7 +28,7 @@
     {
       "type": "skill",
       "id": "devlab-context-bootstrap",
-      "namespace": "community",
+      "namespace": "public",
       "version": ">=0.2.0",
       "scope": "optional",
       "feature": "ledger-production"
@@ -45,7 +45,7 @@
   "sources": {
     "preferred": [
       "repo-checkout",
-      "skill-registry"
+      "public-registry"
     ],
     "allow_fallback": true
   },
@@ -75,5 +75,5 @@
   "contributors": [],
   "skill_type": "workflow",
   "agents_md_inject": "",
-  "updated_at": "2026-08-20"
+  "updated_at": "2026-08-25"
 }

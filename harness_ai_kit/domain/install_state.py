@@ -56,7 +56,7 @@ def manual_invocation_hint(runtime_id: str, skill_id: str) -> str:
     if runtime_id == "kiro":
         return f"In Kiro, the installed steering file shapes behavior automatically; it is not a slash command."
     if runtime_id == "cursor":
-        return f"In Cursor, the installed rule file guides the agent automatically; it is not a slash command."
+        return f"In Cursor, the installed skill in .cursor/skills guides the agent automatically; it is not a slash command."
     return f"Open a fresh session and reference `{skill_id}` explicitly."
 
 
@@ -574,7 +574,3 @@ def sync_records(records: list[SkillRecord], target_dir: Path, runtime_id: str =
 
 def install_managed_asset_directory(asset_dir: Path, target_dir: Path, runtime_id: str) -> Path:
     return managed_install.install_managed_asset_directory(asset_dir, target_dir, runtime_id, ASSET_DIRECTORY_NAMES)
-
-
-
-

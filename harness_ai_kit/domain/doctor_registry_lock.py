@@ -8,11 +8,11 @@ from harness_ai_kit.domain.policies import SOURCE_GIT_REPO, SOURCE_REGISTRY, SOU
 MAINTAINER_DOC = "docs/MAINTAINER-SKILL-LOCK-REGISTRY.md"
 
 
-def is_ai_kit_repo_root(path: Path) -> bool:
+def is_harness_ai_kit_repo_root(path: Path) -> bool:
     return (path / "cli" / "harness_ai_kit").is_dir() and (path / "skills").is_dir()
 
 
-def embedded_ai_kit_skill_checkouts(project_root: Path, root_ids: list[str]) -> dict[str, Path]:
+def embedded_harness_ai_kit_skill_checkouts(project_root: Path, root_ids: list[str]) -> dict[str, Path]:
     """Find nested harness-ai-kit skill checkouts inside a consumer workspace."""
     if not project_root.is_dir():
         return {}
@@ -21,19 +21,20 @@ def embedded_ai_kit_skill_checkouts(project_root: Path, root_ids: list[str]) -> 
     for root_id in root_ids:
         _, base_id = pm.split_canonical_id(root_id)
         candidates = [
-            project_root / "skills" / base_id,
+            project_root / "工程规范" / "harness-ai-kit" / "skills" / base_id,
+            project_root / "harness-ai-kit" / "skills" / base_id,
         ]
         for candidate in candidates:
             if (candidate / "SKILL.md").is_file() or (candidate / "skill.json").is_file():
                 kit_root = candidate.parent.parent
-                if kit_root.is_dir() and is_ai_kit_repo_root(kit_root):
+                if kit_root.is_dir() and is_harness_ai_kit_repo_root(kit_root):
                     found[root_id] = candidate
                     break
         if root_id in found:
             continue
         for skill_md in project_root.glob(f"**/harness-ai-kit/skills/{base_id}/SKILL.md"):
             kit_root = skill_md.parent.parent.parent
-            if kit_root.name == "harness-ai-kit" and is_ai_kit_repo_root(kit_root):
+            if kit_root.name == "harness-ai-kit" and is_harness_ai_kit_repo_root(kit_root):
                 if kit_root.resolve() == project_root.resolve():
                     continue
                 found[root_id] = skill_md.parent
@@ -56,7 +57,7 @@ def collect_registry_lock_guardrails(
     if project_root is None or not manifest_skill_ids:
         return warnings, errors
 
-    embedded = embedded_ai_kit_skill_checkouts(project_root, manifest_skill_ids)
+    embedded = embedded_harness_ai_kit_skill_checkouts(project_root, manifest_skill_ids)
     in_repo_maintainer_context = repo_root is not None and repo_root.resolve() == project_root.resolve()
 
     if lockfile is not None and manifest_skill_ids:
@@ -76,7 +77,7 @@ def collect_registry_lock_guardrails(
         if lock_node is not None and lock_node.source == SOURCE_REGISTRY:
             if not (lock_node.artifact_url and lock_node.metadata_url):
                 errors.append(
-                    f"{root_id}: lock node uses skill-registry but artifact_url/metadata_url is missing; "
+                    f"{root_id}: lock node uses public-registry but artifact_url/metadata_url is missing; "
                     f"re-run refresh-lock. See {MAINTAINER_DOC}."
                 )
 

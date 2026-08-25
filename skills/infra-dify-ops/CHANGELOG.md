@@ -1,5 +1,9 @@
 # 变更记录
 
+## 0.6.4 - 2026-08-25
+
+- Public OSS metadata uses the `public` namespace and `seedforge` owner, and source resolution now uses public-registry instead of the retired private registry label.
+
 ## 0.6.3 - 2026-08-23
 - 将 difyctl 资源工作区默认值改为成员侧 `~/.harness-ai-kit/state/difyctl/resources`，移除维护者 checkout 依赖。
 

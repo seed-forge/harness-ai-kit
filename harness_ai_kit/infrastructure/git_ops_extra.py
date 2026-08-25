@@ -124,11 +124,53 @@ def ensure_checkout(repo_url: str, checkout_dir: Path, sync_after_clone: bool, *
 
 
 
+def _sync_failure_hint(stderr: str) -> str:
+    """Map a git failure to the concrete operator action that resolves it."""
+    text = (stderr or "").lower()
+    if "not possible to fast-forward" in text or "diverging" in text:
+        return (
+            "local checkout has diverged from origin; push/rebase your local commits "
+            "(`git pull --rebase`) or reset to origin (`git fetch origin && git reset --hard origin/master`)"
+        )
+    if "would be overwritten" in text or "local changes" in text:
+        return "checkout has uncommitted changes; commit or `git stash` them, then retry"
+    if "not a git repository" in text or "no such file or directory" in text:
+        return "checkout_dir is missing or not a git repo; fix `config set checkout_dir=...` (consumers need no checkout)"
+    if "could not read username" in text or "authentication failed" in text or "could not resolve host" in text:
+        return "git auth/network failed; check credentials, proxy, and Gitea reachability"
+    if "no upstream" in text or "not currently on a branch" in text:
+        return "checkout has no tracking branch (detached HEAD?); `git checkout master` and set upstream"
+    return "inspect the checkout manually with `git -C <checkout_dir> pull --ff-only`"
+
+
 def maybe_sync_repo(args: argparse.Namespace, repo_root: Path, *, force: bool = False) -> None:
-    if force or getattr(args, "sync_repo", False):
+    """Best-effort repo sync before asset resolution.
+
+    The repo checkout is only one of several asset sources (registry is
+    authoritative for consumers), so a broken/diverged/dirty checkout must not
+    abort the caller. Failures degrade to a warning plus a concrete fix hint and
+    resolution continues from the remaining sources.
+    """
+    if not (force or getattr(args, "sync_repo", False)):
+        return
+    if not repo_looks_valid(repo_root):
+        print(f"Warning: skipped repo sync; not a usable git checkout: {repo_root}")
+        return
+    try:
         message = sync_repo(repo_root)
-        if message:
-            print(message)
+    except subprocess.CalledProcessError as exc:
+        detail = (exc.stderr or exc.stdout or "").strip().splitlines()
+        first = detail[-1] if detail else f"git exited with status {exc.returncode}"
+        print(f"Warning: repo sync failed ({repo_root}): {first}")
+        print(f"         Hint: {_sync_failure_hint(exc.stderr or exc.stdout or '')}")
+        print("         Continuing with registry/lockfile sources; repo-sourced assets may be stale.")
+        return
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        print(f"Warning: repo sync could not run ({repo_root}): {exc}")
+        print("         Continuing with registry/lockfile sources; repo-sourced assets may be stale.")
+        return
+    if message:
+        print(message)
 
 
 
@@ -174,12 +216,10 @@ def parse_asset_selector(tokens: list[str], default_kind: str) -> tuple[str, lis
         return "skill", tokens[1:]
     if selector in {"cli", "clis"}:
         return "cli", tokens[1:]
+    if selector in {"plugin", "plugins"}:
+        return "plugin", tokens[1:]
     if selector in {"loop", "loops"}:
         return "loop", tokens[1:]
     if selector in {"asset", "assets"}:
         return "asset", tokens[1:]
     return default_kind, tokens
-
-
-
-

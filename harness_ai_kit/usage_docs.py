@@ -69,7 +69,7 @@ def _render_lines(
     return "\n".join(blocks)
 
 
-def _render_ai_kit_operator(metadata: Mapping[str, Any]) -> str:
+def _render_harness_ai_kit_operator(metadata: Mapping[str, Any]) -> str:
     asset_id = _clean_text(metadata.get("id") or "harness-ai-kit-ops")
     name = _clean_text(metadata.get("name") or metadata.get("id") or "harness-ai-kit-ops")
     entry = _clean_text(metadata.get("entry") or "SKILL.md")
@@ -113,7 +113,7 @@ def _render_ai_kit_operator(metadata: Mapping[str, Any]) -> str:
     return _render_lines(_usage_title(name), when, inputs, outputs, prompts, fast_path)
 
 
-def _render_ai_kit_maintainer(metadata: Mapping[str, Any]) -> str:
+def _render_harness_ai_kit_maintainer(metadata: Mapping[str, Any]) -> str:
     asset_id = _clean_text(metadata.get("id") or "harness-ai-kit-maintainer")
     name = _clean_text(metadata.get("name") or metadata.get("id") or "harness-ai-kit-maintainer")
     entry = _clean_text(metadata.get("entry") or "SKILL.md")
@@ -148,7 +148,7 @@ def _render_ai_kit_maintainer(metadata: Mapping[str, Any]) -> str:
     return _render_lines(_usage_title(name), when, inputs, outputs, prompts, fast_path)
 
 
-def _render_ai_kit_cli(metadata: Mapping[str, Any]) -> str:
+def _render_harness_ai_kit_cli(metadata: Mapping[str, Any]) -> str:
     name = _clean_text(metadata.get("name") or metadata.get("id") or "harness-ai-kit")
     entry = _clean_text(metadata.get("entry") or "README.md")
     when = [
@@ -226,11 +226,11 @@ def render_usage_doc(metadata: Mapping[str, Any]) -> str:
     entry = _clean_text(metadata.get("entry") or ("SKILL.md" if package_type == "skill" else "README.md"))
 
     if package_type == "skill" and asset_id == "harness-ai-kit-ops":
-        return _render_ai_kit_operator(metadata)
+        return _render_harness_ai_kit_operator(metadata)
     if package_type == "skill" and asset_id == "harness-ai-kit-maintainer":
-        return _render_ai_kit_maintainer(metadata)
+        return _render_harness_ai_kit_maintainer(metadata)
     if package_type == "cli" and asset_id == "harness-ai-kit":
-        return _render_ai_kit_cli(metadata)
+        return _render_harness_ai_kit_cli(metadata)
     if package_type == "skill" and ("请改用" in summary or "已废弃" in summary or "deprecated" in summary.lower()):
         return _render_deprecated_skill(metadata, summary)
 

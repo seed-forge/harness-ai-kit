@@ -40,7 +40,7 @@ def scaffold_skill(repo_root: Path, skill_id: str) -> SkillRecord:
         "compatible_clients": metadata.get("compatible_clients", ["codex"]),
         "installation": {"default_scope": "project"},
         "dependencies": [],
-        "sources": {"preferred": ["repo-checkout", "skill-registry"], "allow_fallback": True},
+        "sources": {"preferred": ["repo-checkout", "public-registry"], "allow_fallback": True},
         "companion_docs": {"usage": "USAGE.md", "example": "EXAMPLE.md", "example_required": False},
         "environment": {
             "dependency_groups": [],
@@ -280,5 +280,3 @@ def scaffold_cli(repo_root: Path, cli_id: str) -> CliAssetRecord:
     )
 
     return load_cli_record(cli_root)
-
-

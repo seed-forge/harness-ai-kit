@@ -11,6 +11,7 @@ from harness_ai_kit.domain.lockfile_io import topological_skill_nodes_from_lock
 from harness_ai_kit.domain.policies import SOURCE_GIT_REPO, SOURCE_PUBLIC_REGISTRY, SOURCE_REGISTRY, SOURCE_REPO
 from harness_ai_kit.domain.runtime_install import runtime_install_destination, runtime_profile
 from harness_ai_kit.domain.versions import compare_versions_safe
+from harness_ai_kit.domain.agents_inject import apply_agents_inject
 
 
 SkillVersionReader = Callable[[Path, str, str], str]
@@ -29,6 +30,29 @@ def _build_extends_attribution(
     if base_canonical_id:
         return f"<!-- Extends: {base_canonical_id}@{base_version} ({strategy}) -- Do not edit this line -->"
     return f"<!-- Extends: ({strategy}) -->"
+
+
+def _split_frontmatter(content: str) -> tuple[str | None, str]:
+    """Return (frontmatter_block, body); frontmatter_block is None when absent."""
+    lines = content.split("\n")
+    if lines and lines[0].strip() == "---":
+        for idx in range(1, min(len(lines), 200)):
+            if lines[idx].strip() == "---":
+                return "\n".join(lines[: idx + 1]), "\n".join(lines[idx + 1 :])
+    return None, content
+
+
+def _assemble(frontmatter: str | None, attribution: str, body_parts: list[str]) -> str:
+    """Assemble a merged SKILL.md: frontmatter first, then attribution, then body.
+
+    AI IDE skill loaders require ``---`` to be the very first line of
+    SKILL.md; the attribution comment is informational and must never
+    precede the frontmatter.
+    """
+    body = "\n\n".join(part.strip("\n") for part in body_parts if part.strip())
+    if frontmatter is None:
+        return f"{attribution}\n\n{body}" if body else attribution
+    return f"{frontmatter}\n{attribution}\n\n{body}\n" if body else f"{frontmatter}\n{attribution}\n"
 
 
 def _filter_markdown_sections(md_text: str, section_names: list[str]) -> str:
@@ -104,31 +128,43 @@ def merge_skill_md(
         Merged markdown content as a string.
     """
     attribution = _build_extends_attribution(base_canonical_id, base_version, strategy)
+    fm_ext, body_ext = _split_frontmatter(extending_md)
+    fm_base, body_base = _split_frontmatter(base_md)
 
     if not extending_md.strip():
         if base_md.strip():
-            return f"{attribution}\n{base_md}"
+            return _assemble(fm_base, attribution, [body_base])
         return attribution
 
     if not base_md.strip():
-        return (
-            f"{attribution}\n"
-            f"<!-- Warning: base skill has no SKILL.md content -->\n"
-            f"{extending_md}"
-        )
+        return _assemble(fm_ext, attribution, [body_ext, "<!-- Warning: base skill has no SKILL.md content -->"])
 
     if strategy == "replace":
-        return f"{attribution}\n{extending_md}"
+        return _assemble(fm_ext, attribution, [body_ext])
 
     if merge_sections:
         extending_md = _filter_markdown_sections(extending_md, merge_sections)
         base_md = _filter_markdown_sections(base_md, merge_sections)
 
+    # Idempotency guard: repeated installs merge onto the previously merged
+    # SKILL.md, so base blocks accumulate without bound (observed: base
+    # content x39 in one installed skill). With multiple extends edges the
+    # file starts with the *last* edge's block, so a prefix check on the
+    # current edge misses. If this edge's full merged block (attribution +
+    # base content) is already present anywhere, skip re-merging it.
+    if base_md.strip() and attribution in extending_md and body_base in extending_md:
+        if extending_md.lstrip().startswith(attribution):
+            # Old-format merged file (attribution before frontmatter): migrate it.
+            rest = extending_md[len(attribution) :].lstrip("\n")
+            fm_rest, body_rest = _split_frontmatter(rest)
+            return _assemble(fm_rest, attribution, [body_rest])
+        return extending_md
+
     if strategy == "prepend":
-        return f"{attribution}\n{base_md}\n\n{extending_md}"
+        return _assemble(fm_ext, attribution, [body_base, body_ext])
 
     if strategy == "append":
-        return f"{attribution}\n{extending_md}\n\n{base_md}"
+        return _assemble(fm_ext, attribution, [body_ext, body_base])
 
     raise ValueError(
         f"Unknown merge strategy: {strategy}. Supported: prepend, append, replace."
@@ -241,6 +277,7 @@ def apply_skill_lockfile(
     install_skill_directory: SkillDirectoryInstaller,
     install_registry_skill: RegistrySkillInstaller,
     warn_same_version_drift: SameVersionDriftWarner,
+    same_version_drift_fast_path: Callable[[LockNode], bool] | None = None,
 ) -> list[Path]:
     ordered_nodes = topological_skill_nodes_from_lock(lockfile)
     backups: list[tuple[Path, Path | None]] = []
@@ -277,6 +314,14 @@ def apply_skill_lockfile(
             if destination.exists():
                 current_version = installed_version(target_dir, node.id, runtime_id)
                 if current_version and compare_versions_safe(current_version, node.version) == 0:
+                    if (
+                        same_version_drift_fast_path is not None
+                        and same_version_drift_fast_path(node)
+                    ):
+                        installed.append(destination)
+                        backups.append((destination, None))
+                        _track_and_merge(node, destination)
+                        continue
                     warn_same_version_drift(
                         node,
                         runtime_id,
@@ -322,6 +367,20 @@ def apply_skill_lockfile(
                 _track_and_merge(node, installed_path)
                 continue
             raise ValueError(f"Unsupported install source for skill {node.id}: {node.source}")
+
+        # agents_inject: 项目级安装完成后，按各 skill.json 声明注入 AGENTS.md（幂等）
+        if target_dir.name == "skills" and target_dir.parent.name == ".agents":
+            project_root = target_dir.parent.parent
+            for node in ordered_nodes:
+                if node.source in {SOURCE_REPO, SOURCE_GIT_REPO} and node.source_ref:
+                    meta_path = Path(node.source_ref) / "skill.json"
+                    if meta_path.exists():
+                        try:
+                            apply_agents_inject(
+                                project_root, meta_path, node.id or node.canonical_id or node.id
+                            )
+                        except Exception:
+                            pass
         return installed
     except Exception:
         for destination, backup_path in reversed(backups):

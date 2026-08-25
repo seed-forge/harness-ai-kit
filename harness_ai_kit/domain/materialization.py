@@ -3,7 +3,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Iterable
 
-from harness_ai_kit.domain.artifacts import hash_named_bytes, hash_skill_directory
+from harness_ai_kit.domain.artifacts import (
+    hash_named_bytes,
+    hash_skill_directory,
+    iter_regular_files,
+)
 from harness_ai_kit.domain.lockfile import LockNode
 from harness_ai_kit.domain.policies import SOURCE_GIT_REPO, SOURCE_REPO
 from harness_ai_kit.domain.versions import compare_versions_safe
@@ -11,9 +15,7 @@ from harness_ai_kit.domain.versions import compare_versions_safe
 
 def hash_directory_with_root(path: Path, root_name: str) -> str:
     entries: list[tuple[str, bytes]] = []
-    for file_path in sorted(path.rglob("*")):
-        if not file_path.is_file():
-            continue
+    for file_path in iter_regular_files(path):
         relative = Path(root_name) / file_path.relative_to(path)
         entries.append((relative.as_posix(), file_path.read_bytes()))
     return hash_named_bytes(entries)

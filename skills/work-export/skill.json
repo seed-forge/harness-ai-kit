@@ -1,9 +1,9 @@
 {
-  "namespace": "community",
+  "namespace": "public",
   "id": "work-export",
   "name": "work-export",
   "owner": "seedforge",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -27,7 +27,7 @@
   "dependencies": [
     {
       "type": "skill",
-      "namespace": "community",
+      "namespace": "public",
       "id": "docx",
       "source_url": "https://github.com/anthropics/skills/tree/main/skills/docx",
       "version": "latest",
@@ -35,7 +35,7 @@
     },
     {
       "type": "skill",
-      "namespace": "community",
+      "namespace": "public",
       "id": "pdf",
       "source_url": "https://github.com/anthropics/skills/tree/main/skills/pdf",
       "version": "latest",
@@ -43,7 +43,7 @@
     },
     {
       "type": "skill",
-      "namespace": "community",
+      "namespace": "public",
       "id": "xlsx",
       "source_url": "https://github.com/anthropics/skills/tree/main/skills/xlsx",
       "version": "latest",
@@ -51,7 +51,7 @@
     },
     {
       "type": "skill",
-      "namespace": "community",
+      "namespace": "public",
       "id": "pptx",
       "source_url": "https://github.com/anthropics/skills/tree/main/skills/pptx",
       "version": "latest",
@@ -60,7 +60,7 @@
   ],
   "sources": {
     "preferred": [
-      "skill-registry",
+      "public-registry",
       "repo-checkout"
     ],
     "allow_fallback": true
@@ -98,5 +98,5 @@
   "post_install_hints": [
     "Verify node and python are available."
   ],
-  "updated_at": "2026-08-20"
+  "updated_at": "2026-08-25"
 }

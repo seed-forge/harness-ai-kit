@@ -16,6 +16,17 @@ from harness_ai_kit.domain.manifest_io import load_skill_manifest, manifest_meta
 
 GitRepoCheckout = Callable[[str, str | None], Path]
 
+# Git subprocesses can hang indefinitely on Windows when the checkout cache is
+# contended (e.g. orphaned git processes from an earlier resolution timeout).
+# Give every subprocess an explicit deadline so sync fails fast instead of
+# blocking the 5-minute resolution window.
+GIT_COMMIT_TIMEOUT = 10
+GIT_FETCH_TIMEOUT = 30
+GIT_RESET_TIMEOUT = 10
+GIT_CLONE_TIMEOUT = 120
+
+_git_source_commit_cache: dict[Path, str] = {}
+
 
 @dataclass(frozen=True)
 class GitSourceSpec:
@@ -119,6 +130,10 @@ def is_git_source_selector(value: str) -> bool:
 def git_source_commit(checkout_dir: Path) -> str | None:
     if not (checkout_dir / ".git").exists():
         return None
+    cache_key = checkout_dir.absolute()
+    cached = _git_source_commit_cache.get(cache_key)
+    if cached is not None:
+        return cached
     try:
         result = subprocess.run(
             ["git", "-C", str(checkout_dir), "rev-parse", "HEAD"],
@@ -127,11 +142,15 @@ def git_source_commit(checkout_dir: Path) -> str | None:
             text=True,
             encoding="utf-8",
             errors="replace",
+            timeout=GIT_COMMIT_TIMEOUT,
         )
-    except (OSError, subprocess.CalledProcessError):
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
         return None
     commit = result.stdout.strip()
-    return commit or None
+    if not commit:
+        return None
+    _git_source_commit_cache[cache_key] = commit
+    return commit
 
 
 def github_raw_metadata_url(source_ref: str, commit: str | None, subpath: str | None) -> str | None:
@@ -165,7 +184,15 @@ def default_git_repo_checkout(source_ref: str, ref: str | None = None, *, force_
         if effective_ref:
             command.extend(["--branch", effective_ref])
         command.extend([clone_url, str(checkout_dir)])
-        subprocess.run(command, check=True, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        subprocess.run(
+            command,
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=GIT_CLONE_TIMEOUT,
+        )
     elif force_refresh:
         refresh_git_checkout(checkout_dir)
     return checkout_dir
@@ -179,6 +206,7 @@ def refresh_git_checkout(checkout_dir: Path) -> bool:
     """
     if not (checkout_dir / ".git").exists():
         return False
+    cache_key = checkout_dir.absolute()
     try:
         before = git_source_commit(checkout_dir)
         subprocess.run(
@@ -188,6 +216,7 @@ def refresh_git_checkout(checkout_dir: Path) -> bool:
             text=True,
             encoding="utf-8",
             errors="replace",
+            timeout=GIT_FETCH_TIMEOUT,
         )
         subprocess.run(
             ["git", "-C", str(checkout_dir), "reset", "--hard", "FETCH_HEAD"],
@@ -196,9 +225,11 @@ def refresh_git_checkout(checkout_dir: Path) -> bool:
             text=True,
             encoding="utf-8",
             errors="replace",
+            timeout=GIT_RESET_TIMEOUT,
         )
+        _git_source_commit_cache.pop(cache_key, None)
         after = git_source_commit(checkout_dir)
-    except (OSError, subprocess.CalledProcessError):
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
         return False
     return before != after
 

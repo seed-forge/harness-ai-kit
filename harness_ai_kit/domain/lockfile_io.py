@@ -23,7 +23,8 @@ def state_dir() -> Path:
 
 
 def lockfile_path(base_dir: Path | None = None) -> Path:
-    return (base_dir or Path.cwd()).resolve() / active_lockfile_name()
+    base = (base_dir or Path.cwd()).resolve()
+    return base / active_lockfile_name()
 
 
 def _write_lockfile_payload(payload: dict[str, object], output_path: Path) -> Path:

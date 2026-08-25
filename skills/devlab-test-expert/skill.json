@@ -1,9 +1,9 @@
 {
-  "namespace": "community",
+  "namespace": "public",
   "id": "devlab-test-expert",
   "name": "DevLab Test Expert Knowledge",
   "owner": "seedforge",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -28,7 +28,7 @@
   "sources": {
     "preferred": [
       "repo-checkout",
-      "skill-registry"
+      "public-registry"
     ],
     "allow_fallback": true
   },
@@ -49,5 +49,5 @@
     "其他测试技能（如 devlab-web-test-e2e）会自动引用本知识库"
   ],
   "skill_type": "knowledge",
-  "updated_at": "2026-08-15"
+  "updated_at": "2026-08-25"
 }
