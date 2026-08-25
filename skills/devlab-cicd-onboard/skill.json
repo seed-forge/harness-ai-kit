@@ -3,7 +3,7 @@
   "id": "devlab-cicd-onboard",
   "name": "DevLab CI/CD Onboard",
   "owner": "seedforge",
-  "version": "0.10.5",
+  "version": "0.10.6",
   "status": "trial",
   "entry": "SKILL.md",
   "package_type": "skill",
@@ -39,13 +39,26 @@
   },
   "environment": {
     "dependency_groups": [],
-    "system": [],
-    "python_strategy": "none",
-    "python_packages": [],
+    "system": [
+      {
+        "name": "python",
+        "command": "python --version"
+      }
+    ],
+    "python_strategy": "project-venv",
+    "python_packages": [
+      "PyYAML>=6.0",
+      "jsonschema>=4.18"
+    ],
     "fonts": [],
-    "verify_commands": []
+    "verify_commands": [
+      "python -c \"import yaml, jsonschema\""
+    ]
   },
-  "runtime_requirements": [],
+  "runtime_requirements": [
+    "The bundled Jenkins-style validator requires PyYAML; jsonschema is required when --schema is used.",
+    "Choose a CI provider and supply its runner, plugins, permissions, and secret store separately; GitHub Actions, Jenkins, and Woodpecker are not bundled dependencies."
+  ],
   "post_install_hints": [
     "Review existing CI files before proposing a provider migration.",
     "Use the CI provider's secret store for credentials and endpoints; keep tracked configuration portable.",

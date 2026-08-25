@@ -43,7 +43,7 @@ python -m pytest -q
 - License: Apache-2.0
 
 ```bash
-pip install --upgrade harness-ai-kit==0.18.1
+pip install --upgrade harness-ai-kit==0.18.2
 harness-ai-kit init
 harness-ai-kit add skill https://github.com/OWNER/REPO/tree/main/path/to/skill
 harness-ai-kit sync

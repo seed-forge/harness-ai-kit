@@ -66,6 +66,21 @@ the provider's secret manager when an automation actually needs them. Keep
 project-specific, non-secret deployment settings in a reviewed file such as
 `.platform/jenkins.yml` or an equivalent provider-native configuration file.
 
+### Runtime dependencies
+
+The bundled Jenkins-style validator runs in the target repository's Python
+virtual environment and requires `PyYAML`. The documented `--schema` path also
+requires `jsonschema`:
+
+```bash
+python -m pip install "PyYAML>=6.0" "jsonschema>=4.18"
+```
+
+The selected CI provider remains an external prerequisite. Its runner image,
+plugins, permissions, secret store, network access, and deployment tools are
+owned and configured by the repository or platform operator; they are not
+installed with this Skill.
+
 Use the bundled `scripts/validate-jenkins-yml.py` only for the documented
 Jenkins-style project configuration. It validates structure; it does not prove
 that a remote host, credential, or CI service is reachable.

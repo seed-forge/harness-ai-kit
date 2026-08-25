@@ -820,6 +820,7 @@ def python_import_name(package: str) -> str:
         "pymupdf": "fitz",
         "python-docx": "docx",
         "python-pptx": "pptx",
+        "pyyaml": "yaml",
     }
     return known.get(base_name.lower(), base_name.replace("-", "_"))
 

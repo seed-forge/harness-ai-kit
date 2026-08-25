@@ -52,7 +52,7 @@ Install any with `harness-ai-kit add skill <id>` (skills) or `pip install <pkg>`
 | Skill | Version | Description |
 |-------|---------|-------------|
 | `devlab-contract-web-server` | 0.1.3 | 前后端契约规范技能（contract 技能簇首个，介于 srv 与 web 之间）：接口/序列化契约、字段类型一致性、配置分层与不过度设计，配契约校验与联调防错清单。 |
-| `devlab-cicd-onboard` | 0.10.5 | Provider-neutral CI/CD onboarding: repository assessment, pipeline design, configuration and secret boundaries, quality gates, and release verification. |
+| `devlab-cicd-onboard` | 0.10.6 | Provider-neutral CI/CD onboarding: repository assessment, pipeline design, configuration and secret boundaries, quality gates, and release verification. |
 | `devlab-integration-fullstack` | 0.1.6 | 全栈集成测试专家技能。支持多服务 Docker Compose 部署场景，基于 Testcontainers + Mock Server 实现端到端集成测试。 |
 | `devlab-srv-test-api` | 0.1.4 | 后端 API 测试专家技能。支持 Java（JUnit）/ Python（pytest）/ Node.js（supertest + jest）后端项目的接口测试、Mock 服务、测试数据管理。 |
 | `devlab-tech-debt-ops` | 0.1.3 | 技术债清理/重构编排方法论（非业务债，侧重技术债）：现状梳理→拆分设计→引用清零安全移除→回归验证；附设计模式清单与典型模式示意性伪代码（点到即止，实操由 AI 给选项）。 |

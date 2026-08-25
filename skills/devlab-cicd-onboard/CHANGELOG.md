@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.6 - 2026-08-25
+
+- Declare the validator's public Python dependencies (`PyYAML` and
+  `jsonschema`) and document the external CI-provider prerequisites separately.
+
 ## 0.10.5 - 2026-08-25
 
 - Public release metadata now uses the `public` namespace and `seedforge` owner; the portable CI/CD references are complete for an OSS installation.

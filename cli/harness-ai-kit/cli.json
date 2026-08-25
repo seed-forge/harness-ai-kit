@@ -2,7 +2,7 @@
   "id": "harness-ai-kit",
   "name": "harness-ai-kit",
   "owner": "seedforge",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "status": "trial",
   "package_type": "cli",
   "summary": "Portable package manager for AI agent assets across supported runtimes.",
