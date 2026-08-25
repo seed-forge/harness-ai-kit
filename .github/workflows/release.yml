@@ -61,7 +61,7 @@ jobs:
             --github-output "$GITHUB_OUTPUT" \
             "${release_args[@]}"
       - name: Upload checked distributions and release evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-build
           path: build/
