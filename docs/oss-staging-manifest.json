@@ -3,46 +3,10 @@
     {
       "id": "harness-ai-kit",
       "package_name": "harness-ai-kit",
-      "tree_sha256": "1b9717c239ab79ac5df6cd1bce3b097a717cf017ea1f93f35e7aa8f76b66bac2",
-      "version": "0.2.2"
-    },
-    {
-      "id": "sf-difyctl",
-      "package_name": "sf-difyctl",
-      "tree_sha256": "2b0d1618250ba9b03ab4190162cebb3f9946088c2b6981d137eacf372cb4744a",
-      "version": "0.15.0"
-    },
-    {
-      "id": "sf-evalctl",
-      "package_name": "sf-evalctl",
-      "tree_sha256": "17ca2c23532aa0ac53a5edf2bb38768a28f86e3d9a591868119c0ac45eaeb17a",
-      "version": "0.1.1"
-    },
-    {
-      "id": "sf-loopctl",
-      "package_name": "sf-loopctl",
-      "tree_sha256": "abd5047a8be82f5edcf23a96d6dbad733e4b5134be44d5a6140aa9c59be2d383",
-      "version": "0.1.0"
-    },
-    {
-      "id": "sf-mineructl",
-      "package_name": "sf-mineructl",
-      "tree_sha256": "fc20f20b7f77b020dd40c735ee3c603db901828756d5f036706b8570895725f6",
-      "version": "0.1.1"
-    },
-    {
-      "id": "sf-nexusctl",
-      "package_name": "sf-nexusctl",
-      "tree_sha256": "76ec5a401d3a37a82aa1db6f53474e9850cf59cda99e08d6ce63bc888660e131",
-      "version": "0.5.2"
-    },
-    {
-      "id": "sf-ragflowctl",
-      "package_name": "sf-ragflowctl",
-      "tree_sha256": "a634ca21390df2b08c894d283380613c5e80f024d9a50c6788958f66257d1f9b",
-      "version": "0.5.1"
+      "tree_sha256": "12a27d3eed6d0a57925c9ab05ee47a8485259ac2b5c1b40d40e3224ab0fd28dc",
+      "version": "0.18.1"
     }
   ],
   "schema_version": 1,
-  "source_revision": "cd1d54b704ce8ac26fc99e72d0be9c182b7123d3"
+  "source_revision": "193893842e60290a4cdae23c429ea86695812888"
 }
