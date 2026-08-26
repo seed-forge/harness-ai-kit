@@ -1,0 +1,17 @@
+{
+  "id": "woodpeckerctl",
+  "name": "woodpeckerctl",
+  "owner": "seedforge",
+  "version": "0.4.0",
+  "status": "trial",
+  "package_type": "cli",
+  "package_name": "sf-woodpeckerctl",
+  "install_type": "python-package",
+  "publish_paths": [
+    "cli/sf-woodpeckerctl"
+  ],
+  "entry_points": [
+    "woodpeckerctl"
+  ],
+  "summary": "woodpeckerctl: Woodpecker CI wrapper CLI — governance (audit/config) + alias routing for official woodpecker-cli."
+}

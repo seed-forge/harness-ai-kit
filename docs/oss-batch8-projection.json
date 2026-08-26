@@ -1,0 +1,34 @@
+{
+  "assets": [
+    {
+      "id": "sf-jenkinsctl",
+      "source_path": "cli/jenkinsctl",
+      "staging_path": "cli/sf-jenkinsctl",
+      "tree_sha256": "263c4d878aa0c9a135755c71aa24905da2015e7b4e351f8a12217062b93271ca",
+      "version": "0.6.0"
+    },
+    {
+      "id": "sf-woodpeckerctl",
+      "source_path": "cli/woodpeckerctl",
+      "staging_path": "cli/sf-woodpeckerctl",
+      "tree_sha256": "98f7a8a2098fffc040436d391c26762a4fcfd4e3cc59f6f0ab3a585ce775ea90",
+      "version": "0.4.0"
+    },
+    {
+      "id": "infra-jenkins-pipeline-ops",
+      "source_path": "skills/infra-jenkins-pipeline-ops",
+      "staging_path": "skills/infra-jenkins-pipeline-ops",
+      "tree_sha256": "f57cac2536b0b81560229ec7aa02527c7371d3bc1fc210b0bab34b35ec64a202",
+      "version": "0.18.8"
+    },
+    {
+      "id": "infra-woodpecker-pipeline-ops",
+      "source_path": "skills/infra-woodpecker-pipeline-ops",
+      "staging_path": "skills/infra-woodpecker-pipeline-ops",
+      "tree_sha256": "dbe94ec053538de8cb2218669a1c667f99d75b1ffda4b748ad145826af1d934a",
+      "version": "0.4.3"
+    }
+  ],
+  "batch": 8,
+  "schema_version": 1
+}

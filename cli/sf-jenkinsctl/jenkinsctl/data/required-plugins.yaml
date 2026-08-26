@@ -1,0 +1,25 @@
+# Shared Library 所需插件清单
+# 根据 vars/*.groovy 原子步骤分析
+plugins:
+  - name: git
+    description: "Git SCM 集成 (gitCheckout, gitTag)"
+  - name: ssh-agent
+    description: "SSH 密钥注入 (deployViaSsh sshagent)"
+  - name: credentials-binding
+    description: "凭据绑定 (withCredentials, notifyMattermost)"
+  - name: pipeline-utility-steps
+    description: "Pipeline 工具步骤 (fileExists, readJSON, writeJSON)"
+  - name: workflow-cps
+    description: "CPS Pipeline 引擎 (Shared Library 核心)"
+  - name: workflow-cps-global-lib
+    description: "Shared Library 支持"
+  - name: docker-workflow
+    description: "Docker Pipeline 集成 (dockerBuild, dockerPush)"
+  - name: ssh-credentials
+    description: "SSH 密钥凭据类型"
+  - name: plain-credentials
+    description: "Secret Text 凭据类型"
+  - name: gitea
+    description: "Gitea SCM 集成 (Gitea 代码仓库)"
+  - name: ssh-slaves
+    description: "SSH Agent 远程执行 (sshExec, sshScp)"

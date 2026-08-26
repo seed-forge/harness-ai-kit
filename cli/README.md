@@ -10,6 +10,8 @@ Companion command-line tools for [harness-ai-kit](https://github.com/seed-forge/
 | `sf-nexusctl/` | `sf-nexusctl` | `nexusctl` | Nexus repository ops (repo CRUD / blobstore / cleanup-policy / inventory / user/role) |
 | `sf-difyctl/` | `sf-difyctl` | `difyctl` | Dify usage-layer ops (DSL import / validate / version detect / provider config) |
 | `sf-ragflowctl/` | `sf-ragflowctl` | `ragflowctl` | RAGFlow operations (doctor / dataset / document / ingest / retrieval) |
+| `sf-jenkinsctl/` | `sf-jenkinsctl` | `jenkinsctl` | Jenkins operations (configuration / jobs / builds / diagnostics) - CI candidate |
+| `sf-woodpeckerctl/` | `sf-woodpeckerctl` | `woodpeckerctl` | Woodpecker CI API operations (repository / build / diagnostics) - CI candidate |
 
 ## Install a CLI
 
@@ -23,6 +25,10 @@ pip install sf-ragflowctl       # -> `ragflowctl` command
 ```
 
 Each CLI declares `harness-ai-kit` as a dependency and reuses its public `domain` / `infrastructure` layers.
+
+The two CI/CD candidates above are built and tested by GitHub Actions but are
+not installable from PyPI until their explicit matrix entries are promoted from
+`publish: false` after the staging-manifest and Trusted Publisher checks.
 
 ## Publishing
 

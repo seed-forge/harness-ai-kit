@@ -9,6 +9,7 @@ import re
 import shlex
 import subprocess
 import sys
+import time
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Iterable
@@ -195,10 +196,27 @@ def run_command(command: str, cwd: Path) -> tuple[bool, int]:
     return completed.returncode == 0, completed.returncode
 
 
+def clear_previous_artifacts(output: Path, *, attempts: int = 5, delay_seconds: float = 0.25) -> None:
+    """Remove only prior distribution files, tolerating short Windows locks.
+
+    Antivirus/indexing and a just-finished archive reader can keep a wheel or
+    sdist handle open briefly on Windows.  A bounded retry makes the release
+    gate deterministic without hiding persistent cleanup failures.
+    """
+    for artifact in (*output.glob("*.whl"), *output.glob("*.tar.gz")):
+        for attempt in range(attempts):
+            try:
+                artifact.unlink()
+                break
+            except PermissionError:
+                if attempt == attempts - 1:
+                    raise
+                time.sleep(delay_seconds * (attempt + 1))
+
+
 def build_package(source_root: Path, output: Path) -> tuple[bool, int]:
     output.mkdir(parents=True, exist_ok=True)
-    for artifact in (*output.glob("*.whl"), *output.glob("*.tar.gz")):
-        artifact.unlink()
+    clear_previous_artifacts(output)
     command = [sys.executable, "-m", "build", "--outdir", str(output), str(source_root)]
     completed = subprocess.run(command, cwd=source_root, check=False)
     if completed.returncode:

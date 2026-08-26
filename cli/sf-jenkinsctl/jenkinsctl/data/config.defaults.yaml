@@ -1,0 +1,44 @@
+$schema: harness-ai-kit-config/v1
+
+config:
+  - key: jenkins_url
+    type: string
+    required: true
+    sensitivity: public
+    description: "Jenkins Web 访问地址"
+    env_var: JENKINS_URL
+
+  - key: jenkins_user
+    type: string
+    required: true
+    sensitivity: internal
+    description: "Jenkins 管理员用户名"
+    env_var: JENKINS_USER
+
+  - key: jenkins_api_token
+    type: string
+    required: true
+    sensitivity: sensitive
+    description: "Jenkins API Token（非登录密码）"
+    env_var: JENKINS_API_TOKEN
+
+  - key: jenkins_container
+    type: string
+    required: false
+    sensitivity: public
+    description: "Jenkins Docker 容器名称"
+    default: "jenkins-2.x"
+
+  - key: jenkins_home
+    type: string
+    required: false
+    sensitivity: public
+    description: "Jenkins home 目录（容器内路径）"
+    default: "/var/jenkins_home"
+
+  - key: jenkins_cli_jar
+    type: string
+    required: false
+    sensitivity: public
+    description: "jenkins-cli.jar 路径（容器内）"
+    default: "/usr/share/jenkins/jenkins-cli.jar"

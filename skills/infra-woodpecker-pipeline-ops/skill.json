@@ -1,0 +1,77 @@
+{
+  "namespace": "public",
+  "id": "infra-woodpecker-pipeline-ops",
+  "name": "infra-woodpecker-pipeline-ops",
+  "owner": "seedforge",
+  "version": "0.4.3",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "infra",
+    "harness-ai-kit",
+    "woodpecker",
+    "kaniko",
+    "harbor",
+    "ci-cd",
+    "webhook",
+    "adnanh-webhook",
+    "deploy",
+    "java",
+    "maven",
+    "nginx",
+    "frontend",
+    "repo-kind",
+    "base-image",
+    "platform-infra"
+  ],
+  "summary": "Design, inspect and operate portable Woodpecker CI pipelines with explicit repository and deployment boundaries.",
+  "compatible_clients": [
+    "codex",
+    "claude-code",
+    "kiro",
+    "cursor"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [
+    {
+      "type": "cli",
+      "namespace": "public",
+      "id": "woodpeckerctl",
+      "version": ">=0.4.0",
+      "scope": "required",
+      "feature": "woodpecker-api-governance"
+    },
+    {
+      "type": "skill",
+      "namespace": "public",
+      "id": "base-cn-registry-mirror-strategy",
+      "version": ">=0.1.10",
+      "scope": "required",
+      "feature": "dockerfile-mirror-config"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "public-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [],
+  "post_install_hints": [
+    "Install sf-woodpeckerctl and configure its assets.woodpeckerctl section in ~/.harness-ai-kit/config.yaml."
+  ],
+  "updated_at": "2026-08-26",
+  "companion_cli": "woodpeckerctl",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

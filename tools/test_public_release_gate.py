@@ -5,6 +5,7 @@ import hashlib
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -223,6 +224,26 @@ class PublicReleaseGateTests(unittest.TestCase):
             lf_digest = gate.tree_sha256(root, package)
         self.assertNotEqual(baseline, crlf_digest)
         self.assertEqual(crlf_digest, lf_digest)
+
+    def test_clear_previous_artifacts_retries_transient_windows_lock(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            artifact = Path(temp_dir) / "example-1.0.0.tar.gz"
+            artifact.write_text("temporary artifact", encoding="utf-8")
+            original_unlink = Path.unlink
+            calls = 0
+
+            def flaky_unlink(path: Path, *args, **kwargs) -> None:
+                nonlocal calls
+                if path == artifact and calls == 0:
+                    calls += 1
+                    raise PermissionError("transient file lock")
+                original_unlink(path, *args, **kwargs)
+
+            with mock.patch.object(gate.Path, "unlink", flaky_unlink), mock.patch.object(gate.time, "sleep") as sleep:
+                gate.clear_previous_artifacts(Path(temp_dir), attempts=2, delay_seconds=0.01)
+
+        self.assertFalse(artifact.exists())
+        sleep.assert_called_once_with(0.01)
 
     def test_update_matrix_snapshot_accepts_digit_prefixed_revision(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

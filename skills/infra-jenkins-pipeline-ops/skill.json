@@ -1,0 +1,61 @@
+{
+  "namespace": "public",
+  "id": "infra-jenkins-pipeline-ops",
+  "name": "infra-jenkins-pipeline-ops",
+  "owner": "seedforge",
+  "version": "0.18.8",
+  "status": "trial",
+  "entry": "SKILL.md",
+  "package_type": "skill",
+  "tags": [
+    "infra",
+    "jenkins",
+    "ci-cd",
+    "cd",
+    "pipeline",
+    "automation",
+    "webhook",
+    "devops",
+    "platform-ops",
+    "tool-config"
+  ],
+  "summary": "Operate Jenkins jobs, credentials, plugins and shared libraries through a portable, configuration-driven workflow.",
+  "compatible_clients": [
+    "codex"
+  ],
+  "installation": {
+    "default_scope": "project"
+  },
+  "dependencies": [
+    {
+      "type": "cli",
+      "namespace": "public",
+      "id": "jenkinsctl",
+      "version": ">=0.6.0",
+      "scope": "required",
+      "feature": "jenkins-api-and-platform-ops"
+    }
+  ],
+  "sources": {
+    "preferred": [
+      "public-registry",
+      "repo-checkout"
+    ],
+    "allow_fallback": true
+  },
+  "runtime_requirements": [],
+  "post_install_hints": [
+    "Install sf-jenkinsctl and configure its assets.jenkinsctl section in ~/.harness-ai-kit/config.yaml."
+  ],
+  "updated_at": "2026-08-26",
+  "companion_cli": "jenkinsctl",
+  "config_schema": "config.defaults.yaml",
+  "execution_context": {
+    "ide": true,
+    "server": true,
+    "requires_codebase": false,
+    "requires_browser": false,
+    "requires_interactive": false,
+    "server_runtime": "cli-direct"
+  }
+}

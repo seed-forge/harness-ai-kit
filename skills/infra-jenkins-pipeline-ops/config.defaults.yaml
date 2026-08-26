@@ -1,0 +1,69 @@
+$schema: harness-ai-kit-config/v1
+
+config:
+  - key: jenkins_url
+    type: string
+    required: true
+    sensitivity: public
+    description: "Jenkins Web 访问地址（含端口）"
+    env_var: JENKINS_URL
+
+  - key: jenkins_user
+    type: string
+    required: true
+    sensitivity: internal
+    description: "Jenkins 管理员用户名"
+    env_var: JENKINS_USER
+
+  - key: jenkins_api_token
+    type: string
+    required: true
+    sensitivity: sensitive
+    description: "Jenkins API Token（非登录密码）"
+    env_var: JENKINS_API_TOKEN
+
+  - key: jenkins_container_name
+    type: string
+    required: false
+    sensitivity: public
+    description: "Docker 部署时的容器名称"
+    default: "jenkins"
+
+  - key: jenkins_host_port
+    type: string
+    required: false
+    sensitivity: public
+    description: "Docker 部署时的宿主机端口"
+    default: "8080"
+
+  - key: scm_url
+    type: string
+    required: false
+    sensitivity: internal
+    description: "代码仓库地址（创建 Folder/Job 时使用）"
+
+  - key: scm_credentials_id
+    type: string
+    required: false
+    sensitivity: internal
+    description: "Jenkins 中已注册的 SCM 凭据 ID"
+
+  - key: shared_lib_repo
+    type: string
+    required: false
+    sensitivity: internal
+    description: "Shared Library 仓库地址"
+
+  - key: shared_lib_name
+    type: string
+    required: false
+    sensitivity: public
+    description: "Shared Library 别名"
+    default: "shared-library"
+
+  - key: shared_lib_branch
+    type: string
+    required: false
+    sensitivity: public
+    description: "Shared Library 默认分支"
+    default: "main"

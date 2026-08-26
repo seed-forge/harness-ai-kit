@@ -111,3 +111,32 @@ packages:
     version_sources: [pyproject, cli_json, init]
     install_command: "{python} -m pip install ."
     test_command: "{python} -m pytest -q tests"
+
+  # Batch 8 candidates are included in CI so that packaging, tests and public
+  # surface scans stay live. They cannot be published until the reviewed
+  # staging commit and manifest explicitly promote them into release wave 1.
+  - id: sf-jenkinsctl
+    package_name: sf-jenkinsctl
+    source_path: cli/sf-jenkinsctl
+    public: true
+    ci: true
+    publish: false
+    hold_reason: "Batch 8 candidate: require reviewed staging manifest and PyPI Trusted Publisher before promotion"
+    version_sources: [pyproject, cli_json, init]
+    install_command: "{python} -m pip install ."
+    test_command: "{python} -m pytest -q tests"
+    included_paths:
+      - cli/sf-jenkinsctl
+
+  - id: sf-woodpeckerctl
+    package_name: sf-woodpeckerctl
+    source_path: cli/sf-woodpeckerctl
+    public: true
+    ci: true
+    publish: false
+    hold_reason: "Batch 8 candidate: require reviewed staging manifest and PyPI Trusted Publisher before promotion"
+    version_sources: [pyproject, cli_json, init]
+    install_command: "{python} -m pip install ."
+    test_command: "{python} -m pytest -q tests"
+    included_paths:
+      - cli/sf-woodpeckerctl

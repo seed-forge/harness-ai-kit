@@ -1,0 +1,14 @@
+{
+  "id": "jenkinsctl",
+  "name": "jenkinsctl",
+  "owner": "seedforge",
+  "version": "0.6.0",
+  "status": "trial",
+  "package_type": "cli",
+  "summary": "Jenkins 运维 CLI：基于官方 jenkins-cli.jar 封装，扩展凭据管理、工具链管理、插件管理、配置管理、用户管理、Job/Folder 管理、Shared Library 管理、通知管理、环境诊断等能力。",
+  "package_name": "sf-jenkinsctl",
+  "install_type": "python-package",
+  "publish_paths": [
+    "cli/sf-jenkinsctl"
+  ]
+}

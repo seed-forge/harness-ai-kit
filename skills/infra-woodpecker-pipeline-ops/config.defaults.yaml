@@ -1,0 +1,14 @@
+$schema: harness-ai-kit-config/v1
+
+config:
+  - key: woodpecker_url
+    type: string
+    required: true
+    sensitivity: public
+    description: "Woodpecker CI 服务 URL"
+    env_var: WOODPECKER_URL
+  - key: woodpecker_token
+    type: string
+    required: true
+    sensitivity: sensitive
+    description: "Woodpecker API Token"

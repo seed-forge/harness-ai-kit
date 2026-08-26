@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sf-jenkinsctl"
+version = "0.6.0"
+description = "Jenkins 运维 CLI：基于官方 jenkins-cli.jar 封装，扩展凭据/工具链/插件/配置/用户/Job/SharedLib/通知管理能力。"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = [
+  "click>=8.1",
+  "PyYAML>=6.0.2",
+  "requests>=2.31",
+  "harness-ai-kit>=0.18.1"
+]
+authors = [
+  { name = "harness-ai-kit" }
+]
+urls = { Homepage = "https://github.com/seed-forge/harness-ai-kit" }
+
+[project.scripts]
+jenkinsctl = "jenkinsctl.cli:cli_entry"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["jenkinsctl*"]
+
+[tool.setuptools.package-data]
+"jenkinsctl.data" = ["*.yaml"]
