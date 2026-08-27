@@ -1,87 +1,87 @@
-# Roadmap
+# harness-ai-kit Roadmap
 
-harness-ai-kit 的分阶段演进路线。每个阶段都有明确的交付物和验收标准。
+## Product Direction
 
-> Star / Watch 本仓库以跟踪进展。有建议请开 [Discussion](https://github.com/seed-forge/harness-ai-kit/discussions)。
+`harness-ai-kit` is a portable package manager and composition layer for AI
+agent assets. Its core job is to make a project's selected Skills, CLIs, MCPs,
+plugins, hooks, subagents, and loops explicit, reproducible, and installable
+across supported AI coding runtimes.
 
----
+The product follows a composition-first rule: reuse a focused public asset when
+it already solves the problem; add orchestration, metadata, and reproducibility
+only where they create durable value.
 
-## v0.1 — Foundation (Current)
+## Current Public Foundation
 
-**Status**: Released
+The public core provides the following stable direction:
 
-| Item | Detail |
-|------|--------|
-| CLI core | init / add / sync / lock / resolve / graph / list / doctor / verify / remove / search |
-| Asset model | 6 kinds: skill, cli, mcp, plugin, hook, subagent |
-| Dependency solver | SAT-based via resolvelib, feature flags, scope overrides |
-| Lockfile | harness-ai-kit.lock with SHA-256 integrity |
-| Multi-runtime | Codex, Claude Code, Cursor, Kiro |
-| Install | GitHub direct install, atomic staging + rollback, offline mode |
-| Curated skills | 23 skills (expert bases, diagnostic playbooks, utilities) |
-| CI | Python 3.10–3.12 matrix, sensitive-scan, secret-scan |
+| Area | Current contract |
+|---|---|
+| Project declaration | `harness-ai-kit.yml` describes the requested assets and features |
+| Reproducible state | `harness-ai-kit.lock` records resolved sources, versions, and checksums |
+| Installation | Staged materialization verifies selected assets before replacing runtime targets |
+| Sources | Public Git repositories and configured public registries can provide assets |
+| Runtime support | Codex, Claude Code, Cursor, Kiro, and dsh adapters are part of the product boundary |
+| Public catalog | Assets enter the public catalog only through an explicit allowlist and redaction gate |
+| Configuration | Endpoints and credentials belong in user configuration, never public asset defaults |
 
----
+The current published catalog is intentionally selective. A private asset is
+not implied to be public, and an internal iteration does not imply a public
+release. See [the catalog](CATALOG.md) for the source of truth.
 
-## v0.2 — Automation & Authoring
+## Near-Term: Authoring And Automation
 
-**Status**: Planned
+The next product layer improves how portable assets are created and operated:
 
-| Item | Detail |
-|------|--------|
-| Loop framework | Declarative loop assets for recurring AI workflows |
-| Hooks | Pre/post-install and pre/post-sync lifecycle hooks |
-| Skill authoring toolkit | Scaffold, validate, and test new skills locally |
-| harness-ai-kit upgrade | Self-update with rollback |
-| Rich search | Full-text search across skill name, description, tags |
-| Config profiles | Named configuration profiles for multi-project workflows |
+- clearer authoring templates and offline validation contracts;
+- richer dependency, environment, and provenance declarations;
+- Loop and Hook authoring patterns with explicit runtime and safety boundaries;
+- better discovery and upgrade guidance for public assets;
+- public examples that demonstrate complete, reproducible workflows.
 
-**Target**: Q4 2026
+These capabilities are released only when their public behavior, documentation,
+and tests are ready. They are not promised merely because private experiments
+exist.
 
----
+## Later: Ecosystem Expansion
 
-## v0.3 — Ecosystem Expansion
+As the public core and asset ecosystem mature, the roadmap includes:
 
-**Status**: Backlog
+- broader engineering and operations asset families;
+- improved MCP and plugin installation paths;
+- publish and contributor workflows that preserve provenance and review;
+- richer visibility into dependency, lockfile, and runtime state.
 
-| Item | Detail |
-|------|--------|
-| Extended skill library | infra-* and devlab-* skill packs (50+ skills) |
-| MCP assets | First-class MCP server install/manage via CLI |
-| RBAC governance | Role-based access for asset publishing (consumer / contributor / maintainer) |
-| Plugin system | User-defined CLI plugins via entry points |
-| Import/export | Bundle skills into portable .aikit archives |
+Expansion remains guided by portability. An asset that depends on a private
+network topology, credentials, or an unportable platform fact remains outside
+the public catalog until it can be safely generalized.
 
-**Target**: H1 2027
+## Platform Milestones
 
----
+Registry services, a browser experience, and organization-level administration
+are separate platform milestones. They must not become hidden prerequisites for
+the core CLI:
 
-## Phase B — Platform (Research)
+| Milestone | Intent | Boundary |
+|---|---|---|
+| Public registry | Discover reviewed public assets | Optional source for the core resolver |
+| Browser | Explore assets and their contracts | Convenience layer, not a required runtime |
+| Publisher and admin flows | Review, provenance, and organization governance | Explicitly permissioned and separately deployed |
+| Federation | Cross-organization sharing with trust policies | Requires a clear security model before delivery |
 
-**Status**: Exploring
+## Release Principles
 
-| Item | Detail |
-|------|--------|
-| Public registry | Central registry with web UI for skill discovery |
-| Browser UI | Visual skill browser and one-click install |
-| Admin console | Org-level asset governance, usage analytics |
-| Federation | Cross-org skill sharing with trust policies |
+1. Public documentation describes shipped behavior, a marked roadmap item, or
+   an explicit non-goal. It must not describe private-only capability as public.
+2. Public releases use an allowlisted staging tree, redaction scans, package
+   checks, and fresh-install evidence.
+3. TestPyPI and PyPI are distinct release states; a successful build or GitHub
+   commit is not proof of publication.
+4. Public documentation is versioned source material. Build scripts may render
+   it but must not silently replace it with an abbreviated product description.
 
-**Target**: TBD — gated on community adoption metrics from v0.1–v0.3
+## Participation
 
----
-
-## Milestone Criteria
-
-We ship each phase when:
-
-1. All CI checks pass on Python 3.10–3.12
-2. New features have documentation in `docs/`
-3. Breaking changes are called out in CHANGELOG with migration notes
-4. At least one real-world usage validation before tagging
-
-## How to Influence the Roadmap
-
-- **Feature requests**: Open an [issue](https://github.com/seed-forge/harness-ai-kit/issues/new?template=feature_request.md)
-- **Skill proposals**: Use the [skill proposal template](https://github.com/seed-forge/harness-ai-kit/issues/new?template=skill_proposal.md)
-- **Discussions**: Join [GitHub Discussions](https://github.com/seed-forge/harness-ai-kit/discussions) for open-ended design conversations
+Use GitHub Issues for defects and focused feature requests. Use Discussions for
+design questions and asset proposals. Star or Watch the repository to follow
+released public batches; community interest never unlocks an unreviewed asset.
