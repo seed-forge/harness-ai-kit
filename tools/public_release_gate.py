@@ -82,6 +82,10 @@ CORE_PUBLIC_README_MARKERS: dict[str, tuple[str, ...]] = {
         "## 许可证",
     ),
 }
+CORE_PUBLIC_README_MINIMUM_CHARACTERS = {
+    "README.md": 2500,
+    "README.zh-CN.md": 2000,
+}
 
 
 def is_ignored_path(path: Path, root: Path) -> bool:
@@ -182,6 +186,12 @@ def core_public_documentation_errors(repo_root: Path) -> list[str]:
             errors.append(
                 f"harness-ai-kit documentation contract missing sections in {relative_path}: "
                 + ", ".join(missing_markers)
+            )
+        minimum_characters = CORE_PUBLIC_README_MINIMUM_CHARACTERS[relative_path]
+        if len(contents) < minimum_characters:
+            errors.append(
+                f"harness-ai-kit documentation contract is too short in {relative_path}: "
+                f"{len(contents)} characters; expected at least {minimum_characters}"
             )
     return errors
 

@@ -165,6 +165,7 @@ class PublicReleaseGateTests(unittest.TestCase):
                 contents = "release input\n"
                 if relative_path in gate.CORE_PUBLIC_README_MARKERS:
                     contents = "\n".join(gate.CORE_PUBLIC_README_MARKERS[relative_path]) + "\n"
+                    contents += "x" * gate.CORE_PUBLIC_README_MINIMUM_CHARACTERS[relative_path]
                 (root / relative_path).write_text(contents, encoding="utf-8")
             (root / "pyproject.toml").write_text(
                 "[project]\nname = 'harness-ai-kit'\nversion = '1.2.3'\n\n"
@@ -213,6 +214,26 @@ class PublicReleaseGateTests(unittest.TestCase):
             "harness-ai-kit documentation contract missing sections in README.zh-CN.md: "
             "## 为什么需要它, ## REMIX 方法论, ## 不锁定内容, ## 团队协作, ## 架构, "
             "## 文档入口, ## 许可证",
+            errors,
+        )
+
+    def test_matrix_rejects_core_readme_with_only_section_titles(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            for relative_path, markers in gate.CORE_PUBLIC_README_MARKERS.items():
+                (root / relative_path).write_text("\n".join(markers) + "\n", encoding="utf-8")
+            errors = gate.core_public_documentation_errors(root)
+
+        self.assertIn(
+            "harness-ai-kit documentation contract is too short in README.md: "
+            f"{len(chr(10).join(gate.CORE_PUBLIC_README_MARKERS['README.md'])) + 1} characters; "
+            f"expected at least {gate.CORE_PUBLIC_README_MINIMUM_CHARACTERS['README.md']}",
+            errors,
+        )
+        self.assertIn(
+            "harness-ai-kit documentation contract is too short in README.zh-CN.md: "
+            f"{len(chr(10).join(gate.CORE_PUBLIC_README_MARKERS['README.zh-CN.md'])) + 1} characters; "
+            f"expected at least {gate.CORE_PUBLIC_README_MINIMUM_CHARACTERS['README.zh-CN.md']}",
             errors,
         )
 

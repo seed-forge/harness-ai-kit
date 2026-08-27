@@ -13,9 +13,10 @@ reviewed matrix entry.
    `README.zh-CN.md`, `INSTALL.md`, and `docs/quickstart.md` with the exact
    pinned public version. The release gate also requires the core English and
    Chinese README sections that define positioning, REMIX, lock-in boundary,
-   workflow, architecture, and documentation; a short placeholder cannot
-   replace the public product documentation. Add a source test command plus a
-   wheel `smoke_command` that invokes the installed public console entry point.
+   workflow, architecture, and documentation, plus a minimum body size for
+   each README; a short placeholder or heading-only outline cannot replace the
+   public product documentation. Add a source test command plus a wheel
+   `smoke_command` that invokes the installed public console entry point.
 3. Commit the reviewed public staging baseline, then generate a checked
    staging manifest from that immutable commit. The manifest records each
    selected package's name, version, and source-tree SHA-256. Private-only
