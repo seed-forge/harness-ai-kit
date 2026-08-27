@@ -25,12 +25,15 @@ reviewed matrix entry.
    `false` by default. Assign `release_wave` values so dependencies publish in
    an earlier wave.
 5. Run the release gate locally, then use the manual workflow from the reviewed
-   commit: TestPyPI first, then PyPI. A pushed `v*` tag never publishes by
-   itself; running the production workflow from a tag additionally creates the
-   GitHub Release. The workflow builds packages, performs the
-   full gate, verifies existing PyPI hashes, publishes only missing identical
-   versions through OIDC, and reads hashes back before creating a GitHub
-   Release.
+   commit: TestPyPI first, then PyPI. The TestPyPI run builds the checked
+   distribution artifact. The production dispatch must provide that successful
+   `testpypi_run_id`; it downloads the immutable artifact from that run and
+   verifies its hashes against TestPyPI before publishing the exact same files
+   to PyPI through OIDC. A pushed `v*` tag never publishes by itself; running
+   the production workflow from a tag additionally creates the GitHub Release.
+   The production run still performs the full gate for its tagged source,
+   verifies existing PyPI hashes, publishes only missing identical versions,
+   and reads hashes back before creating a GitHub Release.
 
 Private-only versions may be skipped. A public package version may not be
 reused: an existing version is accepted only when every remote wheel and sdist

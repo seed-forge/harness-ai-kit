@@ -15,6 +15,10 @@ on:
         default: all
         type: choice
         options: [all, 0, 1, 2, 3]
+      testpypi_run_id:
+        description: Successful TestPyPI Release workflow run ID (required for PyPI)
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -36,6 +40,7 @@ jobs:
       has_wave_1: ${{ steps.plan.outputs.has_wave_1 }}
       has_wave_2: ${{ steps.plan.outputs.has_wave_2 }}
       has_wave_3: ${{ steps.plan.outputs.has_wave_3 }}
+      artifact_run_id: ${{ steps.plan.outputs.artifact_run_id }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -49,7 +54,19 @@ jobs:
         id: plan
         run: |
           python -m harness_ai_kit.main validate --repo-root .
-          echo "channel=${{ inputs.channel || 'pypi' }}" >> "$GITHUB_OUTPUT"
+          channel="${{ inputs.channel || 'pypi' }}"
+          testpypi_run_id="${{ inputs.testpypi_run_id }}"
+          if [[ "$channel" == "pypi" ]]; then
+            if [[ ! "$testpypi_run_id" =~ ^[0-9]+$ ]]; then
+              echo "::error::testpypi_run_id must be a successful TestPyPI Release workflow run ID when channel=pypi"
+              exit 1
+            fi
+            artifact_run_id="$testpypi_run_id"
+          else
+            artifact_run_id="${{ github.run_id }}"
+          fi
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+          echo "artifact_run_id=$artifact_run_id" >> "$GITHUB_OUTPUT"
           release_args=()
           if [[ "${{ inputs.release_wave || 'all' }}" != "all" ]]; then
             release_args+=(--max-release-wave "${{ inputs.release_wave }}")
@@ -73,6 +90,8 @@ jobs:
     environment:
       name: ${{ needs.prepare.outputs.channel }}
     permissions:
+      actions: read
+      contents: read
       id-token: write
     strategy:
       fail-fast: false
@@ -87,9 +106,12 @@ jobs:
         with:
           name: release-build
           path: build
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ needs.prepare.outputs.artifact_run_id }}
       - name: Require TestPyPI release before PyPI
         if: needs.prepare.outputs.channel == 'pypi'
-        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
+        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
       - name: Preflight immutable PyPI version
         id: preflight
         run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30 --github-output "$GITHUB_OUTPUT"
@@ -109,6 +131,8 @@ jobs:
     environment:
       name: ${{ needs.prepare.outputs.channel }}
     permissions:
+      actions: read
+      contents: read
       id-token: write
     strategy:
       fail-fast: false
@@ -123,9 +147,12 @@ jobs:
         with:
           name: release-build
           path: build
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ needs.prepare.outputs.artifact_run_id }}
       - name: Require TestPyPI release before PyPI
         if: needs.prepare.outputs.channel == 'pypi'
-        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
+        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
       - name: Preflight immutable PyPI version
         id: preflight
         run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30 --github-output "$GITHUB_OUTPUT"
@@ -145,6 +172,8 @@ jobs:
     environment:
       name: ${{ needs.prepare.outputs.channel }}
     permissions:
+      actions: read
+      contents: read
       id-token: write
     strategy:
       fail-fast: false
@@ -159,9 +188,12 @@ jobs:
         with:
           name: release-build
           path: build
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ needs.prepare.outputs.artifact_run_id }}
       - name: Require TestPyPI release before PyPI
         if: needs.prepare.outputs.channel == 'pypi'
-        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
+        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
       - name: Preflight immutable PyPI version
         id: preflight
         run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30 --github-output "$GITHUB_OUTPUT"
@@ -181,6 +213,8 @@ jobs:
     environment:
       name: ${{ needs.prepare.outputs.channel }}
     permissions:
+      actions: read
+      contents: read
       id-token: write
     strategy:
       fail-fast: false
@@ -195,9 +229,12 @@ jobs:
         with:
           name: release-build
           path: build
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ needs.prepare.outputs.artifact_run_id }}
       - name: Require TestPyPI release before PyPI
         if: needs.prepare.outputs.channel == 'pypi'
-        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase presence --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
+        run: python tools/pypi_release_verify.py --repository testpypi --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --phase readback --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30
       - name: Preflight immutable PyPI version
         id: preflight
         run: python tools/pypi_release_verify.py --repository ${{ needs.prepare.outputs.channel }} --package ${{ matrix.package_name }} --version ${{ matrix.version }} --artifacts build/${{ matrix.dist_path }} --max-attempts 6 --max-total-seconds 90 --base-backoff-seconds 2 --max-backoff-seconds 30 --github-output "$GITHUB_OUTPUT"
