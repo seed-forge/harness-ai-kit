@@ -24,6 +24,7 @@ GIT_COMMIT_TIMEOUT = 10
 GIT_FETCH_TIMEOUT = 30
 GIT_RESET_TIMEOUT = 10
 GIT_CLONE_TIMEOUT = 120
+_IMMUTABLE_COMMIT_REF = re.compile(r"^[0-9a-fA-F]{7,64}$")
 
 _git_source_commit_cache: dict[Path, str] = {}
 
@@ -181,7 +182,7 @@ def default_git_repo_checkout(source_ref: str, ref: str | None = None, *, force_
             shutil.rmtree(checkout_dir)
         checkout_dir.parent.mkdir(parents=True, exist_ok=True)
         command = ["git", "clone", "--depth", "1"]
-        if effective_ref:
+        if effective_ref and not _IMMUTABLE_COMMIT_REF.fullmatch(effective_ref):
             command.extend(["--branch", effective_ref])
         command.extend([clone_url, str(checkout_dir)])
         subprocess.run(
@@ -193,9 +194,47 @@ def default_git_repo_checkout(source_ref: str, ref: str | None = None, *, force_
             errors="replace",
             timeout=GIT_CLONE_TIMEOUT,
         )
+    if effective_ref and _IMMUTABLE_COMMIT_REF.fullmatch(effective_ref):
+        _checkout_immutable_commit(checkout_dir, effective_ref)
     elif force_refresh:
         refresh_git_checkout(checkout_dir)
     return checkout_dir
+
+
+def _checkout_immutable_commit(checkout_dir: Path, commit: str) -> None:
+    """Detach a cached checkout at an explicit commit without treating it as a branch."""
+    command = ["git", "-C", str(checkout_dir), "checkout", "--detach", commit]
+    try:
+        subprocess.run(
+            command,
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=GIT_RESET_TIMEOUT,
+        )
+    except subprocess.CalledProcessError:
+        # A shallow default-branch clone may not contain an older pinned commit.
+        subprocess.run(
+            ["git", "-C", str(checkout_dir), "fetch", "--depth", "1", "origin", commit],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=GIT_FETCH_TIMEOUT,
+        )
+        subprocess.run(
+            command,
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=GIT_RESET_TIMEOUT,
+        )
+    _git_source_commit_cache.pop(checkout_dir.absolute(), None)
 
 
 def refresh_git_checkout(checkout_dir: Path) -> bool:

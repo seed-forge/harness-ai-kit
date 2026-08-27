@@ -75,70 +75,6 @@ DSH_BASELINE_VERSION = "0.1.0-rc.6"
 PNPM_MIN_MAJOR = 10
 
 
-def public_catalog_path(repo_root: Path) -> Path | None:
-    """Return the public catalog when this checkout uses the public layout.
-
-    Windows may retain the old spelling after a case-only Git rename, so the
-    public title is the layout discriminator rather than filesystem case.
-    """
-    catalog_path = repo_root / "CATALOG.md"
-    try:
-        content = catalog_path.read_text(encoding="utf-8")
-    except OSError:
-        return None
-    return catalog_path if content.startswith("# harness-ai-kit Asset Catalog") else None
-
-
-def public_catalog_asset_ids(catalog_path: Path) -> set[str]:
-    """Read asset IDs from the public, description-only catalog table."""
-    asset_ids: set[str] = set()
-    for raw_line in catalog_path.read_text(encoding="utf-8").splitlines():
-        match = re.match(r"^\|\s*`([^`]+)`\s*\|", raw_line)
-        if match:
-            asset_ids.add(match.group(1))
-    return asset_ids
-
-
-def public_doctor_versions_results(repo_root: Path, catalog_path: Path) -> list[dict[str, str]]:
-    """Validate version records for the intentionally smaller public layout."""
-    results: list[dict[str, str]] = []
-    catalog_ids = public_catalog_asset_ids(catalog_path)
-
-    for record in load_skill_inventory(repo_root).values():
-        changelog_version = read_top_changelog_version(record.path / "CHANGELOG.md") if record.path else None
-        if changelog_version == record.version:
-            changelog_status = "success"
-            changelog_message = f"skill.json={record.version}; CHANGELOG.md={changelog_version}"
-        else:
-            changelog_status = "error"
-            changelog_message = f"skill.json={record.version}; CHANGELOG.md={changelog_version or '<missing>'}"
-        results.append(
-            {
-                "subject": f"skill:{record.skill_id}:changelog",
-                "status": changelog_status,
-                "message": changelog_message,
-            }
-        )
-        listed = record.skill_id in catalog_ids
-        results.append(
-            {
-                "subject": f"skill:{record.skill_id}:catalog",
-                "status": "success" if listed else "error",
-                "message": f"skill.json={record.version}; CATALOG.md={'listed' if listed else '<missing>'}",
-            }
-        )
-
-    project_version = read_project_version(pyproject_path(repo_root))
-    results.append(
-        {
-            "subject": "package:harness-ai-kit:pyproject",
-            "status": "success" if project_version else "error",
-            "message": f"pyproject.toml={project_version or '<missing>'}; public package layout",
-        }
-    )
-    return results
-
-
 def _run_version_command(command: list[str]) -> str:
     import subprocess
 
@@ -311,10 +247,6 @@ def doctor_pi_results(home_dir: Path | None = None, config: Any = None) -> list[
 
 
 def doctor_versions_results(repo_root: Path) -> list[dict[str, str]]:
-    public_catalog = public_catalog_path(repo_root)
-    if public_catalog is not None:
-        return public_doctor_versions_results(repo_root, public_catalog)
-
     results: list[dict[str, str]] = []
     catalog_map = catalog_versions(repo_root / "catalog.md")
 
@@ -382,6 +314,47 @@ def doctor_versions_results(repo_root: Path) -> list[dict[str, str]]:
             }
         )
 
+    skill_inventory = load_skill_inventory(repo_root)
+    for skill_id in ("harness-ai-kit-ops", "harness-ai-kit-maintainer"):
+        record = skill_inventory.get(skill_id)
+        if record is None or record.path is None:
+            results.append(
+                {
+                    "subject": f"skill:{skill_id}:cli-dependency",
+                    "status": "error",
+                    "message": "Missing skill inventory record.",
+                }
+            )
+            continue
+        metadata = load_skill_metadata(record.path)
+        declared_version = None
+        for dependency in metadata.get("dependencies", []):
+            if (
+                str(dependency.get("type", "")).strip() == "cli"
+                and str(dependency.get("id", "")).strip() == "harness-ai-kit"
+            ):
+                declared_version = str(dependency.get("version", "")).strip()
+                break
+        expected_version = f">={project_version}"
+        # 向后兼容检查：验证声明的版本约束是否满足最小兼容要求
+        # 允许 >=X.Y.Z 或 ==X.Y.Z 形式，但 >= 是推荐形式
+        is_compatible = False
+        if declared_version:
+            if declared_version.startswith(">="):
+                # >= 形式：提取版本号并比较
+                declared_ver = declared_version[2:].strip()
+                is_compatible = declared_ver == project_version or declared_ver < project_version
+            elif declared_version.startswith("=="):
+                # == 形式：精确匹配（向后兼容旧格式）
+                declared_ver = declared_version[2:].strip()
+                is_compatible = declared_ver == project_version
+        results.append(
+            {
+                "subject": f"skill:{skill_id}:cli-dependency",
+                "status": "success" if is_compatible else "error",
+                "message": f"dependency={declared_version or '<missing>'}; expected={expected_version} (>= for backward compatibility)",
+            }
+        )
     return results
 
 
@@ -652,14 +625,14 @@ def source_selection_reason(
             return "selected repo-checkout because registry was unavailable or did not satisfy the request"
     if selected_source == pm.SOURCE_REGISTRY:
         if preferred == pm.SOURCE_REGISTRY and registry_version:
-            return "selected registry because it is the preferred available source"
+            return "selected team-skill-registry because it is the preferred available source"
         if registry_version:
-            return "selected registry because repo-checkout was unavailable or not selected"
+            return "selected team-skill-registry because repo-checkout was unavailable or not selected"
     if selected_source == pm.SOURCE_PUBLIC_REGISTRY:
         if preferred == pm.SOURCE_PUBLIC_REGISTRY and registry_version:
             return "selected public-registry because it is the preferred available source"
         if registry_version:
-            return "selected public-registry because repo-checkout was unavailable or not selected"
+            return "selected public-registry because workspace-repo was unavailable or not selected"
     return f"selected {selected_source}"
 
 
@@ -820,7 +793,6 @@ def python_import_name(package: str) -> str:
         "pymupdf": "fitz",
         "python-docx": "docx",
         "python-pptx": "pptx",
-        "pyyaml": "yaml",
     }
     return known.get(base_name.lower(), base_name.replace("-", "_"))
 

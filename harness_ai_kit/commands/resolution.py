@@ -92,6 +92,7 @@ def command_lock(args: argparse.Namespace, config_path: Path, context: Resolutio
         runtime_id,
         install_scope,
         offline=args.offline,
+        source_selector=getattr(args, "source_selector", None),
     )
     lock_path = pm.lockfile_path(manifest_path.parent)
     pm.write_lockfile(

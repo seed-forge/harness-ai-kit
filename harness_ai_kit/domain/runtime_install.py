@@ -211,6 +211,11 @@ def runtime_managed_asset_root(target_dir: Path) -> Path:
     bundle = active_product_profile().managed_asset_bundle_root
     if bundle:
         return target_dir.parent / bundle
+    # Project targets normally end in `.agents/skills`. The skills directory
+    # may not exist yet when the lockfile only contains a managed asset, so do
+    # not rely on `.agents` already being materialized before deriving its root.
+    if target_dir.parent.name == ".agents":
+        return target_dir.parent
     # Walk up to find .agents (canonical asset root)
     current = target_dir.resolve()
     for candidate in [current, *current.parents]:
@@ -347,6 +352,7 @@ def resolve_target_dir(
     runtime_id: str = "codex",
     scope: str = "project",
     home_dir: Path | None = None,
+    search_parent_project_targets: bool = True,
 ) -> Path:
     from harness_ai_kit.infrastructure.config_io import default_home_dir
 
@@ -369,10 +375,11 @@ def resolve_target_dir(
         return (base_home / ".agents" / "skills").resolve()
 
     if runtime_id in {"codex", "dsh", "pi"}:
-        for probe in [base_cwd, *base_cwd.parents]:
-            candidate = probe / ".agents" / "skills"
-            if candidate.exists():
-                return candidate.resolve()
+        if search_parent_project_targets:
+            for probe in [base_cwd, *base_cwd.parents]:
+                candidate = probe / ".agents" / "skills"
+                if candidate.exists():
+                    return candidate.resolve()
         return (base_cwd / ".agents" / "skills").resolve()
 
     if not profile.project_target:

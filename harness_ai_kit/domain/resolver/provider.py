@@ -1,6 +1,7 @@
 """ResolutionProvider: resolvelib AbstractProvider implementation for skill/CLI dependency resolution."""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any, Callable, Iterator, Sequence
 
@@ -23,6 +24,7 @@ from harness_ai_kit.domain.policies import (
 )
 from harness_ai_kit.domain.registry import registry_artifact_url, registry_metadata_url, RegistryUnavailableError
 from harness_ai_kit.domain.resolution import DependencyRequirement, PackageCandidate
+from harness_ai_kit.infrastructure.http_client import http_request, registry_auth_headers
 
 from .git_source import (
     DiscoveredGitSkill,
@@ -41,6 +43,7 @@ RegistryManifestDownloader = Callable[
     tuple[SkillManifest, dict[str, Any]],
 ]
 RegistryUrlResolver = Callable[[dict[str, Any]], str]
+MANAGED_ASSET_DEP_TYPES = frozenset({"plugin", "hook", "subagent", "mcp", "loop"})
 
 
 class CircularExtendsError(Exception):
@@ -52,7 +55,7 @@ class CircularExtendsError(Exception):
         super().__init__(f"Circular extends chain detected: {chain}")
 
 
-class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidate, str]):
+class ResolutionProvider(AbstractProvider):
     def __init__(
         self,
         repo_root: Path,
@@ -93,7 +96,8 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
         self._extends_metadata_store: dict[str, list[dict[str, Any]]] = {}
         self._candidate_matches_cache: dict[tuple[str, str, str | None], list[PackageCandidate]] = {}
         self._skill_candidates_cache: dict[tuple[str, str | None], list[PackageCandidate]] = {}
-        self._registry_exact_cache: dict[tuple[str, str | None, str], list[PackageCandidate]] = {}
+        self._registry_exact_cache: dict[tuple[str, str, str | None, str], list[PackageCandidate]] = {}
+        self._cli_registry_index_cache: dict[str, Any] | None = None
         self._git_resolution_notes: dict[str, str] = {}
         self._git_discovery_cache: dict[tuple[str, str | None], list[Any]] = {}
 
@@ -106,6 +110,25 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
             offline=self.offline,
             force_refresh=self.refresh_cache,
         )
+
+    def _load_cli_registry_index(self) -> dict[str, Any]:
+        """Load the raw CLI registry once for this resolution run."""
+        if self._cli_registry_index_cache is not None:
+            return self._cli_registry_index_cache
+        if not self.cli_registry_index_url:
+            self._cli_registry_index_cache = {}
+            return self._cli_registry_index_cache
+
+        payload = http_request(self.cli_registry_index_url, headers=registry_auth_headers())
+        parsed = json.loads(payload.decode("utf-8"))
+        if isinstance(parsed, list):
+            clis = [entry for chunk in parsed if isinstance(chunk, dict) for entry in chunk.get("clis", [])]
+            self._cli_registry_index_cache = {"clis": clis}
+        elif isinstance(parsed, dict):
+            self._cli_registry_index_cache = parsed
+        else:
+            self._cli_registry_index_cache = {}
+        return self._cli_registry_index_cache
 
     def identify(self, requirement_or_candidate: DependencyRequirement | PackageCandidate) -> str:
         return package_key_for(
@@ -133,14 +156,19 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
             (candidate.dep_type, candidate.namespace, candidate.package_id, candidate.version, candidate.source)
             for candidate in incompatibilities.get(identifier, [])
         }
-        if dep_type == "skill":
+        if dep_type == "skill" or dep_type in MANAGED_ASSET_DEP_TYPES:
             has_satisfying_candidate = any(
                 self._candidate_satisfies_specifiers(candidate, specifiers)
                 and (candidate.dep_type, candidate.namespace, candidate.package_id, candidate.version, candidate.source) not in incompatible
                 for candidate in matches
             )
             if not has_satisfying_candidate:
-                matches = matches + self._exact_registry_candidates_for_requirements(package_id, namespace, requirement_list)
+                matches = matches + self._exact_registry_candidates_for_requirements(
+                    dep_type,
+                    package_id,
+                    namespace,
+                    requirement_list,
+                )
         git_requirements = [requirement for requirement in requirement_list if requirement.source_ref]
         if git_requirements:
             matches = self._git_candidates_for_requirements(package_id, namespace, git_requirements) + matches
@@ -362,28 +390,43 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
             return result
         if dep_type == "cli":
             version = self.cli_versions.get(package_id)
-            if not version and not self.offline:
-                # Fallback to CLI registry index
+            source = SOURCE_REPO
+            metadata_url: str | None = None
+            registry_only = SOURCE_REGISTRY in self.source_order and SOURCE_REPO not in self.source_order
+            if (registry_only or not version) and not self.offline:
+                # Registry-only project locks must not retain a stale checkout version.
                 try:
-                    import urllib.request
-                    import json
-                    index_url = self.cli_registry_index_url or ""
-                    if index_url:
-                        with urllib.request.urlopen(index_url, timeout=10) as response:
-                            index_data = json.loads(response.read().decode("utf-8"))
-                            for cli_entry in index_data.get("clis", []):
-                                if cli_entry.get("id") == package_id:
-                                    version = cli_entry.get("latest_version")
+                    index_data = self._load_cli_registry_index()
+                    for cli_entry in index_data.get("clis", []):
+                        if cli_entry.get("id") == package_id:
+                            version = cli_entry.get("latest_version")
+                            source = SOURCE_REGISTRY
+                            for item in cli_entry.get("versions", []):
+                                if isinstance(item, dict) and item.get("version") == version:
+                                    metadata_url = str(item.get("metadata_url") or "").strip() or None
                                     break
+                            break
                 except Exception:
-                    pass  # Registry lookup failed, fall through to return empty
+                    if registry_only:
+                        version = None
+            if registry_only and source != SOURCE_REGISTRY:
+                version = None
             if not version:
                 self._candidate_matches_cache[cache_key] = []
                 return []
-            result = [PackageCandidate(dep_type="cli", namespace=namespace, package_id=package_id, version=version, source=SOURCE_REPO)]
+            result = [
+                PackageCandidate(
+                    dep_type="cli",
+                    namespace=namespace,
+                    package_id=package_id,
+                    version=version,
+                    source=source,
+                    metadata_url=metadata_url,
+                )
+            ]
             self._candidate_matches_cache[cache_key] = result
             return result
-        if dep_type in {"plugin", "hook", "subagent", "mcp", "loop"}:
+        if dep_type in MANAGED_ASSET_DEP_TYPES:
             result = self._managed_asset_candidates(dep_type, package_id, namespace)
             self._candidate_matches_cache[cache_key] = result
             return result
@@ -392,25 +435,87 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
         return result
 
     def _managed_asset_candidates(self, dep_type: str, package_id: str, namespace: str | None = None) -> list[PackageCandidate]:
-        asset_dir = self.repo_root / f"{dep_type}s" / package_id
-        if not asset_dir.exists():
-            return []
-        try:
-            manifest = load_skill_manifest(asset_dir)
-        except (FileNotFoundError, OSError) as exc:
-            print(f"WARNING: {dep_type} '{package_id}' directory exists at {asset_dir} but metadata file is missing or invalid. Skipping. ({exc})")
-            return []
-        candidate_namespace = manifest.namespace or namespace
-        if namespace is not None and candidate_namespace != namespace:
-            return []
-        checksum = hash_skill_directory(asset_dir)
-        return [
-            PackageCandidate(
-                dep_type=dep_type, namespace=candidate_namespace, package_id=package_id,
-                version=manifest.version, source=SOURCE_REPO, manifest=manifest, path=asset_dir,
-                checksum=checksum, source_checksum=checksum,
+        candidates: list[PackageCandidate] = []
+        for source in self.source_order:
+            if source == SOURCE_REPO:
+                asset_dir = self.repo_root / f"{dep_type}s" / package_id
+                if not asset_dir.exists():
+                    continue
+                try:
+                    manifest = load_skill_manifest(asset_dir)
+                except (FileNotFoundError, OSError) as exc:
+                    print(f"WARNING: {dep_type} '{package_id}' directory exists at {asset_dir} but metadata file is missing or invalid. Skipping. ({exc})")
+                    continue
+                if manifest.package_type != dep_type:
+                    print(
+                        f"WARNING: {dep_type} '{package_id}' at {asset_dir} declares "
+                        f"package_type '{manifest.package_type}'. Skipping."
+                    )
+                    continue
+                candidate_namespace = manifest.namespace or namespace
+                if namespace is not None and candidate_namespace != namespace:
+                    continue
+                checksum = hash_skill_directory(asset_dir)
+                candidates.append(
+                    PackageCandidate(
+                        dep_type=dep_type,
+                        namespace=candidate_namespace,
+                        package_id=package_id,
+                        version=manifest.version,
+                        source=SOURCE_REPO,
+                        manifest=manifest,
+                        path=asset_dir,
+                        checksum=checksum,
+                        source_checksum=checksum,
+                    )
+                )
+                continue
+            if source not in {SOURCE_REGISTRY, SOURCE_PUBLIC_REGISTRY}:
+                continue
+            registry_index_url = (
+                self.public_registry_index_url
+                if source == SOURCE_PUBLIC_REGISTRY
+                else self.registry_index_url
             )
-        ]
+            if not registry_index_url:
+                continue
+            try:
+                manifest, entry = self.registry_manifest_downloader(
+                    registry_index_url,
+                    canonical_package_id(package_id, namespace),
+                    None,
+                )
+            except KeyError:
+                continue
+            except RegistryUnavailableError:
+                raise
+            except Exception as exc:
+                print(f"WARNING: could not load registry {dep_type} '{package_id}' from {source}. Skipping. ({exc})")
+                continue
+            if manifest.id != package_id or manifest.package_type != dep_type:
+                print(
+                    f"WARNING: registry {dep_type} '{package_id}' metadata does not match the requested asset "
+                    f"(id={manifest.id!r}, package_type={manifest.package_type!r}). Skipping."
+                )
+                continue
+            candidate_namespace = manifest.namespace or namespace
+            if namespace is not None and candidate_namespace != namespace:
+                continue
+            candidates.append(
+                PackageCandidate(
+                    dep_type=dep_type,
+                    namespace=candidate_namespace,
+                    package_id=package_id,
+                    version=manifest.version,
+                    source=source,
+                    manifest=manifest,
+                    artifact_url=self.registry_artifact_url_resolver(entry),
+                    metadata_url=self.registry_metadata_url_resolver(entry),
+                    checksum=str(entry.get("checksum") or ""),
+                    source_checksum=str(entry.get("checksum") or ""),
+                )
+            )
+        return candidates
 
     def _skill_candidates(self, skill_id: str, namespace: str | None = None, *, _dep_context: str | None = None) -> list[PackageCandidate]:
         cache_key = (skill_id, namespace)
@@ -485,7 +590,13 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
         self._skill_candidates_cache[cache_key] = candidates
         return candidates
 
-    def _exact_registry_candidates_for_requirements(self, skill_id: str, namespace: str | None, requirements: list[DependencyRequirement]) -> list[PackageCandidate]:
+    def _exact_registry_candidates_for_requirements(
+        self,
+        dep_type: str,
+        package_id: str,
+        namespace: str | None,
+        requirements: list[DependencyRequirement],
+    ) -> list[PackageCandidate]:
         versions: list[str] = []
         seen: set[str] = set()
         for requirement in requirements:
@@ -501,7 +612,7 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
             versions.append(version)
         if not versions:
             return []
-        cache_key = (skill_id, namespace, ",".join(versions))
+        cache_key = (dep_type, package_id, namespace, ",".join(versions))
         cached = self._registry_exact_cache.get(cache_key)
         if cached is not None:
             return cached
@@ -515,18 +626,24 @@ class ResolutionProvider(AbstractProvider[DependencyRequirement, PackageCandidat
                 continue
             for version in versions:
                 try:
-                    manifest, entry = self.registry_manifest_downloader(registry_index_url, canonical_package_id(skill_id, namespace), version)
+                    manifest, entry = self.registry_manifest_downloader(
+                        registry_index_url,
+                        canonical_package_id(package_id, namespace),
+                        version,
+                    )
                 except KeyError:
+                    continue
+                if manifest.id != package_id or manifest.package_type != dep_type:
                     continue
                 candidate_namespace = manifest.namespace or namespace
                 if namespace is not None and candidate_namespace != namespace:
                     continue
-                signature = (candidate_namespace, skill_id, manifest.version, source)
+                signature = (candidate_namespace, package_id, manifest.version, source)
                 if signature in seen_sigs:
                     continue
                 seen_sigs.add(signature)
                 candidates.append(PackageCandidate(
-                    dep_type="skill", namespace=candidate_namespace, package_id=skill_id,
+                    dep_type=dep_type, namespace=candidate_namespace, package_id=package_id,
                     version=manifest.version, source=source, manifest=manifest,
                     artifact_url=self.registry_artifact_url_resolver(entry),
                     metadata_url=self.registry_metadata_url_resolver(entry),

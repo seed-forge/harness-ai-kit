@@ -14,6 +14,29 @@ from .resolution import ResolutionCommandContext, build_resolution_handlers
 from .upgrade import UpgradeCommandContext, build_upgrade_handlers
 
 
+def _optional_private_command_module(module_name: str):
+    """Load maintainer-only command modules when the current product ships them."""
+    import importlib
+
+    try:
+        return importlib.import_module(f"{__package__}.{module_name}")
+    except ModuleNotFoundError as exc:
+        if exc.name != f"{__package__}.{module_name}":
+            raise
+        return None
+
+
+_authoring = _optional_private_command_module("authoring")
+_governance = _optional_private_command_module("governance")
+_publish = _optional_private_command_module("publish")
+_release = _optional_private_command_module("release")
+
+
+def private_command_modules_available() -> bool:
+    """Return whether the maintainer-only command surface is installed."""
+    return all(module is not None for module in (_authoring, _governance, _publish, _release))
+
+
 def build_project_command_context(core: ModuleType, pm: ModuleType, load_effective_config: Callable[[Path], object]) -> ProjectCommandContext:
     project_service = ProjectManifestService(
         ProjectManifestPorts(
@@ -85,6 +108,33 @@ def build_bootstrap_handler_map(core: ModuleType) -> Mapping[str, Callable]:
     )
 
 
+def build_authoring_handler_map(core: ModuleType) -> Mapping[str, Callable]:
+    if _authoring is None:
+        return {}
+    return _authoring.build_authoring_handlers(
+        _authoring.AuthoringCommandContext(
+            load_config=core.load_config,
+            resolve_repo_root=core.resolve_repo_root,
+            scaffold_skill=core.scaffold_skill,
+            scaffold_managed_asset=core.scaffold_managed_asset,
+            scaffold_cli=core.scaffold_cli,
+            project_sync_presentation=core.project_sync_presentation,
+            load_skill_inventory=core.load_skill_inventory,
+            select_records=core.select_records,
+            load_managed_asset_record_by_id=core.load_managed_asset_record_by_id,
+            asset_directory_names=core.ASSET_DIRECTORY_NAMES,
+            ensure_catalog_entry=core.ensure_catalog_entry,
+            validate_publish_selection=core.validate_publish_selection,
+            publish_selection=core.publish_selection,
+            refresh_existing_local_skill_installs=core.refresh_existing_local_skill_installs,
+            print_local_skill_refresh_summary=core.print_local_skill_refresh_summary,
+            load_cli_inventory=core.load_cli_inventory,
+            select_cli_records=core.select_cli_records,
+            select_target_cli_record=core.select_target_cli_record,
+        )
+    )
+
+
 def build_resolution_handler_map(core: ModuleType, load_effective_config: Callable[[Path], object]) -> Mapping[str, Callable]:
     return build_resolution_handlers(
         ResolutionCommandContext(
@@ -122,6 +172,20 @@ def build_inspect_handler_map(core: ModuleType, load_effective_config: Callable[
             format_cli_table=core.format_cli_table,
             format_managed_asset_table=core.format_managed_asset_table,
             load_skill_document_for_record=core.load_skill_document_for_record,
+        )
+    )
+
+
+def build_governance_handler_map(core: ModuleType, load_effective_config: Callable[[Path], object]) -> Mapping[str, Callable]:
+    if _governance is None:
+        return {}
+    return _governance.build_governance_handlers(
+        _governance.GovernanceCommandContext(
+            load_effective_config=load_effective_config,
+            resolve_repo_root=core.resolve_repo_root,
+            apply_skill_lifecycle_status=core.apply_skill_lifecycle_status,
+            apply_managed_asset_lifecycle_status=core.apply_managed_asset_lifecycle_status,
+            apply_cli_lifecycle_status=core.apply_cli_lifecycle_status,
         )
     )
 
@@ -283,4 +347,78 @@ def build_health_handler_map(core: ModuleType) -> Mapping[str, Callable]:
             run_repo_validation=core.run_repo_validation,
             doctor_extends_results=core.doctor_extends_results,
         )
+    )
+
+
+def build_publish_handler_map(core: ModuleType) -> Mapping[str, Callable]:
+    if _publish is None:
+        return {}
+    return _publish.build_publish_handlers(
+        _publish.PublishCommandContext(
+            load_config=core.load_config,
+            effective_config=core.effective_config,
+            resolve_repo_root=core.resolve_repo_root,
+            load_skill_record_by_id=core.load_skill_record_by_id,
+            load_managed_asset_record_by_id=core.load_managed_asset_record_by_id,
+            pm=core.pm,
+            build_skill_archive=core.build_skill_archive,
+            skill_archive_url=core.skill_archive_url,
+            skill_metadata_url=core.skill_metadata_url,
+            slash_join=core.slash_join,
+            project_sync_presentation=core.project_sync_presentation,
+            skill_registry_write_ready=core.skill_registry_write_ready,
+            load_skill_registry_index=core.load_skill_registry_index,
+            save_skill_registry_index=core.save_skill_registry_index,
+            refresh_existing_local_skill_installs=core.refresh_existing_local_skill_installs,
+            print_local_skill_refresh_summary=core.print_local_skill_refresh_summary,
+            load_cli_inventory=core.load_cli_inventory,
+            select_cli_records=core.select_cli_records,
+            select_target_cli_record=core.select_target_cli_record,
+            resolve_cli_publish_root=core.resolve_cli_publish_root,
+            cli_metadata_url=core.cli_metadata_url,
+            dist_files=core.dist_files,
+            twine_upload_command=core.twine_upload_command,
+            console_safe_text=core.console_safe_text,
+            clean_release_artifacts=core.clean_release_artifacts,
+            build_artifacts=core.build_artifacts,
+            twine_check_artifacts=core.twine_check_artifacts,
+            upload_artifacts=core.upload_artifacts,
+            upload_file=core.upload_file,
+            load_cli_registry_index=core.load_cli_registry_index,
+            update_cli_registry_index_payload=core.update_cli_registry_index_payload,
+            save_cli_registry_index=core.save_cli_registry_index,
+            validate_publish_selection=core.validate_publish_selection,
+            publish_selection=core.publish_selection,
+        )
+    )
+
+
+def build_release_handler(core: ModuleType, publish_handlers: Mapping[str, Callable]) -> Callable:
+    if _release is None:
+        raise RuntimeError("release commands are unavailable in this product profile")
+    return lambda args, config_path: _release.command_release(
+        args,
+        config_path,
+        _release.ReleaseCommandContext(
+            load_config=core.load_config,
+            resolve_repo_root=core.resolve_repo_root,
+            load_skill_inventory=core.load_skill_inventory,
+            select_records=core.select_records,
+            build_skill_archive=core.build_skill_archive,
+            project_sync_presentation=core.project_sync_presentation,
+            publish_skill_handler=publish_handlers["publish-skill"],
+            publish_loop_handler=publish_handlers["publish-loop"],
+            read_project_version=core.read_project_version,
+            pyproject_path=core.pyproject_path,
+            bump_version_string=core.bump_version_string,
+            write_project_version=core.write_project_version,
+            sync_cli_metadata_versions=core.sync_cli_metadata_versions,
+            read_project_name=core.read_project_name,
+            clean_release_artifacts=core.clean_release_artifacts,
+            build_artifacts=core.build_artifacts,
+            twine_check_artifacts=core.twine_check_artifacts,
+            upload_artifacts=core.upload_artifacts,
+            twine_environment_ready=core.twine_environment_ready,
+            create_git_tag=core.create_git_tag,
+        ),
     )

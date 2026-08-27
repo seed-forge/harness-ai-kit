@@ -77,7 +77,7 @@ def collect_registry_lock_guardrails(
         if lock_node is not None and lock_node.source == SOURCE_REGISTRY:
             if not (lock_node.artifact_url and lock_node.metadata_url):
                 errors.append(
-                    f"{root_id}: lock node uses public-registry but artifact_url/metadata_url is missing; "
+                    f"{root_id}: lock node uses team-skill-registry but artifact_url/metadata_url is missing; "
                     f"re-run refresh-lock. See {MAINTAINER_DOC}."
                 )
 

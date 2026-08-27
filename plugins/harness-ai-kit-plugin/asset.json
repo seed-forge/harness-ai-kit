@@ -1,8 +1,8 @@
 {
-  "namespace": "public",
+  "namespace": "team",
   "id": "harness-ai-kit-plugin",
   "name": "harness-ai-kit-plugin",
-  "owner": "seedforge",
+  "owner": "team",
   "version": "0.1.0",
   "status": "trial",
   "entry": "README.md",

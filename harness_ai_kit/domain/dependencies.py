@@ -107,6 +107,11 @@ class DependencySpec(_PrivateFieldsAllowed):
 
     @model_validator(mode="after")
     def validate_optional_feature(self) -> "DependencySpec":
+        # CLI distributions are global package names. Older skill manifests
+        # incorrectly carried their enclosing skill namespace; normalize them
+        # at the shared parsing boundary so registry locks remain resolvable.
+        if self.type == "cli":
+            self.namespace = None
         if self.scope == "optional" and not self.feature:
             raise ValueError("Optional dependencies must declare a feature name.")
         return self

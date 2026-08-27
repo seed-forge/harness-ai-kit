@@ -5,10 +5,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import shlex
 import subprocess
 import sys
+import tempfile
 import time
 from collections import defaultdict
 from pathlib import Path
@@ -35,7 +37,8 @@ SCAN_RULES = (
     ("known-token-prefix", TOKEN_RE),
     ("assigned-secret", ASSIGNED_SECRET_RE),
 )
-IGNORED_PARTS = {".git", ".venv", "venv", "build", "dist", "dist3", "__pycache__", ".pytest_cache"}
+IGNORED_PARTS = {".git", ".tmp", ".venv", "venv", "build", "dist", "dist3", "__pycache__", ".pytest_cache"}
+PUBLIC_PYPI_SIMPLE_URL = "https://pypi.org/simple"
 
 
 def is_ignored_path(path: Path, root: Path) -> bool:
@@ -152,10 +155,20 @@ def validate_matrix(repo_root: Path, matrix: dict[str, Any]) -> list[str]:
         names.add(package_name)
         if not (repo_root / source_path).is_dir():
             errors.append(f"source path is missing for {package_id}: {source_path}")
-        if item.get("ci") and not isinstance(item.get("test_command"), str):
-            errors.append(f"ci package is missing test_command: {package_id}")
-        if "install_command" in item and not isinstance(item.get("install_command"), str):
-            errors.append(f"install_command must be a string when set: {package_id}")
+        if item.get("ci"):
+            if not isinstance(item.get("test_command"), str):
+                errors.append(f"ci package is missing test_command: {package_id}")
+            if not isinstance(item.get("entrypoint"), str) or not item["entrypoint"]:
+                errors.append(f"ci package is missing entrypoint: {package_id}")
+            else:
+                pyproject_path = repo_root / source_path / "pyproject.toml"
+                if pyproject_path.is_file():
+                    project = read_toml(pyproject_path).get("project", {})
+                    scripts = project.get("scripts", {}) if isinstance(project, dict) else {}
+                    if not isinstance(scripts, dict) or item["entrypoint"] not in scripts:
+                        errors.append(f"ci entrypoint is not declared by pyproject: {package_id}")
+            if not isinstance(item.get("smoke_command"), str):
+                errors.append(f"ci package is missing smoke_command: {package_id}")
         if item.get("publish"):
             if not item.get("public"):
                 errors.append(f"publish package is not public: {package_id}")
@@ -189,10 +202,21 @@ def validate_matrix(repo_root: Path, matrix: dict[str, Any]) -> list[str]:
     return errors
 
 
-def run_command(command: str, cwd: Path) -> tuple[bool, int]:
-    rendered = command.format(python="{python}")
-    args = [sys.executable if item == "{python}" else item for item in shlex.split(rendered)]
-    completed = subprocess.run(args, cwd=cwd, check=False)
+def run_command(
+    command: str,
+    cwd: Path,
+    *,
+    python_executable: Path | str | None = None,
+    token_replacements: dict[str, str] | None = None,
+    environment: dict[str, str] | None = None,
+) -> tuple[bool, int]:
+    """Run an explicit matrix command without shell interpolation."""
+    rendered = command.format(python="{python}", entrypoint="{entrypoint}")
+    replacements = {"{python}": str(python_executable or sys.executable)}
+    if token_replacements:
+        replacements.update({f"{{{key}}}": value for key, value in token_replacements.items()})
+    args = [replacements.get(item, item) for item in shlex.split(rendered)]
+    completed = subprocess.run(args, cwd=cwd, env=environment, check=False)
     return completed.returncode == 0, completed.returncode
 
 
@@ -224,6 +248,101 @@ def build_package(source_root: Path, output: Path) -> tuple[bool, int]:
     artifacts = sorted((*output.glob("*.whl"), *output.glob("*.tar.gz")))
     check = subprocess.run([sys.executable, "-m", "twine", "check", *map(str, artifacts)], check=False)
     return check.returncode == 0, check.returncode
+
+
+def package_wheel(output: Path, package_name: str) -> Path | None:
+    """Return the one wheel built for a package from its isolated output path."""
+    normalized = re.sub(r"[-_.]+", "_", package_name).lower()
+    wheels = [path for path in output.glob("*.whl") if path.name.lower().startswith(f"{normalized}-")]
+    return wheels[0] if len(wheels) == 1 else None
+
+
+def venv_executable(venv_root: Path, name: str) -> Path:
+    directory = "Scripts" if os.name == "nt" else "bin"
+    suffix = ".exe" if os.name == "nt" else ""
+    return venv_root / directory / f"{name}{suffix}"
+
+
+def public_pip_environment() -> dict[str, str]:
+    """Prevent local Python and private index configuration from leaking into a smoke test."""
+    environment = os.environ.copy()
+    for key in ("PYTHONPATH", "PYTHONHOME", "PIP_INDEX_URL", "PIP_EXTRA_INDEX_URL", "PIP_TRUSTED_HOST"):
+        environment.pop(key, None)
+    environment["PIP_CONFIG_FILE"] = os.devnull
+    environment["PIP_DISABLE_PIP_VERSION_CHECK"] = "1"
+    environment["PYTHONUTF8"] = "1"
+    return environment
+
+
+def run_isolated_wheel_smoke(
+    package: dict[str, Any],
+    source_root: Path,
+    output: Path,
+    version: str,
+    dependency_wheels: list[Path],
+) -> tuple[bool, int]:
+    """Install this build in a fresh venv and invoke its public entry point.
+
+    Source tests may run with the repository on ``sys.path``. This final check
+    deliberately does not: it proves the generated wheel, its declared public
+    dependencies and its console script work without a maintainer's installed
+    packages or private package index.
+    """
+    wheel = package_wheel(output, str(package["package_name"]))
+    if wheel is None:
+        return False, 1
+    with tempfile.TemporaryDirectory(prefix=f"public-release-{package['id']}-") as temp_dir:
+        venv_root = Path(temp_dir) / "venv"
+        environment = public_pip_environment()
+        created = subprocess.run(
+            [sys.executable, "-m", "venv", str(venv_root)],
+            cwd=source_root,
+            env=environment,
+            check=False,
+        )
+        if created.returncode:
+            return False, created.returncode
+        python = venv_executable(venv_root, "python")
+        installed = subprocess.run(
+            [
+                str(python),
+                "-m",
+                "pip",
+                "install",
+                "--disable-pip-version-check",
+                "--no-input",
+                "--index-url",
+                PUBLIC_PYPI_SIMPLE_URL,
+                *map(str, dependency_wheels),
+                str(wheel),
+            ],
+            cwd=source_root,
+            env=environment,
+            check=False,
+        )
+        if installed.returncode:
+            return False, installed.returncode
+        metadata_check = (
+            "import importlib.metadata as metadata; "
+            f"expected = {str(version)!r}; actual = metadata.version({str(package['package_name'])!r}); "
+            "raise SystemExit(0 if actual == expected else 1)"
+        )
+        metadata = subprocess.run(
+            [str(python), "-c", metadata_check],
+            cwd=source_root,
+            env=environment,
+            check=False,
+        )
+        if metadata.returncode:
+            return False, metadata.returncode
+        entrypoint = venv_executable(venv_root, str(package["entrypoint"]))
+        return run_command(
+            str(package["smoke_command"]),
+            source_root,
+            python_executable=python,
+            token_replacements={"entrypoint": str(entrypoint)},
+            environment=environment,
+        )
 
 
 def canonical_file_bytes(path: Path) -> bytes:
@@ -389,6 +508,8 @@ def gate(
     if scan_findings:
         errors.append(f"sensitive scan found {len(scan_findings)} potential public leaks")
     results: list[dict[str, Any]] = []
+    result_by_id: dict[str, dict[str, Any]] = {}
+    built_wheels: dict[str, Path] = {}
     for package in selected:
         result: dict[str, Any] = {"id": package["id"], "package_name": package["package_name"], "status": "passed"}
         source_root = repo_root / str(package["source_path"])
@@ -398,14 +519,6 @@ def gate(
             result["status"] = "failed"
             result["errors"] = version_errors
             errors.extend(f"{package['id']}: {error}" for error in version_errors)
-        install_command = package.get("install_command")
-        if isinstance(install_command, str):
-            success, returncode = run_command(install_command, source_root)
-            result["install_returncode"] = returncode
-            if not success:
-                result["status"] = "failed"
-                result.setdefault("errors", []).append("install-command-failed")
-                errors.append(f"{package['id']}: install-command-failed")
         command = package.get("test_command")
         if isinstance(command, str):
             success, returncode = run_command(command, source_root)
@@ -425,7 +538,38 @@ def gate(
             result["status"] = "failed"
             result.setdefault("errors", []).append("build-or-twine-check-failed")
             errors.append(f"{package['id']}: build-or-twine-check-failed")
+        else:
+            wheel = package_wheel(build_root / str(package["id"]), str(package["package_name"]))
+            if wheel is None:
+                result["status"] = "failed"
+                result.setdefault("errors", []).append("missing-or-ambiguous-wheel")
+                errors.append(f"{package['id']}: missing-or-ambiguous-wheel")
+            else:
+                built_wheels[str(package["id"])] = wheel
         results.append(result)
+        result_by_id[str(package["id"])] = result
+    for package in selected:
+        result = result_by_id[str(package["id"])]
+        if result["status"] == "failed":
+            continue
+        version_values = {value for values in result["versions"].values() for value in values}
+        local_dependencies = [
+            built_wheels[dependency]
+            for dependency in package.get("depends_on", [])
+            if dependency in built_wheels
+        ]
+        success, returncode = run_isolated_wheel_smoke(
+            package,
+            repo_root / str(package["source_path"]),
+            build_root / str(package["id"]),
+            next(iter(version_values)),
+            local_dependencies,
+        )
+        result["isolated_smoke_returncode"] = returncode
+        if not success:
+            result["status"] = "failed"
+            result.setdefault("errors", []).append("isolated-wheel-smoke-failed")
+            errors.append(f"{package['id']}: isolated-wheel-smoke-failed")
     if mode == "release" and not errors:
         errors.extend(verify_staging_manifest(repo_root, matrix, selected))
     return {

@@ -22,7 +22,7 @@ class ProjectRootSpec(BaseModel):
     sources: list[
         Literal[
             "repo-checkout",
-            "public-registry",
+            "team-skill-registry",
             "public-registry",
             "git-repo",
             "local-cache",

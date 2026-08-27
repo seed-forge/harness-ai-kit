@@ -33,6 +33,8 @@ packages:
     depends_on: []
     version_sources: [pyproject]
     test_command: "{python} -c \"import harness_ai_kit; print('harness-ai-kit import OK')\""
+    entrypoint: harness-ai-kit
+    smoke_command: "{entrypoint} --version"
     included_paths:
       - harness_ai_kit
       - cli/harness-ai-kit
@@ -49,8 +51,9 @@ packages:
     release_wave: 1
     depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
-    install_command: "{python} -m pip install ."
     test_command: "{python} -m pytest -q tests"
+    entrypoint: difyctl
+    smoke_command: "{entrypoint} --help"
 
   - id: sf-evalctl
     package_name: sf-evalctl
@@ -61,8 +64,9 @@ packages:
     release_wave: 1
     depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
-    install_command: "{python} -m pip install ."
     test_command: "{python} -m pytest -q tests"
+    entrypoint: evalctl
+    smoke_command: "{entrypoint} --help"
 
   - id: sf-loopctl
     package_name: sf-loopctl
@@ -73,8 +77,9 @@ packages:
     release_wave: 1
     depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
-    install_command: "{python} -m pip install ."
     test_command: "{python} -m pytest -q tests"
+    entrypoint: loopctl
+    smoke_command: "{entrypoint} --help"
 
   - id: sf-mineructl
     package_name: sf-mineructl
@@ -85,8 +90,9 @@ packages:
     release_wave: 1
     depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
-    install_command: "{python} -m pip install ."
     test_command: "{python} -m pytest -q tests"
+    entrypoint: mineructl
+    smoke_command: "{entrypoint} --help"
 
   - id: sf-nexusctl
     package_name: sf-nexusctl
@@ -97,8 +103,9 @@ packages:
     release_wave: 1
     depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
-    install_command: "{python} -m pip install ."
     test_command: "{python} -m pytest -q tests"
+    entrypoint: nexusctl
+    smoke_command: "{entrypoint} --help"
 
   - id: sf-ragflowctl
     package_name: sf-ragflowctl
@@ -109,8 +116,9 @@ packages:
     release_wave: 1
     depends_on: [harness-ai-kit]
     version_sources: [pyproject, cli_json, init]
-    install_command: "{python} -m pip install ."
     test_command: "{python} -m pytest -q tests"
+    entrypoint: ragflowctl
+    smoke_command: "{entrypoint} --help"
 
   # Batch 8 candidates are included in CI so that packaging, tests and public
   # surface scans stay live. They cannot be published until the reviewed
@@ -121,10 +129,12 @@ packages:
     public: true
     ci: true
     publish: false
+    depends_on: [harness-ai-kit]
     hold_reason: "Batch 8 candidate: require reviewed staging manifest and PyPI Trusted Publisher before promotion"
     version_sources: [pyproject, cli_json, init]
-    install_command: "{python} -m pip install ."
     test_command: "{python} -m pytest -q tests"
+    entrypoint: jenkinsctl
+    smoke_command: "{entrypoint} --help"
     included_paths:
       - cli/sf-jenkinsctl
 
@@ -134,9 +144,11 @@ packages:
     public: true
     ci: true
     publish: false
+    depends_on: [harness-ai-kit]
     hold_reason: "Batch 8 candidate: require reviewed staging manifest and PyPI Trusted Publisher before promotion"
     version_sources: [pyproject, cli_json, init]
-    install_command: "{python} -m pip install ."
     test_command: "{python} -m pytest -q tests"
+    entrypoint: woodpeckerctl
+    smoke_command: "{entrypoint} --help"
     included_paths:
       - cli/sf-woodpeckerctl

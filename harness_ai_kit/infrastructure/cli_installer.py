@@ -68,6 +68,10 @@ def is_python_package_installed(package_name: str) -> bool:
 def installed_cli_records(records: list[CliAssetRecord]) -> list[CliAssetRecord]:
     installed: list[CliAssetRecord] = []
     for record in records:
+        if record.install_type == "python-package":
+            if is_python_package_installed(record.package_name):
+                installed.append(record)
+            continue
         if installed_cli_version(record):
             installed.append(record)
     return installed

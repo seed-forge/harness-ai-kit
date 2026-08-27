@@ -125,7 +125,50 @@ def warn_same_version_drift(
 
 
 
-def apply_managed_asset_lockfile(lockfile: pm.Lockfile, target_dir: Path, runtime_id: str) -> list[tuple[pm.LockNode, Path]]:
+def apply_managed_asset_lockfile(
+    lockfile: pm.Lockfile,
+    target_dir: Path,
+    runtime_id: str,
+    *,
+    config: CliConfig | None = None,
+    offline: bool = False,
+    refresh_cache: bool = False,
+) -> list[tuple[pm.LockNode, Path]]:
+    def install_registry_asset(node: pm.LockNode) -> Path:
+        if config is None:
+            raise ValueError(
+                f"Registry installation for {node.type} {node.id}@{node.version} requires CLI configuration."
+            )
+        registry_index_url = (
+            config.public_skill_registry_index_url
+            if node.source == pm.SOURCE_PUBLIC_REGISTRY
+            else config.skill_registry_index_url
+        )
+        if not registry_index_url:
+            raise ValueError(
+                f"No registry index URL is configured for {node.type} {node.id}@{node.version}."
+            )
+        payload, _entry = pm.download_registry_artifact(
+            registry_index_url,
+            node.id,
+            version=node.version,
+            offline=offline,
+            force_refresh=refresh_cache,
+        )
+        expected_checksum = (node.checksum or "").strip()
+        actual_checksum = pm.hash_bytes(payload)
+        if expected_checksum and actual_checksum != expected_checksum:
+            raise ValueError(
+                f"Checksum mismatch for {node.id}@{node.version}: expected {expected_checksum}, got {actual_checksum}"
+            )
+        return managed_install.install_managed_asset_archive_bytes(
+            payload,
+            node,
+            target_dir,
+            runtime_id,
+            ASSET_DIRECTORY_NAMES,
+        )
+
     return managed_install.apply_managed_asset_lockfile(
         lockfile,
         target_dir,
@@ -134,6 +177,7 @@ def apply_managed_asset_lockfile(lockfile: pm.Lockfile, target_dir: Path, runtim
         installed_version=installed_managed_asset_version,
         installed_materialized_checksum=installed_managed_asset_materialized_checksum,
         warn_same_version_drift=warn_same_version_drift,
+        install_registry_asset=install_registry_asset,
     )
 
 
@@ -371,8 +415,8 @@ def resolve_asset_plan(
                 "No public skill registry index URL is configured. "
                 "Set `--public-skill-registry-index-url` via `harness-ai-kit config set` or omit `--from public-registry`."
             )
-    from resolvelib.resolvers.exceptions import ResolutionImpossible as _ResolutionImpossible
-    from resolvelib.resolvers.exceptions import InconsistentCandidate as _InconsistentCandidate
+    from resolvelib.resolvers import InconsistentCandidate as _InconsistentCandidate
+    from resolvelib.resolvers import ResolutionImpossible as _ResolutionImpossible
     # Role-based source default: consumers (and unset machines) resolve
     # registry-only, never depending on a local repo checkout. An explicit
     # ``preferred_sources`` or ``--from`` selector always wins.
@@ -535,7 +579,14 @@ def resolve_cli_publish_root(record: CliAssetRecord, repo_root: Path) -> Path:
 
 
 def manifest_target_dir(manifest_path: Path, runtime_id: str, install_scope: str, target_dir: str | None = None) -> Path:
-    return _runtime_resolve_target_dir(manifest_path.parent, target_dir, cwd=manifest_path.parent, runtime_id=runtime_id, scope=install_scope)
+    return _runtime_resolve_target_dir(
+        manifest_path.parent,
+        target_dir,
+        cwd=manifest_path.parent,
+        runtime_id=runtime_id,
+        scope=install_scope,
+        search_parent_project_targets=False,
+    )
 
 
 
@@ -567,11 +618,13 @@ def project_lockfile_from_manifest(
     *,
     offline: bool,
     refresh_cache: bool = False,
+    source_selector: str | None = None,
 ) -> pm.Lockfile:
     skill_root_ids = project_root_ids(manifest)
     loop_root_ids = [pm.canonical_package_id(item.id, item.namespace) for item in declared_loop_specs(manifest)]
     features = manifest_declared_features(manifest)
     skill_source_policy = manifest_skill_source_policy(manifest)
+    selector_source_policy = pm.source_order_for_selector(source_selector)
     skill_root_sources = manifest_skill_root_sources(manifest)
     skill_root_specifiers = manifest_skill_version_specifiers(manifest)
     manifest_root_requests = project_manifest_root_requests(manifest)
@@ -585,7 +638,8 @@ def project_lockfile_from_manifest(
             features=features,
             offline=offline,
             refresh_cache=refresh_cache,
-            preferred_sources=skill_source_policy,
+            source_selector=source_selector,
+            preferred_sources=selector_source_policy or skill_source_policy,
             root_sources=skill_root_sources,
             root_specifiers=skill_root_specifiers,
         )
@@ -614,6 +668,7 @@ def project_lockfile_from_manifest(
             features=features,
             offline=offline,
             refresh_cache=refresh_cache,
+            source_selector=source_selector,
             root_specifiers=loop_specifiers,
         )
         lockfile = plan.to_lockfile()
@@ -630,7 +685,12 @@ def project_lockfile_from_manifest(
     cli_entries: list[project_locking.CliLockEntry] = []
     cli_specs = declared_cli_specs(manifest)
     if cli_specs:
-        inventory = load_combined_cli_inventory(repo_root, config, offline=offline)
+        cli_inventory_repo_root = (
+            None
+            if pm.selectable_install_source(source_selector) == pm.SOURCE_REGISTRY
+            else repo_root
+        )
+        inventory = load_combined_cli_inventory(cli_inventory_repo_root, config, offline=offline)
         for spec in cli_specs:
             record = select_cli_record_for_spec(inventory, spec)
             cli_entries.append(project_locking.CliLockEntry(spec=spec, record=record))
@@ -1037,18 +1097,18 @@ def run_project_sync(
     runtime_id = runtime_override or manifest.runtime
     install_scope = scope_override or manifest.scope
     repo_root = resolve_repo_root_if_available(repo_root_arg, config, cwd=manifest_path.parent)
-    team_repo_skill_specs = [item for item in declared_skill_specs(manifest) if not item.source_ref]
     if repo_root is not None and sync_repo:
         maybe_sync_repo(argparse.Namespace(sync_repo=True), repo_root)
     elif repo_root is None and (
-        team_repo_skill_specs
-        or declared_plugin_specs(manifest)
+        declared_plugin_specs(manifest)
         or declared_hook_specs(manifest)
         or declared_subagent_specs(manifest)
         or declared_mcp_specs(manifest)
-        or declared_loop_specs(manifest)
     ):
-        raise ValueError("Project sync needs a bootstrapped local repository or explicit --repo-root when managed assets are declared.")
+        raise ValueError(
+            "Project sync needs a bootstrapped local repository or explicit --repo-root "
+            "for Plugin, Hook, Subagent, or MCP declarations."
+        )
     repo_root_for_target = repo_root or manifest_path.parent
     target_dir = manifest_target_dir(manifest_path, runtime_id, install_scope, target_dir_override)
     lock_path = project_lock_path_for_manifest(manifest_path, target_dir, install_scope)
@@ -1120,7 +1180,14 @@ def run_project_sync(
             offline,
             refresh_cache=refresh_cache,
         )
-    installed_asset_paths = apply_managed_asset_lockfile(lockfile, target_dir, runtime_id)
+    installed_asset_paths = apply_managed_asset_lockfile(
+        lockfile,
+        target_dir,
+        runtime_id,
+        config=config,
+        offline=offline,
+        refresh_cache=refresh_cache,
+    )
     if install_scope == "project":
         removed_skills = prune_orphaned_project_skills(
             target_dir,

@@ -9,7 +9,8 @@ reviewed matrix entry.
 1. Generate a public snapshot from the private source into the separate
    staging checkout, remove private operational details, and review the diff.
 2. Align `pyproject.toml`, `cli.json`, and package `__version__` where the
-   package uses them. Add and run a package test command.
+   package uses them. Add a source test command plus a wheel `smoke_command`
+   that invokes the installed public console entry point.
 3. Commit the reviewed public staging baseline, then generate a checked
    staging manifest from that immutable commit. The manifest records each
    selected package's name, version, and source-tree SHA-256. Private-only
@@ -59,3 +60,10 @@ python tools/public_release_gate.py --mode release --report build/release-gate.j
 The final command intentionally fails until `publish: true`, a source commit,
 and a matching staging manifest are present. That failure is the pre-release
 control, not a reason to bypass it.
+
+The release gate runs source tests first, then creates a brand-new system-temp
+virtual environment for every generated wheel. It removes `PYTHONPATH` and
+private pip index settings, installs only from public PyPI plus explicitly
+built dependency wheels, verifies the installed distribution version, and runs
+the matrix `smoke_command`. A globally installed older CLI cannot satisfy this
+check.

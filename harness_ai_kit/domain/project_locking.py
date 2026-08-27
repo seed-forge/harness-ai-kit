@@ -172,7 +172,11 @@ def assemble_project_lockfile(
     cli_entries: Sequence[CliLockEntry] = (),
     managed_entries: Sequence[ManagedAssetLockEntry] = (),
 ) -> Lockfile:
-    nodes = append_cli_lock_nodes(base_nodes, cli_entries)
+    nodes = replace_declared_cli_lock_nodes(
+        base_nodes,
+        cli_entries,
+        declared_cli_ids={entry.spec.id for entry in cli_entries},
+    )
     nodes = append_managed_asset_lock_nodes(nodes, managed_entries)
     return Lockfile(
         generated_at=generated_at,

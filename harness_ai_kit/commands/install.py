@@ -108,7 +108,7 @@ class InstallCommandContext:
     install_environment_requirements: Callable[[list[dict[str, object]], bool], list[str]]
     environment_records_for_lockfile: Callable[[Any], list[dict[str, object]]]
     apply_skill_lockfile: Callable[[Path, Any, Any, Path, str, bool], list[Path]]
-    apply_managed_asset_lockfile: Callable[[Any, Path, str], list[tuple[Any, Path]]]
+    apply_managed_asset_lockfile: Callable[..., list[tuple[Any, Path]]]
     missing_environment_requirements: Callable[[list[dict[str, object]]], list[dict[str, str]]]
     bootstrap_project_manifest_from_lockfile: Callable[[Path, Any], Any]
     project_manifest_path: Callable[[Path], Path]
@@ -967,7 +967,14 @@ def command_sync(args: argparse.Namespace, config_path: Path, context: InstallCo
         # (apply_skill_lockfile only installs type=="skill" nodes and would
         # silently skip loop nodes). CLI deps are requirements, not loop assets:
         # they are reported as hints, never materialized into the loops dir.
-        installed_asset_paths = context.apply_managed_asset_lockfile(lockfile, target_dir, runtime_id)
+        installed_asset_paths = context.apply_managed_asset_lockfile(
+            lockfile,
+            target_dir,
+            runtime_id,
+            config=config,
+            offline=getattr(args, "offline", False),
+            refresh_cache=getattr(args, "refresh_cache", False),
+        )
         action = "updated" if args.command == "update" else "installed"
         for node, destination in installed_asset_paths:
             print(f"{action} loop {node.canonical_id} {node.version} -> {destination}")
@@ -1135,7 +1142,14 @@ def command_sync(args: argparse.Namespace, config_path: Path, context: InstallCo
     if _pending_manifest_new_ids:
         context.save_project_manifest(manifest_path, manifest)
         print(f"Auto-added {len(_pending_manifest_new_ids)} skill(s) to manifest: {', '.join(_pending_manifest_new_ids)}")
-    installed_asset_paths = context.apply_managed_asset_lockfile(lockfile, target_dir, runtime_id)
+    installed_asset_paths = context.apply_managed_asset_lockfile(
+        lockfile,
+        target_dir,
+        runtime_id,
+        config=config,
+        offline=getattr(args, "offline", False),
+        refresh_cache=getattr(args, "refresh_cache", False),
+    )
     # 注入 agents_md_inject 内容到项目 AGENTS.md（幂等更新 + 卸载自动清除）
     if install_scope == "project":
         from harness_ai_kit.application.project_sync import apply_agents_md_injections

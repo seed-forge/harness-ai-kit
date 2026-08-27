@@ -99,8 +99,30 @@ def topological_skill_nodes(plan: ResolutionPlan) -> list[LockNode]:
     return ordered
 
 
+def _resolve_lock_dependency_key(
+    dependency_key: str,
+    nodes_by_key: dict[str, LockNode],
+    nodes_by_type_and_id: dict[tuple[str, str], list[str]],
+) -> str | None:
+    """Resolve a lockfile edge without guessing between namespace candidates."""
+    if dependency_key in nodes_by_key:
+        return dependency_key
+
+    dependency_type, separator, canonical_id = dependency_key.partition(":")
+    if not separator or not dependency_type or not canonical_id:
+        return None
+    namespace, package_id = split_canonical_id(canonical_id)
+    if namespace is not None:
+        return None
+    candidates = nodes_by_type_and_id.get((dependency_type, package_id), [])
+    return candidates[0] if len(candidates) == 1 else None
+
+
 def topological_skill_nodes_from_lock(lockfile: Lockfile) -> list[LockNode]:
     nodes_by_key = {package_key_for(node.type, node.id, node.namespace): node for node in lockfile.nodes}
+    nodes_by_type_and_id: dict[tuple[str, str], list[str]] = {}
+    for key, node in nodes_by_key.items():
+        nodes_by_type_and_id.setdefault((node.type, node.id), []).append(key)
     visited: set[str] = set()
     ordered: list[LockNode] = []
 
@@ -112,8 +134,9 @@ def topological_skill_nodes_from_lock(lockfile: Lockfile) -> list[LockNode]:
 
         # Visit requires dependencies first
         for child in node.requires:
-            if child in nodes_by_key:
-                visit(child)
+            child_key = _resolve_lock_dependency_key(child, nodes_by_key, nodes_by_type_and_id)
+            if child_key is not None:
+                visit(child_key)
 
         # Visit extends edges so base skills install before extending skills.
         # node.extends entries use canonical_id format (e.g. "team/infra-ops").

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import os
 import sys
 import tempfile
 import unittest
@@ -18,7 +19,7 @@ class PublicReleaseGateTests(unittest.TestCase):
         package_root = root / "cli" / "example"
         package_root.mkdir(parents=True)
         (package_root / "pyproject.toml").write_text(
-            "[project]\nname = 'example-cli'\nversion = '1.2.3'\n",
+            "[project]\nname = 'example-cli'\nversion = '1.2.3'\n\n[project.scripts]\nexamplectl = 'example.cli:main'\n",
             encoding="utf-8",
         )
         (package_root / "cli.json").write_text(json.dumps({"version": cli_version}), encoding="utf-8")
@@ -35,6 +36,8 @@ class PublicReleaseGateTests(unittest.TestCase):
             "publish": False,
             "version_sources": ["pyproject", "cli_json", "init"],
             "test_command": "{python} -c \"print('ok')\"",
+            "entrypoint": "examplectl",
+            "smoke_command": "{entrypoint} --help",
         }
 
     def test_package_versions_reports_metadata_drift(self) -> None:
@@ -71,6 +74,18 @@ class PublicReleaseGateTests(unittest.TestCase):
             findings = gate.scan_release_surface(root)
         self.assertEqual(findings, [])
 
+    def test_release_surface_scan_ignores_staging_temp_state(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            temporary_state = root / ".tmp" / "release-test" / "venv"
+            temporary_state.mkdir(parents=True)
+            private_address = ".".join(("10", "1", "2", "3"))
+            (temporary_state / "pyvenv.cfg").write_text(
+                f"endpoint = '{private_address}'\n", encoding="utf-8"
+            )
+            findings = gate.scan_release_surface(root)
+        self.assertEqual(findings, [])
+
     def test_matrix_rejects_duplicate_package_names(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
@@ -90,20 +105,65 @@ class PublicReleaseGateTests(unittest.TestCase):
             errors = gate.validate_matrix(root, matrix)
         self.assertIn("publish dependency must be in an earlier release wave: cli -> base", errors)
 
-    def test_matrix_rejects_non_string_install_command(self) -> None:
+    def test_matrix_rejects_ci_package_without_wheel_smoke_command(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
             package = self.make_package(root)
-            package["install_command"] = True
+            package.pop("smoke_command")
             matrix = {"public": {"repository": "seed-forge/harness-ai-kit"}, "packages": [package]}
             errors = gate.validate_matrix(root, matrix)
-        self.assertIn("install_command must be a string when set: example-cli", errors)
+        self.assertIn("ci package is missing smoke_command: example-cli", errors)
+
+    def test_matrix_rejects_ci_package_without_entrypoint(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            package = self.make_package(root)
+            package.pop("entrypoint")
+            matrix = {"public": {"repository": "seed-forge/harness-ai-kit"}, "packages": [package]}
+            errors = gate.validate_matrix(root, matrix)
+        self.assertIn("ci package is missing entrypoint: example-cli", errors)
+
+    def test_matrix_rejects_ci_entrypoint_missing_from_pyproject(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            package = self.make_package(root)
+            package["entrypoint"] = "otherctl"
+            matrix = {"public": {"repository": "seed-forge/harness-ai-kit"}, "packages": [package]}
+            errors = gate.validate_matrix(root, matrix)
+        self.assertIn("ci entrypoint is not declared by pyproject: example-cli", errors)
 
     def test_run_command_replaces_python_placeholder_without_windows_path_escaping(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             ok, returncode = gate.run_command('{python} -c "print(123)"', Path(temp_dir))
         self.assertTrue(ok)
         self.assertEqual(returncode, 0)
+
+    def test_run_command_replaces_quoted_entrypoint_placeholder(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            ok, returncode = gate.run_command(
+                '"{entrypoint}" -c "print(123)"',
+                Path(temp_dir),
+                token_replacements={"entrypoint": sys.executable},
+            )
+        self.assertTrue(ok)
+        self.assertEqual(returncode, 0)
+
+    def test_public_pip_environment_ignores_local_python_and_indexes(self) -> None:
+        with mock.patch.dict(
+            os.environ,
+            {
+                "PYTHONPATH": "private-source",
+                "PYTHONHOME": "private-python",
+                "PIP_INDEX_URL": "https://private.example/simple",
+                "PIP_EXTRA_INDEX_URL": "https://extra.example/simple",
+                "PIP_TRUSTED_HOST": "private.example",
+            },
+            clear=False,
+        ):
+            environment = gate.public_pip_environment()
+        for key in ("PYTHONPATH", "PYTHONHOME", "PIP_INDEX_URL", "PIP_EXTRA_INDEX_URL", "PIP_TRUSTED_HOST"):
+            self.assertNotIn(key, environment)
+        self.assertEqual(environment["PIP_CONFIG_FILE"], os.devnull)
 
     def test_staging_manifest_requires_immutable_snapshot(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

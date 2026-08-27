@@ -1,109 +1,65 @@
-# Quick Start
+# Quickstart
 
-Get from zero to a working AI skill in under 2 minutes.
+This guide creates a reproducible project-local AI asset setup. It does not
+require a private registry, a maintainer checkout, or a machine-specific
+configuration.
 
 ## Prerequisites
 
-- Python >= 3.10 (`python --version` to check)
-- Git (`git --version` to check)
-- One of: Codex, Claude Code, Cursor, or Kiro
+- Python 3.10 or later
+- Git
+- A supported AI coding runtime, such as Codex, Claude Code, Cursor, Kiro, or
+  dsh
 
-## Step 1: Install
-
-```bash
-pip install harness-ai-kit
-```
-
-Verify:
+## Install
 
 ```bash
+python -m pip install --upgrade harness-ai-kit
 harness-ai-kit --version
-# Expected: harness-ai-kit 0.1.0
 ```
 
-## Step 2: Initialize
+## Initialize Your Local Configuration
 
 ```bash
 harness-ai-kit init
 ```
 
-This creates `~/.ai-kit/config.yaml` and clones the skill repository.
+This creates or updates `~/.harness-ai-kit/config.yaml`. It is the shared
+location for user-specific endpoints and credentials; do not write those
+values into a project manifest, lockfile, or Skill.
 
-Verify:
+For a registry-backed public catalog, configure the public registry endpoint
+in that file. You can also use a public Git source directly, as shown below.
 
-```bash
-harness-ai-kit doctor
-# Expected: all checks pass (git, config, checkout, runtime)
-```
-
-## Step 3: Add a Skill
+## Create A Project And Add A Public Skill
 
 ```bash
-cd your-project
+mkdir my-agent-project
+cd my-agent-project
+harness-ai-kit init-project --runtime codex
 harness-ai-kit add skill https://github.com/anthropics/skills/tree/main/skills/skill-creator
 ```
 
-This downloads the skill and records it in `harness-ai-kit.yml`.
+`init-project` writes `harness-ai-kit.yml`, which declares what the project
+wants. `add` resolves the source, writes `harness-ai-kit.lock`, and installs
+the selected Skill into the configured runtime directory.
 
-## Step 4: Sync
+## Verify The Result
 
 ```bash
 harness-ai-kit sync
+harness-ai-kit doctor
 ```
 
-This installs the skill into your AI runtime's skill directory.
+For the default Codex project runtime, the installed Skill is under
+`.agents/skills/`. The manifest and lockfile are the files to commit; the
+runtime directory is a materialized working copy.
 
-Verify:
+## Next Steps
 
-```bash
-ls .agents/skills/skill-creator/    # Codex
-# or
-ls .claude/skills/skill-creator/    # Claude Code
-```
-
-## Step 5: Use It
-
-Open your AI coding tool and ask it to use the skill. For example:
-
-> "Help me create a new skill using the skill-creator skill"
-
-The AI agent reads the SKILL.md from the installed directory and follows its instructions.
-
----
-
-## What's Next?
-
-- **Browse curated skills**: `harness-ai-kit list` — 23 production-tested skills included
-- **See all commands**: [CLI Reference](cli-reference.md)
-- **Real-world examples**: [examples/](../examples/README.md) — team sync, multi-runtime, offline mode
-- **Trouble?**: [Troubleshooting guide](troubleshooting.md)
-- **Write your own skill**: [Skill Authoring Guide](skill-authoring.md)
-
-## Multi-Runtime Quick Reference
-
-```bash
-# Codex (default) — installs to .agents/skills/
-harness-ai-kit add skill <id> --runtime codex
-
-# Claude Code — installs to .claude/skills/
-harness-ai-kit add skill <id> --runtime claude-code
-
-# Cursor — installs to .cursor/rules/
-harness-ai-kit add skill <id> --runtime cursor
-
-# Kiro — installs to .kiro/steering/ + harness-ai-kit-skills/
-harness-ai-kit add skill <id> --runtime kiro
-```
-
-## Team Workflow
-
-```bash
-# Team lead: pin skills for the project
-harness-ai-kit init-project
-harness-ai-kit add skill diag-mysql-deadlock
-harness-ai-kit lock
-git add harness-ai-kit.yml harness-ai-kit.lock && git commit -m "pin team skills"
-
-# Team members: get identical state
-harness-ai-kit sync
-```
+- See the [CLI reference](cli-reference.md) for command options.
+- See [usage scenarios](usage-scenarios.md) for choosing Skills and Loops.
+- See [concepts](concepts.md) for manifests, locks, sources, and runtime
+  materialization.
+- Use [troubleshooting](troubleshooting.md) when a source, dependency, or
+  runtime check fails.

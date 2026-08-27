@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import io
 import os
+import threading
 import urllib.error
 import urllib.request
 from base64 import b64encode
@@ -16,6 +17,24 @@ from pathlib import Path
 
 import httpx
 import yaml
+
+
+_http_client: httpx.Client | None = None
+_http_client_factory: object | None = None
+_http_client_lock = threading.Lock()
+
+
+def _shared_http_client() -> httpx.Client:
+    """Return a process-local client so repeated registry reads share TLS setup."""
+    global _http_client, _http_client_factory
+    factory = httpx.Client
+    with _http_client_lock:
+        if _http_client is None or _http_client_factory is not factory:
+            if _http_client is not None:
+                _http_client.close()
+            _http_client = factory(follow_redirects=True)
+            _http_client_factory = factory
+        return _http_client
 
 
 def slash_join(base_url: str, *parts: str) -> str:
@@ -111,10 +130,10 @@ def http_request(
     ``except urllib.error.*`` clauses continue to work.
     """
     try:
-        with httpx.Client(timeout=timeout, follow_redirects=True) as client:
-            response = client.request(method, url, headers=headers, content=data)
-            response.raise_for_status()
-            return response.content
+        client = _shared_http_client()
+        response = client.request(method, url, headers=headers, content=data, timeout=timeout)
+        response.raise_for_status()
+        return response.content
     except httpx.HTTPStatusError as exc:
         raise urllib.error.HTTPError(
             url=str(exc.request.url),

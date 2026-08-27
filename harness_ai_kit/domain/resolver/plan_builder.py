@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Callable, Iterable
 
 from resolvelib import BaseReporter, Resolver
-from resolvelib.resolvers.exceptions import ResolutionImpossible, InconsistentCandidate
+from resolvelib.resolvers import InconsistentCandidate, ResolutionImpossible
 
 from harness_ai_kit.domain.artifacts import hash_skill_directory
 from harness_ai_kit.domain.identity import canonical_package_id, package_key_for, split_canonical_id

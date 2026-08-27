@@ -57,7 +57,7 @@ class RootRequest(BaseModel):
     source_policy: list[
         Literal[
             "repo-checkout",
-            "public-registry",
+            "team-skill-registry",
             "public-registry",
             "git-repo",
             "local-cache",
