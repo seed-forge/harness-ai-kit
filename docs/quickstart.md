@@ -14,7 +14,7 @@ configuration.
 ## Install
 
 ```bash
-python -m pip install --upgrade harness-ai-kit
+python -m pip install --upgrade harness-ai-kit==0.18.18
 harness-ai-kit --version
 ```
 

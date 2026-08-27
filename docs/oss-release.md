@@ -9,8 +9,10 @@ reviewed matrix entry.
 1. Generate a public snapshot from the private source into the separate
    staging checkout, remove private operational details, and review the diff.
 2. Align `pyproject.toml`, `cli.json`, and package `__version__` where the
-   package uses them. Add a source test command plus a wheel `smoke_command`
-   that invokes the installed public console entry point.
+   package uses them. For the core CLI, also align `README.md`,
+   `README.zh-CN.md`, `INSTALL.md`, and `docs/quickstart.md` with the exact
+   pinned public version. Add a source test command plus a wheel
+   `smoke_command` that invokes the installed public console entry point.
 3. Commit the reviewed public staging baseline, then generate a checked
    staging manifest from that immutable commit. The manifest records each
    selected package's name, version, and source-tree SHA-256. Private-only

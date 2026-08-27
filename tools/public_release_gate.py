@@ -39,6 +39,25 @@ SCAN_RULES = (
 )
 IGNORED_PARTS = {".git", ".tmp", ".venv", "venv", "build", "dist", "dist3", "__pycache__", ".pytest_cache"}
 PUBLIC_PYPI_SIMPLE_URL = "https://pypi.org/simple"
+CORE_PUBLIC_RELEASE_INPUTS = frozenset(
+    {
+        "harness_ai_kit",
+        "cli/harness-ai-kit",
+        "cli/harness-ai-kit/cli.json",
+        "pyproject.toml",
+        "README.md",
+        "README.zh-CN.md",
+        "INSTALL.md",
+        "CATALOG.md",
+        "docs/quickstart.md",
+        "ROADMAP.md",
+        "CHANGELOG.md",
+        "LICENSE",
+    }
+)
+SNAPSHOT_METADATA_PATHS = frozenset(
+    {"docs/oss-public-release.yaml", "docs/oss-staging-manifest.json"}
+)
 
 
 def is_ignored_path(path: Path, root: Path) -> bool:
@@ -155,6 +174,39 @@ def validate_matrix(repo_root: Path, matrix: dict[str, Any]) -> list[str]:
         names.add(package_name)
         if not (repo_root / source_path).is_dir():
             errors.append(f"source path is missing for {package_id}: {source_path}")
+        if package_id == "harness-ai-kit":
+            included_paths = item.get("included_paths")
+            if not isinstance(included_paths, list) or not all(isinstance(path, str) and path for path in included_paths):
+                errors.append("harness-ai-kit included_paths must list the core public release inputs")
+            else:
+                missing_inputs = sorted(CORE_PUBLIC_RELEASE_INPUTS - set(included_paths))
+                if missing_inputs:
+                    errors.append(
+                        "harness-ai-kit included_paths missing core public release inputs: "
+                        + ", ".join(missing_inputs)
+                    )
+                absent_inputs = sorted(
+                    path for path in CORE_PUBLIC_RELEASE_INPUTS if not (repo_root / path).exists()
+                )
+                if absent_inputs:
+                    errors.append(
+                        "harness-ai-kit core public release inputs are missing from checkout: "
+                        + ", ".join(absent_inputs)
+                    )
+                normalized_inputs = [path.replace("\\", "/").strip("/") for path in included_paths]
+                recursive_snapshot_inputs = sorted(
+                    snapshot_path
+                    for snapshot_path in SNAPSHOT_METADATA_PATHS
+                    if any(
+                        snapshot_path == input_path or snapshot_path.startswith(input_path + "/")
+                        for input_path in normalized_inputs
+                    )
+                )
+                if recursive_snapshot_inputs:
+                    errors.append(
+                        "harness-ai-kit included_paths must not include staging snapshot metadata: "
+                        + ", ".join(recursive_snapshot_inputs)
+                    )
         if item.get("ci"):
             if not isinstance(item.get("test_command"), str):
                 errors.append(f"ci package is missing test_command: {package_id}")

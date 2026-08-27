@@ -132,6 +132,67 @@ class PublicReleaseGateTests(unittest.TestCase):
             errors = gate.validate_matrix(root, matrix)
         self.assertIn("ci entrypoint is not declared by pyproject: example-cli", errors)
 
+    def test_matrix_requires_core_public_release_inputs(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            package = self.make_package(root)
+            package.update({"id": "harness-ai-kit", "package_name": "harness-ai-kit", "source_path": "."})
+            matrix = {"public": {"repository": "seed-forge/harness-ai-kit"}, "packages": [package]}
+            errors = gate.validate_matrix(root, matrix)
+
+        self.assertIn(
+            "harness-ai-kit included_paths must list the core public release inputs",
+            errors,
+        )
+
+    def test_matrix_accepts_complete_core_public_release_inputs(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "harness_ai_kit").mkdir()
+            (root / "cli" / "harness-ai-kit").mkdir(parents=True)
+            (root / "docs").mkdir()
+            for relative_path in (
+                "cli/harness-ai-kit/cli.json",
+                "README.md",
+                "README.zh-CN.md",
+                "INSTALL.md",
+                "CATALOG.md",
+                "ROADMAP.md",
+                "CHANGELOG.md",
+                "LICENSE",
+                "docs/quickstart.md",
+            ):
+                (root / relative_path).write_text("release input\n", encoding="utf-8")
+            (root / "pyproject.toml").write_text(
+                "[project]\nname = 'harness-ai-kit'\nversion = '1.2.3'\n\n"
+                "[project.scripts]\nharness-ai-kit = 'harness_ai_kit.main:main'\n",
+                encoding="utf-8",
+            )
+            package = {
+                "id": "harness-ai-kit",
+                "package_name": "harness-ai-kit",
+                "source_path": ".",
+                "public": True,
+                "ci": True,
+                "publish": False,
+                "version_sources": ["pyproject"],
+                "test_command": "{python} -c \"print('ok')\"",
+                "entrypoint": "harness-ai-kit",
+                "smoke_command": "{entrypoint} --version",
+                "included_paths": sorted(gate.CORE_PUBLIC_RELEASE_INPUTS),
+            }
+            matrix = {"public": {"repository": "seed-forge/harness-ai-kit"}, "packages": [package]}
+            errors = gate.validate_matrix(root, matrix)
+            package["included_paths"].append("docs")
+            recursive_errors = gate.validate_matrix(root, matrix)
+
+        self.assertEqual(errors, [])
+        self.assertIn(
+            "harness-ai-kit included_paths must not include staging snapshot metadata: "
+            "docs/oss-public-release.yaml, docs/oss-staging-manifest.json",
+            recursive_errors,
+        )
+
     def test_run_command_replaces_python_placeholder_without_windows_path_escaping(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             ok, returncode = gate.run_command('{python} -c "print(123)"', Path(temp_dir))

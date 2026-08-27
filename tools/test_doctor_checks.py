@@ -16,6 +16,13 @@ from harness_ai_kit.domain.doctor_checks import (
 
 
 class PublicDoctorVersionTests(unittest.TestCase):
+    @staticmethod
+    def write_project_metadata(repo_root: Path) -> None:
+        (repo_root / "pyproject.toml").write_text(
+            '[project]\nname = "harness-ai-kit"\nversion = "0.1.0"\n',
+            encoding="utf-8",
+        )
+
     def test_private_catalog_is_not_mistaken_for_the_public_layout(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             repo_root = Path(temp_dir)
@@ -34,6 +41,28 @@ class PublicDoctorVersionTests(unittest.TestCase):
             if result["status"] == "error"
         ]
         self.assertEqual(errors, [])
+
+    def test_public_staging_does_not_require_private_governance_skills(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            (repo_root / "CATALOG.md").write_text("# Public catalog\n", encoding="utf-8")
+            self.write_project_metadata(repo_root)
+
+            subjects = {result["subject"] for result in doctor_versions_results(repo_root)}
+
+        self.assertNotIn("skill:harness-ai-kit-ops:cli-dependency", subjects)
+        self.assertNotIn("skill:harness-ai-kit-maintainer:cli-dependency", subjects)
+
+    def test_private_checkout_still_requires_governance_skill_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            (repo_root / "catalog.md").write_text("# Internal catalog\n", encoding="utf-8")
+            self.write_project_metadata(repo_root)
+
+            subjects = {result["subject"] for result in doctor_versions_results(repo_root)}
+
+        self.assertIn("skill:harness-ai-kit-ops:cli-dependency", subjects)
+        self.assertIn("skill:harness-ai-kit-maintainer:cli-dependency", subjects)
 
     def test_python_package_import_name_maps_pyyaml_to_yaml(self) -> None:
         self.assertEqual(python_import_name("PyYAML>=6.0"), "yaml")

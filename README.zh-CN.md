@@ -43,7 +43,7 @@ harness-ai-kit.yml  ->  解析依赖  ->  harness-ai-kit.lock  ->  安装到运�
 前置条件：Python 3.10+ 与 Git。
 
 ```bash
-python -m pip install --upgrade harness-ai-kit
+python -m pip install --upgrade harness-ai-kit==0.18.18
 harness-ai-kit init
 
 mkdir my-agent-project

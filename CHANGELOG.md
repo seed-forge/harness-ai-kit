@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.18] - 2026-08-27
+
+### Fixed
+
+- Make public version checks read `CATALOG.md`, validate every public install
+  entry point, and allow the OSS package to omit private maintainer Skills.
+- Require the release matrix to snapshot the core metadata and public product
+  documentation that define the published version and installation contract.
+
 ## [0.18.17] - 2026-08-27
 
 ### Fixed

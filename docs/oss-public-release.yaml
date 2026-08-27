@@ -38,8 +38,15 @@ packages:
     included_paths:
       - harness_ai_kit
       - cli/harness-ai-kit
+      - cli/harness-ai-kit/cli.json
       - pyproject.toml
       - README.md
+      - README.zh-CN.md
+      - INSTALL.md
+      - CATALOG.md
+      - docs/quickstart.md
+      - ROADMAP.md
+      - CHANGELOG.md
       - LICENSE
 
   - id: sf-difyctl

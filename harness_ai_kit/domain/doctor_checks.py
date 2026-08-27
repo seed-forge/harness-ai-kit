@@ -246,9 +246,21 @@ def doctor_pi_results(home_dir: Path | None = None, config: Any = None) -> list[
     return results
 
 
+def public_catalog_path(repo_root: Path) -> Path | None:
+    """Return the reviewed public catalog when this is an OSS checkout."""
+    try:
+        return next(
+            path for path in repo_root.iterdir() if path.name == "CATALOG.md" and path.is_file()
+        )
+    except (FileNotFoundError, StopIteration):
+        return None
+
+
 def doctor_versions_results(repo_root: Path) -> list[dict[str, str]]:
     results: list[dict[str, str]] = []
-    catalog_map = catalog_versions(repo_root / "catalog.md")
+    catalog_path = public_catalog_path(repo_root) or repo_root / "catalog.md"
+    is_public_checkout = catalog_path.name == "CATALOG.md"
+    catalog_map = catalog_versions(catalog_path)
 
     for record in load_skill_inventory(repo_root).values():
         changelog_version = read_top_changelog_version(record.path / "CHANGELOG.md") if record.path else None
@@ -269,10 +281,10 @@ def doctor_versions_results(repo_root: Path) -> list[dict[str, str]]:
         catalog_version = catalog_map.get(record.skill_id)
         if catalog_version == record.version:
             catalog_status = "success"
-            catalog_message = f"skill.json={record.version}; catalog.md={catalog_version}"
+            catalog_message = f"skill.json={record.version}; {catalog_path.name}={catalog_version}"
         else:
             catalog_status = "error"
-            catalog_message = f"skill.json={record.version}; catalog.md={catalog_version or '<missing>'}"
+            catalog_message = f"skill.json={record.version}; {catalog_path.name}={catalog_version or '<missing>'}"
         results.append(
             {
                 "subject": f"skill:{record.skill_id}:catalog",
@@ -293,7 +305,10 @@ def doctor_versions_results(repo_root: Path) -> list[dict[str, str]]:
         }
     )
 
-    for relative_path in ("README.md", "INSTALL.md"):
+    version_documents = ("README.md", "INSTALL.md")
+    if is_public_checkout:
+        version_documents = ("README.md", "README.zh-CN.md", "INSTALL.md", "docs/quickstart.md")
+    for relative_path in version_documents:
         document_path = repo_root / relative_path
         if not document_path.exists():
             results.append(
@@ -318,6 +333,8 @@ def doctor_versions_results(repo_root: Path) -> list[dict[str, str]]:
     for skill_id in ("harness-ai-kit-ops", "harness-ai-kit-maintainer"):
         record = skill_inventory.get(skill_id)
         if record is None or record.path is None:
+            if is_public_checkout:
+                continue
             results.append(
                 {
                     "subject": f"skill:{skill_id}:cli-dependency",
@@ -791,6 +808,7 @@ def python_import_name(package: str) -> str:
         "beautifulsoup4": "bs4",
         "pillow": "PIL",
         "pymupdf": "fitz",
+        "pyyaml": "yaml",
         "python-docx": "docx",
         "python-pptx": "pptx",
     }
