@@ -49,7 +49,7 @@ jobs:
           python tools/public_release_gate.py --mode ci --report build/release-gate.json
       - name: Upload release gate evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: public-release-gate
           path: |
