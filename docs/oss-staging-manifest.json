@@ -3,8 +3,8 @@
     {
       "id": "harness-ai-kit",
       "package_name": "harness-ai-kit",
-      "tree_sha256": "746e14aa85272794ecbb134a800d056475652754663cd29d08cfd5908ad2256f",
-      "version": "0.18.2"
+      "tree_sha256": "6e8fade0c4ec2d77b754aef285fe9cdf07e20cadf2577178bad3c0f7cfa6f7b6",
+      "version": "0.18.17"
     },
     {
       "id": "sf-difyctl",
@@ -44,5 +44,5 @@
     }
   ],
   "schema_version": 1,
-  "source_revision": "af2ac2f64b6b4032ddaac30aaa7fff1dfcde0484"
+  "source_revision": "187ef681d25e2cc2f29062bdb06402bad3221700"
 }
