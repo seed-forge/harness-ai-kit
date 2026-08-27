@@ -162,7 +162,10 @@ class PublicReleaseGateTests(unittest.TestCase):
                 "LICENSE",
                 "docs/quickstart.md",
             ):
-                (root / relative_path).write_text("release input\n", encoding="utf-8")
+                contents = "release input\n"
+                if relative_path in gate.CORE_PUBLIC_README_MARKERS:
+                    contents = "\n".join(gate.CORE_PUBLIC_README_MARKERS[relative_path]) + "\n"
+                (root / relative_path).write_text(contents, encoding="utf-8")
             (root / "pyproject.toml").write_text(
                 "[project]\nname = 'harness-ai-kit'\nversion = '1.2.3'\n\n"
                 "[project.scripts]\nharness-ai-kit = 'harness_ai_kit.main:main'\n",
@@ -191,6 +194,26 @@ class PublicReleaseGateTests(unittest.TestCase):
             "harness-ai-kit included_paths must not include staging snapshot metadata: "
             "docs/oss-public-release.yaml, docs/oss-staging-manifest.json",
             recursive_errors,
+        )
+
+    def test_matrix_rejects_simplified_core_readme(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "README.md").write_text("# harness-ai-kit\n## Quick Start\n", encoding="utf-8")
+            (root / "README.zh-CN.md").write_text("# harness-ai-kit\n## 快速开始\n", encoding="utf-8")
+            errors = gate.core_public_documentation_errors(root)
+
+        self.assertIn(
+            "harness-ai-kit documentation contract missing sections in README.md: "
+            "## Why, ## The REMIX Method, ## No Lock-In, ## Team Workflow, ## Architecture, "
+            "## Documentation, ## License",
+            errors,
+        )
+        self.assertIn(
+            "harness-ai-kit documentation contract missing sections in README.zh-CN.md: "
+            "## 为什么需要它, ## REMIX 方法论, ## 不锁定内容, ## 团队协作, ## 架构, "
+            "## 文档入口, ## 许可证",
+            errors,
         )
 
     def test_run_command_replaces_python_placeholder_without_windows_path_escaping(self) -> None:
@@ -225,6 +248,30 @@ class PublicReleaseGateTests(unittest.TestCase):
         for key in ("PYTHONPATH", "PYTHONHOME", "PIP_INDEX_URL", "PIP_EXTRA_INDEX_URL", "PIP_TRUSTED_HOST"):
             self.assertNotIn(key, environment)
         self.assertEqual(environment["PIP_CONFIG_FILE"], os.devnull)
+
+    def test_source_test_install_uses_local_core_and_public_index(self) -> None:
+        root = Path("C:/staging")
+        source = root / "cli" / "example"
+        command = gate.source_test_install_command(Path("C:/venv/python.exe"), root, source)
+
+        self.assertEqual(command[:9], [
+            str(Path("C:/venv/python.exe")),
+            "-m",
+            "pip",
+            "install",
+            "--disable-pip-version-check",
+            "--no-input",
+            "--index-url",
+            gate.PUBLIC_PYPI_SIMPLE_URL,
+            "pytest",
+        ])
+        self.assertEqual(command[9:], ["-e", str(root), "-e", str(source)])
+
+    def test_source_test_install_does_not_install_core_twice(self) -> None:
+        root = Path("C:/staging")
+        command = gate.source_test_install_command(Path("C:/venv/python.exe"), root, root)
+        self.assertEqual(command.count("-e"), 1)
+        self.assertEqual(command[-1], str(root))
 
     def test_staging_manifest_requires_immutable_snapshot(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

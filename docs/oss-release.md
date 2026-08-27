@@ -11,8 +11,11 @@ reviewed matrix entry.
 2. Align `pyproject.toml`, `cli.json`, and package `__version__` where the
    package uses them. For the core CLI, also align `README.md`,
    `README.zh-CN.md`, `INSTALL.md`, and `docs/quickstart.md` with the exact
-   pinned public version. Add a source test command plus a wheel
-   `smoke_command` that invokes the installed public console entry point.
+   pinned public version. The release gate also requires the core English and
+   Chinese README sections that define positioning, REMIX, lock-in boundary,
+   workflow, architecture, and documentation; a short placeholder cannot
+   replace the public product documentation. Add a source test command plus a
+   wheel `smoke_command` that invokes the installed public console entry point.
 3. Commit the reviewed public staging baseline, then generate a checked
    staging manifest from that immutable commit. The manifest records each
    selected package's name, version, and source-tree SHA-256. Private-only
@@ -64,8 +67,10 @@ and a matching staging manifest are present. That failure is the pre-release
 control, not a reason to bypass it.
 
 The release gate runs source tests first, then creates a brand-new system-temp
-virtual environment for every generated wheel. It removes `PYTHONPATH` and
-private pip index settings, installs only from public PyPI plus explicitly
-built dependency wheels, verifies the installed distribution version, and runs
-the matrix `smoke_command`. A globally installed older CLI cannot satisfy this
-check.
+virtual environment for every source test and generated wheel. Source tests
+install the staging core and the selected CLI as editable packages, resolving
+their declared dependencies only from public PyPI. Wheel smoke tests remove
+`PYTHONPATH` and private pip index settings, install only from public PyPI plus
+explicitly built dependency wheels, verify the installed distribution version,
+and run the matrix `smoke_command`. A globally installed older CLI or cached
+dependency cannot satisfy either check.

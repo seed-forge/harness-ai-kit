@@ -58,6 +58,30 @@ CORE_PUBLIC_RELEASE_INPUTS = frozenset(
 SNAPSHOT_METADATA_PATHS = frozenset(
     {"docs/oss-public-release.yaml", "docs/oss-staging-manifest.json"}
 )
+CORE_PUBLIC_README_MARKERS: dict[str, tuple[str, ...]] = {
+    "README.md": (
+        "# harness-ai-kit",
+        "## Why",
+        "## The REMIX Method",
+        "## No Lock-In",
+        "## Quick Start",
+        "## Team Workflow",
+        "## Architecture",
+        "## Documentation",
+        "## License",
+    ),
+    "README.zh-CN.md": (
+        "# harness-ai-kit",
+        "## 为什么需要它",
+        "## REMIX 方法论",
+        "## 不锁定内容",
+        "## 快速开始",
+        "## 团队协作",
+        "## 架构",
+        "## 文档入口",
+        "## 许可证",
+    ),
+}
 
 
 def is_ignored_path(path: Path, root: Path) -> bool:
@@ -145,6 +169,23 @@ def package_versions(repo_root: Path, package: dict[str, Any]) -> tuple[dict[str
     return values, errors
 
 
+def core_public_documentation_errors(repo_root: Path) -> list[str]:
+    """Reject a staging projection that keeps filenames but loses product documentation."""
+    errors: list[str] = []
+    for relative_path, required_markers in CORE_PUBLIC_README_MARKERS.items():
+        path = repo_root / relative_path
+        if not path.is_file():
+            continue
+        contents = path.read_text(encoding="utf-8")
+        missing_markers = [marker for marker in required_markers if marker not in contents]
+        if missing_markers:
+            errors.append(
+                f"harness-ai-kit documentation contract missing sections in {relative_path}: "
+                + ", ".join(missing_markers)
+            )
+    return errors
+
+
 def validate_matrix(repo_root: Path, matrix: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     public = matrix.get("public")
@@ -207,6 +248,7 @@ def validate_matrix(repo_root: Path, matrix: dict[str, Any]) -> list[str]:
                         "harness-ai-kit included_paths must not include staging snapshot metadata: "
                         + ", ".join(recursive_snapshot_inputs)
                     )
+                errors.extend(core_public_documentation_errors(repo_root))
         if item.get("ci"):
             if not isinstance(item.get("test_command"), str):
                 errors.append(f"ci package is missing test_command: {package_id}")
@@ -324,6 +366,62 @@ def public_pip_environment() -> dict[str, str]:
     environment["PIP_DISABLE_PIP_VERSION_CHECK"] = "1"
     environment["PYTHONUTF8"] = "1"
     return environment
+
+
+def source_test_install_command(python: Path, repo_root: Path, source_root: Path) -> list[str]:
+    """Build the public-only dependency install for a source-test environment."""
+    editable_sources = [repo_root]
+    if source_root != repo_root:
+        editable_sources.append(source_root)
+    command = [
+        str(python),
+        "-m",
+        "pip",
+        "install",
+        "--disable-pip-version-check",
+        "--no-input",
+        "--index-url",
+        PUBLIC_PYPI_SIMPLE_URL,
+        "pytest",
+    ]
+    for source in editable_sources:
+        command.extend(("-e", str(source)))
+    return command
+
+
+def run_isolated_source_test(
+    command: str,
+    repo_root: Path,
+    source_root: Path,
+    package_id: str,
+) -> tuple[bool, int]:
+    """Run source tests with only declared public dependencies available.
+
+    A checkout can satisfy imports from a maintainer's global environment. The
+    release gate deliberately avoids that so source tests and wheel smoke tests
+    exercise the same public dependency boundary.
+    """
+    with tempfile.TemporaryDirectory(prefix=f"public-source-test-{package_id}-") as temp_dir:
+        venv_root = Path(temp_dir) / "venv"
+        environment = public_pip_environment()
+        created = subprocess.run(
+            [sys.executable, "-m", "venv", str(venv_root)],
+            cwd=source_root,
+            env=environment,
+            check=False,
+        )
+        if created.returncode:
+            return False, created.returncode
+        python = venv_executable(venv_root, "python")
+        installed = subprocess.run(
+            source_test_install_command(python, repo_root, source_root),
+            cwd=source_root,
+            env=environment,
+            check=False,
+        )
+        if installed.returncode:
+            return False, installed.returncode
+        return run_command(command, source_root, python_executable=python, environment=environment)
 
 
 def run_isolated_wheel_smoke(
@@ -573,7 +671,12 @@ def gate(
             errors.extend(f"{package['id']}: {error}" for error in version_errors)
         command = package.get("test_command")
         if isinstance(command, str):
-            success, returncode = run_command(command, source_root)
+            success, returncode = run_isolated_source_test(
+                command,
+                repo_root,
+                source_root,
+                str(package["id"]),
+            )
             result["test_returncode"] = returncode
             if not success:
                 result["status"] = "failed"
