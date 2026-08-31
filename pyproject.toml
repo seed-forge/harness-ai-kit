@@ -19,7 +19,7 @@ dependencies = [
   "platformdirs>=4.3.6",
   "pydantic>=2.9.2",
   "PyYAML>=6.0.2",
-  "resolvelib>=0.5.3"
+  "resolvelib>=1.2.1"
 ]
 
 [project.scripts]
