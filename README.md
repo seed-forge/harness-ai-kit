@@ -135,7 +135,7 @@ deployment topology do not belong in the published tree.
   adapter. See [dsh integration](docs/dsh-integration.md).
 
 The [usage scenarios](docs/usage-scenarios.md) explain when to use a Skill,
-when a loop is appropriate, and how a spec-driven workflow can route both.
+when a loop is appropriate, and how a spec-driven workflow can route both. For upstream spec discovery, [MySpec](https://myspec.dev) compiles guided developer interviews into 4-file specification bundles with MCP server integration.
 
 ## Roadmap
 
